@@ -10,25 +10,24 @@
 
 ## ✨ 特性
 
--   🎯 多平台覆盖，支持 微信小程序、支付宝小程序、H5、App.
+-   🎯 面向 App 端（Android / iOS）设计，已针对 App 端完成适配与验证.
 -   🚀 90+ 个高质量组件，覆盖移动端主流场景.
 -   📖 提供丰富的文档和组件示例.
 -   🎨 支持全局主题色与字号缩放配置（setThemeColor / setFontScale）.
 
 ## 📱 预览
 
-扫描二维码访问演示，注意：因微信审核机制限制，当前的微信小程序示例可能不是最新版本，可以 clone 代码到本地预览。
-
-<p style="display:flex;gap:24px">
-<img src="https://image.whzb.com/chain/StellarUI/%E5%BE%AE%E4%BF%A1.jpg" width="200" height="200"/>
-<img src="https://image.whzb.com/chain/StellarUI/%E6%94%AF%E4%BB%98%E5%AE%9D.png" width="200" height="200" />
-</p>
+组件库目前仅针对 App 端完成适配与验证。请在 uni-app x 编译环境中将演示工程运行到 App 端，浏览各组件示例；也可通过 [文档网站](https://stellar-ui.intecloud.com.cn/?projectName=stellar-ui-uvue) 查看组件说明与示例。Web 端仅用于文档展示，不作为组件库的平台兼容性承诺。
 
 ## 平台支持
 
-| App | H5应用 | 微信小程序 | 支付宝小程序 | 百度小程序 | 字节小程序 | QQ小程序 |
-| :-: | :----: | :--------: | :----------: | :--------: | :--------: | :------: |
-| √ | √ | √ | √ | × | × | × |
+| 平台 | 状态 |
+| --- | --- |
+| App（Android / iOS） | ✅ 已完成适配与验证 |
+| H5 / Web | ❌ 未做兼容性验证 |
+| 微信小程序 / 支付宝小程序 / 其他小程序 | ❌ 未做兼容性验证 |
+
+> 演示工程可以编译为 Web 静态站点，用于文档站展示与示例预览；这不等同于组件库对 Web 端提供兼容支持。
 
 ## 安装与使用
 
@@ -113,23 +112,17 @@ import SteButton from 'stellar-ui-uvue/components/ste-button/ste-button.uvue'
 
 `ste-icon`、`ste-rate`、`ste-input` 等组件共用一套图标字体，由组件库内置的统一加载器从 CDN 加载（全库仅加载一次），**业务项目无需放置任何字体文件**。
 
-> 字体从 `https://at.alicdn.com/t/c/font_4457057_74vgslmjyas.ttf` 加载，运行时需要网络；微信小程序还需在后台配置 `downloadFile` 合法域名。
+> 字体从 `https://at.alicdn.com/t/c/font_4457057_74vgslmjyas.ttf` 加载，App 端运行时需要网络。
 
 字体族名常量 `ICON_FONT_FAMILY`、幂等加载函数 `ensureIconFont()` 与状态查询 `getIconFontSource()` 从 `stellar-ui-uvue/components/ste-icon/iconfont.uts` 导出；`getIconFontSource()` 返回实际命中的来源，为空串表示尚未加载成功，可用于排查图标不显示的问题。
 
 请勿在业务代码里另行调用 `uni.loadFontFace` 加载同一字体：并发加载同一来源会触发 `errCode 300001 same source task is loading`，导致两处都失败。
 
-### 多端说明
+### 平台适配说明
 
-图标字体由 `uni.loadFontFace` 从 CDN 加载，各平台注意事项：
+组件库目前仅针对 App 端（Android / iOS）完成适配与验证。H5 / Web、微信小程序及其他小程序端均未做兼容性验证，暂不提供可用性承诺。
 
-| 平台 | 说明 |
-| --- | --- |
-| App（Android / iOS） | 直接可用，运行时需可访问网络 |
-| H5 / Web | 直接可用，字体 CDN 已返回 `Access-Control-Allow-Origin: *`，无跨域限制 |
-| 微信小程序 | 小程序**只支持加载网络字体**，与本库的远程方案一致；需在小程序管理后台把 `https://at.alicdn.com` 加入 `downloadFile` 合法域名。开发阶段可在 `manifest.json` 设置 `mp-weixin.setting.urlCheck: false` 跳过域名校验 |
-
-微信小程序如需字体在所有页面全局生效，DCloud 文档要求带 `global: true` 的调用位于 `app.uvue`；组件内的调用至少保证当前页面可用。`ste-image` 与 `ste-media-preview` 的微信小程序长按菜单属性已按 `MP-WEIXIN` 条件编译隔离，App / H5 端不会渲染该属性。
+图标字体由 `uni.loadFontFace` 从远程 CDN 加载，App 端运行时需可访问网络。源码中少量平台专属能力仍保留条件编译隔离（例如 `ste-image` 与 `ste-media-preview` 的长按菜单属性），这些分支未在 App 之外的平台验证；各组件文档中出现的平台差异说明属于源码实现说明，不构成平台兼容性承诺。
 
 详细说明见 [文档站](https://stellar-ui.intecloud.com.cn/?projectName=stellar-ui-uvue)。
 
