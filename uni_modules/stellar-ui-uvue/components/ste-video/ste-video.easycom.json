@@ -1,0 +1,243 @@
+{
+    "name": "ste-video",
+    "description": "Video 视频组件，基于原生 Video 进行增强封装，提供自定义控制栏、多清晰度无缝切换、多倍速播放、全屏/退出全屏手势联动及静音控制。(UTS/UVUE)。",
+    "example": "<ste-video src=\"https://example.com/video.mp4\" title=\"视频标题\" />",
+    "tutorial": "https://stellar-ui.intecloud.com.cn/?projectName=stellar-ui-uvue&menu=%E7%BB%84%E4%BB%B6&active=ste-video",
+    "attributes": [
+        {
+            "name": "title",
+            "description": "视频标题，全屏播放时在顶部标题栏中展示",
+            "type": "string",
+            "default": ""
+        },
+        {
+            "name": "autoHeight",
+            "description": "是否视频高度跟随父容器高度（自适应）",
+            "type": "boolean",
+            "default": false
+        },
+        {
+            "name": "resolution",
+            "description": "多清晰度播放源列表，类型为强类型 VideoResolution[]（每项含 text 与 url）；配置后全屏下可选择清晰度无缝切换",
+            "type": "VideoResolution[]",
+            "default": []
+        },
+        {
+            "name": "src",
+            "description": "默认要播放的视频网络资源地址",
+            "type": "string",
+            "default": ""
+        },
+        {
+            "name": "autoplay",
+            "description": "是否自动开始播放",
+            "type": "boolean",
+            "default": false
+        },
+        {
+            "name": "loop",
+            "description": "是否循环播放",
+            "type": "boolean",
+            "default": false
+        },
+        {
+            "name": "muted",
+            "description": "是否静音播放",
+            "type": "boolean",
+            "default": false
+        },
+        {
+            "name": "initialTime",
+            "description": "指定视频初始播放位置，单位为秒（s）",
+            "type": "number",
+            "default": 0
+        },
+        {
+            "name": "duration",
+            "description": "指定视频总时长，单位为秒（s）",
+            "type": "number",
+            "default": 0
+        },
+        {
+            "name": "pageGesture",
+            "description": "在非全屏模式下，是否开启亮度与音量调节手势",
+            "type": "boolean",
+            "default": false
+        },
+        {
+            "name": "direction",
+            "description": "设置全屏时视频的方向（0: 正常竖向, 90: 逆时针90度, -90: 顺时针90度）",
+            "type": "number",
+            "default": 0
+        },
+        {
+            "name": "showFullscreenBtn",
+            "description": "是否在底部控制栏显示全屏切换按钮",
+            "type": "boolean",
+            "default": true
+        },
+        {
+            "name": "showPlayBtn",
+            "description": "是否在底部控制栏显示播放/暂停按钮",
+            "type": "boolean",
+            "default": true
+        },
+        {
+            "name": "enableProgressGesture",
+            "description": "是否开启滑动控制进度的手势",
+            "type": "boolean",
+            "default": true
+        },
+        {
+            "name": "objectFit",
+            "description": "当视频大小与 video 容器大小不一致时视频的表现形式",
+            "type": "string",
+            "default": "contain",
+            "values": [
+                {
+                    "name": "contain",
+                    "description": "包含（保持宽高比缩放至全部可见）"
+                },
+                {
+                    "name": "fill",
+                    "description": "填充（拉伸填满容器）"
+                },
+                {
+                    "name": "cover",
+                    "description": "覆盖（保持宽高比缩放并裁剪溢出部分）"
+                }
+            ]
+        },
+        {
+            "name": "poster",
+            "description": "视频封面的图片网络资源地址",
+            "type": "string",
+            "default": ""
+        },
+        {
+            "name": "codec",
+            "description": "解码器选择",
+            "type": "string",
+            "default": "hardware",
+            "values": [
+                {
+                    "name": "hardware",
+                    "description": "硬件解码（算力高、更清晰）"
+                },
+                {
+                    "name": "software",
+                    "description": "软件解码"
+                }
+            ]
+        },
+        {
+            "name": "httpCache",
+            "description": "是否对 http/https 视频源开启本地缓存",
+            "type": "boolean",
+            "default": true
+        },
+        {
+            "name": "playStrategy",
+            "description": "播放策略（0: 普通模式, 1: 平滑播放模式, 2: M3U8优化模式）",
+            "type": "number",
+            "default": 0
+        },
+        {
+            "name": "isLive",
+            "description": "是否为直播流媒体源",
+            "type": "boolean",
+            "default": false
+        },
+        {
+            "name": "[event]play",
+            "description": "开始/继续播放时触发"
+        },
+        {
+            "name": "[event]pause",
+            "description": "暂停播放时触发"
+        },
+        {
+            "name": "[event]ended",
+            "description": "播放至视频末尾时触发"
+        },
+        {
+            "name": "[event]timeupdate",
+            "description": "播放进度变化时触发，detail = {currentTime, duration}"
+        },
+        {
+            "name": "[event]fullscreenchange",
+            "description": "视频进入/退出全屏时触发，detail = {fullScreen, direction}"
+        },
+        {
+            "name": "[event]waiting",
+            "description": "视频出现缓冲等待时触发"
+        },
+        {
+            "name": "[event]error",
+            "description": "视频播放出错时触发"
+        },
+        {
+            "name": "[event]progress",
+            "description": "视频加载进度变化时触发"
+        },
+        {
+            "name": "[event]loadedmetadata",
+            "description": "视频元数据（宽高、时长等）加载完毕时触发"
+        },
+        {
+            "name": "[event]controlstoggle",
+            "description": "控制栏显隐状态切换时触发",
+            "params": [
+                {
+                    "name": "show",
+                    "type": "boolean",
+                    "description": "当前控制栏是否展示"
+                }
+            ]
+        },
+        {
+            "name": "[method]play",
+            "description": "命令式开始播放视频",
+            "returnValue": "void"
+        },
+        {
+            "name": "[method]pause",
+            "description": "命令式暂停视频播放",
+            "returnValue": "void"
+        },
+        {
+            "name": "[method]seek",
+            "description": "命令式跳转到指定秒数位置播放",
+            "params": [
+                {
+                    "name": "position",
+                    "type": "number",
+                    "description": "跳转的目标时间秒数（s）"
+                }
+            ],
+            "returnValue": "void"
+        },
+        {
+            "name": "[method]requestFullScreen",
+            "description": "命令式进入全屏播放",
+            "returnValue": "void"
+        },
+        {
+            "name": "[method]exitFullScreen",
+            "description": "命令式退出全屏播放",
+            "returnValue": "void"
+        },
+        {
+            "name": "[method]playbackRate",
+            "description": "命令式设置视频倍速播放",
+            "params": [
+                {
+                    "name": "rate",
+                    "type": "number",
+                    "description": "倍速数值（如 0.5、1.0、1.25、1.5）"
+                }
+            ],
+            "returnValue": "void"
+        }
+    ]
+}

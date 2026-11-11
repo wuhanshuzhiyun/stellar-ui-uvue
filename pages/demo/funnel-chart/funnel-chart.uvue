@@ -1,0 +1,134 @@
+<template>
+	<scroll-view direction="vertical" class="page">
+		<!-- 页面头部说明 -->
+		<view class="header">
+			<text class="title">FunnelChart 漏斗图</text>
+			<text class="desc">采用梯度梯形截面由上至下层层递减，直观呈现业务转化率与流失环节。</text>
+		</view>
+
+		<!-- 1. 基础电商转化漏斗 -->
+		<view class="section">
+			<text class="section-title">1. 电商交易转化漏斗</text>
+			<text class="section-desc">展现从首页曝光到最终支付各环节的流失与转化</text>
+			<view class="chart-card">
+				<ste-funnel-chart :series="series1" height="420" />
+			</view>
+		</view>
+
+		<!-- 2. 招聘转化漏斗 -->
+		<view class="section">
+			<text class="section-title">2. 人才招聘流转漏斗</text>
+			<text class="section-desc">各阶段梯度梯形，内置每层名称与数值居中标注</text>
+			<view class="chart-card">
+				<ste-funnel-chart :series="series2" height="420" />
+			</view>
+		</view>
+
+		<!-- 3. 动态刷新 -->
+		<view class="section">
+			<text class="section-title">3. 动态数据与入场动画</text>
+			<text class="section-desc">点击按钮更新漏斗数据，梯形截面平滑展开</text>
+			<view class="chart-card">
+				<ste-funnel-chart :series="dynamicSeries" height="420" />
+			</view>
+			<view class="btn-box">
+				<button class="action-btn" size="mini" @click="randomizeData">随机更新漏斗</button>
+			</view>
+		</view>
+	</scroll-view>
+</template>
+
+<script setup lang="uts">
+/**
+ * @file funnel-chart.uvue
+ * @description FunnelChart 漏斗图全功能交互式 Demo
+ */
+
+const series1: UTSJSONObject[] = [
+	{ name: '访问商品', value: 1000, color: '#165DFF' },
+	{ name: '加入购物车', value: 650, color: '#14C9C9' },
+	{ name: '生成订单', value: 420, color: '#F7BA1E' },
+	{ name: '完成支付', value: 280, color: '#9FDB1D' }
+];
+
+const series2: UTSJSONObject[] = [
+	{ name: '简历初筛', value: 500, color: '#722ED1' },
+	{ name: '初试通过', value: 260, color: '#165DFF' },
+	{ name: '复试通过', value: 120, color: '#14C9C9' },
+	{ name: '发送 Offer', value: 45, color: '#9FDB1D' }
+];
+
+const dynamicSeries = ref<UTSJSONObject[]>([
+	{ name: '潜在商机', value: 800, color: '#165DFF' },
+	{ name: '需求对接', value: 500, color: '#14C9C9' },
+	{ name: '合同拟定', value: 300, color: '#F7BA1E' },
+	{ name: '正式签约', value: 180, color: '#9FDB1D' }
+]);
+
+function randomizeData() {
+	const step1 = Math.floor(Math.random() * 400) + 700;
+	const step2 = Math.floor(step1 * 0.65);
+	const step3 = Math.floor(step2 * 0.6);
+	const step4 = Math.floor(step3 * 0.6);
+
+	dynamicSeries.value = [
+		{ name: '潜在商机', value: step1, color: '#165DFF' },
+		{ name: '需求对接', value: step2, color: '#14C9C9' },
+		{ name: '合同拟定', value: step3, color: '#F7BA1E' },
+		{ name: '正式签约', value: step4, color: '#9FDB1D' }
+	];
+}
+</script>
+
+<style>
+.page {
+	padding: 24rpx;
+	background-color: #f7f8fa;
+	flex: 1;
+}
+.header {
+	margin-bottom: 28rpx;
+}
+.title {
+	font-size: 38rpx;
+	font-weight: bold;
+	color: #1f2329;
+}
+.desc {
+	font-size: 26rpx;
+	color: #646a73;
+	margin-top: 10rpx;
+	line-height: 38rpx;
+}
+.section {
+	margin-bottom: 32rpx;
+}
+.section-title {
+	font-size: 30rpx;
+	font-weight: bold;
+	color: #1f2329;
+}
+.section-desc {
+	font-size: 24rpx;
+	color: #8f959e;
+	margin-top: 6rpx;
+	margin-bottom: 14rpx;
+}
+.chart-card {
+	background-color: #ffffff;
+	border-radius: 16rpx;
+	padding: 16rpx;
+	box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
+}
+.btn-box {
+	margin-top: 16rpx;
+	flex-direction: row;
+	justify-content: center;
+}
+.action-btn {
+	background-color: #165dff;
+	color: #ffffff;
+	border-radius: 8rpx;
+	font-size: 26rpx;
+}
+</style>

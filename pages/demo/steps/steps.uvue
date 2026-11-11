@@ -1,0 +1,177 @@
+<template>
+	<scroll-view direction="vertical" class="page">
+		<!-- 顶部标题 -->
+		<view class="header">
+			<text class="title">Steps 步骤条</text>
+			<text class="desc">拆分展示某项流程的步骤，引导用户按流程完成任务或向用户展示当前状态。</text>
+		</view>
+
+		<!-- 1. 基础用法与步骤切换 -->
+		<view class="section">
+			<text class="section-title">1. 基础横向步骤条 (可点击或按钮切换)</text>
+			<view class="demo-card">
+				<ste-steps :active="active1" @clickStep="onStepClick">
+					<ste-step title="第一步"></ste-step>
+					<ste-step title="第二步"></ste-step>
+					<ste-step title="第三步"></ste-step>
+					<ste-step title="第四步"></ste-step>
+				</ste-steps>
+				<view class="btn-row">
+					<ste-button :disabled="active1 <= 0" @click="onPrev1">上一步</ste-button>
+					<ste-button :disabled="active1 >= 3" style="margin-left: 20rpx;" @click="onNext1">下一步</ste-button>
+				</view>
+			</view>
+		</view>
+
+		<!-- 2. 带描述信息的步骤条 -->
+		<view class="section">
+			<text class="section-title">2. 设置详细描述信息</text>
+			<view class="demo-card">
+				<ste-steps :active="1">
+					<ste-step title="注册账号" description="填写手机号"></ste-step>
+					<ste-step title="实名认证" description="上传身份材料"></ste-step>
+					<ste-step title="审核通过" description="开启全部权限"></ste-step>
+				</ste-steps>
+			</view>
+		</view>
+
+		<!-- 3. 点状步骤条 -->
+		<view class="section">
+			<text class="section-title">3. 点状步骤条 (dot=true)</text>
+			<view class="demo-card">
+				<ste-steps :active="1" :dot="true">
+					<ste-step title="待支付"></ste-step>
+					<ste-step title="待发货"></ste-step>
+					<ste-step title="待收货"></ste-step>
+					<ste-step title="已完成"></ste-step>
+				</ste-steps>
+			</view>
+		</view>
+
+		<!-- 4. 自定义图标与错误状态 -->
+		<view class="section">
+			<text class="section-title">4. 错误状态与自定义图标</text>
+			<view class="demo-card">
+				<ste-steps :active="1">
+					<ste-step title="提交申请" status="finished"></ste-step>
+					<ste-step title="资质审核" status="error" description="资料不合规"></ste-step>
+					<ste-step title="签约放款" icon="&#xe6a2;"></ste-step>
+				</ste-steps>
+			</view>
+		</view>
+
+		<!-- 5. 纵向垂直步骤条 -->
+		<view class="section">
+			<text class="section-title">5. 纵向垂直步骤条 (direction="column")</text>
+			<view class="demo-card">
+				<ste-steps :active="1" direction="column">
+					<ste-step title="包裹已发货" description="2026-08-26 09:00 快递员已揽件"></ste-step>
+					<ste-step title="运输途中" description="2026-08-26 12:30 抵达杭州分拨中心"></ste-step>
+					<ste-step title="派送中" description="快递员正在为您派件"></ste-step>
+					<ste-step title="已签收" description="包裹已存放至自提柜"></ste-step>
+				</ste-steps>
+			</view>
+		</view>
+
+		<!-- 6. 纵向点状步骤条 -->
+		<view class="section">
+			<text class="section-title">6. 纵向点状步骤条</text>
+			<view class="demo-card">
+				<ste-steps :active="2" :dot="true" direction="column">
+					<ste-step title="需求评审通过" description="2026-08-20"></ste-step>
+					<ste-step title="研发编码完成" description="2026-08-23"></ste-step>
+					<ste-step title="联调测试进行中" description="2026-08-25"></ste-step>
+					<ste-step title="正式发布上线" description="预计明天"></ste-step>
+				</ste-steps>
+			</view>
+		</view>
+
+		<!-- 底部留白 -->
+		<view class="footer-space"></view>
+	</scroll-view>
+</template>
+
+<script setup lang="uts">
+	/**
+	 * @file steps.uvue
+	 * @description Steps 步骤条全场景交互式演示 Demo
+	 */
+	import { ref } from 'vue'
+
+	const active1 = ref(1)
+
+	function onStepClick(index: number) {
+		// index 从 1 开始，对应 active = index - 1
+		active1.value = index - 1
+		uni.showToast({
+			title: '切换至第 ' + index.toString() + ' 步',
+			icon: 'none',
+		})
+	}
+
+	function onPrev1() {
+		if (active1.value > 0) {
+			active1.value--
+		}
+	}
+
+	function onNext1() {
+		if (active1.value < 3) {
+			active1.value++
+		}
+	}
+</script>
+
+<style>
+.page {
+	padding: 24rpx;
+	background-color: #f7f8fa;
+	flex: 1;
+}
+
+.header {
+	margin-bottom: 30rpx;
+}
+
+.title {
+	font-size: 38rpx;
+	font-weight: bold;
+	color: #1f2329;
+}
+
+.desc {
+	font-size: 26rpx;
+	color: #8f959e;
+	margin-top: 10rpx;
+	line-height: 1.5;
+}
+
+.section {
+	margin-bottom: 36rpx;
+}
+
+.section-title {
+	font-size: 30rpx;
+	font-weight: bold;
+	color: #1f2329;
+	margin-bottom: 16rpx;
+}
+
+.demo-card {
+	padding: 32rpx 24rpx;
+	background-color: #ffffff;
+	border-radius: 16rpx;
+	box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.03);
+}
+
+.btn-row {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	margin-top: 36rpx;
+}
+
+.footer-space {
+	height: 80rpx;
+}
+</style>

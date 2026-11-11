@@ -1,0 +1,242 @@
+<template>
+	<scroll-view direction="vertical" class="page">
+		<view class="header">
+			<text class="title">Drag Sort 拖拽排序</text>
+		</view>
+
+		<view class="section">
+			<text class="section-title">基础排序（长按拖拽）</text>
+			<ste-drag-sort :modelValue="list1" @change="onChange1">
+				<template #item="{ item, index }">
+					<view class="sort-item">
+						<text class="sort-item-text">{{ getText(item!) }}</text>
+					</view>
+				</template>
+			</ste-drag-sort>
+		</view>
+
+		<view class="section">
+			<text class="section-title">直接拖拽（无需长按）</text>
+			<ste-drag-sort :modelValue="list2" :longPress="false" @change="onChange2">
+				<template #item="{ item, index }">
+					<view class="sort-item sort-item-blue">
+						<text class="sort-item-text">{{ getText(item!) }}</text>
+					</view>
+				</template>
+			</ste-drag-sort>
+		</view>
+
+		<view class="section">
+			<text class="section-title">禁用排序</text>
+			<ste-drag-sort :modelValue="list3" disabled>
+				<template #item="{ item, index }">
+					<view class="sort-item sort-item-gray">
+						<text class="sort-item-text">{{ getText(item!) }}</text>
+					</view>
+				</template>
+			</ste-drag-sort>
+		</view>
+
+		<view class="section">
+			<text class="section-title">包含禁用项</text>
+			<ste-drag-sort :modelValue="list4" @change="onChange4">
+				<template #item="{ item, index }">
+					<view class="sort-item" :class="{ 'sort-item-disabled': isDisabled(item!) }">
+						<text class="sort-item-text">{{ getText(item!) }}</text>
+					</view>
+				</template>
+			</ste-drag-sort>
+		</view>
+
+		<view class="section">
+			<text class="section-title">多列排序（3列）</text>
+			<ste-drag-sort :modelValue="list5" :columns="3" @change="onChange5">
+				<template #item="{ item, index }">
+					<view class="grid-item">
+						<text class="grid-item-text">{{ getText(item!) }}</text>
+					</view>
+				</template>
+			</ste-drag-sort>
+		</view>
+
+		<view class="section">
+			<text class="section-title">事件回调</text>
+			<ste-drag-sort :modelValue="list6" @start="onStart" @end="onEnd" @change="onChange6">
+				<template #item="{ item, index }">
+					<view class="sort-item sort-item-green">
+						<text class="sort-item-text">{{ getText(item!) }}</text>
+					</view>
+				</template>
+			</ste-drag-sort>
+			<text v-if="eventLog != ''" class="event-log">{{ eventLog }}</text>
+		</view>
+	</scroll-view>
+</template>
+
+<script setup lang="uts">
+	import { ref } from 'vue'
+
+	// #ifdef APP-ANDROID || APP-IOS
+	function getText(item : Any) : string {
+	// #endif
+	// #ifndef APP-ANDROID || APP-IOS
+	function getText(item : any) : string {
+	// #endif
+		const obj = item as UTSJSONObject
+		const t = obj['text']
+		return t != null ? t as string : ''
+	}
+
+	// #ifdef APP-ANDROID || APP-IOS
+	function isDisabled(item : Any) : boolean {
+	// #endif
+	// #ifndef APP-ANDROID || APP-IOS
+	function isDisabled(item : any) : boolean {
+	// #endif
+		const obj = item as UTSJSONObject
+		return obj['disabled'] == true
+	}
+
+	function makeItem(text : string) : UTSJSONObject {
+		const obj : UTSJSONObject = {}
+		obj['text'] = text
+		return obj
+	}
+
+	function makeDisabledItem(text : string) : UTSJSONObject {
+		const obj : UTSJSONObject = {}
+		obj['text'] = text
+		obj['disabled'] = true
+		return obj
+	}
+
+	const list1 = ref<UTSJSONObject[]>([
+		makeItem('项目 A'), makeItem('项目 B'), makeItem('项目 C'), makeItem('项目 D')
+	])
+	const list2 = ref<UTSJSONObject[]>([
+		makeItem('选项 1'), makeItem('选项 2'), makeItem('选项 3')
+	])
+	const list3 = ref<UTSJSONObject[]>([
+		makeItem('固定 1'), makeItem('固定 2'), makeItem('固定 3')
+	])
+	const list4 = ref<UTSJSONObject[]>([
+		makeItem('可拖 1'), makeDisabledItem('禁用项'), makeItem('可拖 2'), makeDisabledItem('禁用项'), makeItem('可拖 3')
+	])
+	const list5 = ref<UTSJSONObject[]>([
+		makeItem('1'), makeItem('2'), makeItem('3'),
+		makeItem('4'), makeItem('5'), makeItem('6'),
+		makeItem('7'), makeItem('8'), makeItem('9')
+	])
+	const list6 = ref<UTSJSONObject[]>([
+		makeItem('监听 1'), makeItem('监听 2'), makeItem('监听 3')
+	])
+
+	const eventLog = ref('')
+
+	function onChange1(val : UTSJSONObject[]) {
+		list1.value = val
+	}
+	function onChange2(val : UTSJSONObject[]) {
+		list2.value = val
+	}
+	function onChange4(val : UTSJSONObject[]) {
+		list4.value = val
+	}
+	function onChange5(val : UTSJSONObject[]) {
+		list5.value = val
+	}
+	function onChange6(val : UTSJSONObject[]) {
+		list6.value = val
+	}
+
+	function onStart(index : number) {
+		eventLog.value = '开始拖拽: index=' + index
+	}
+	function onEnd(index : number) {
+		eventLog.value = '结束拖拽: index=' + index
+	}
+</script>
+
+<style>
+	.page {
+		padding: 20rpx;
+		background-color: #f5f5f5;
+		flex: 1
+	}
+
+	.header {
+		margin-bottom: 30rpx;
+	}
+
+	.title {
+		font-size: 36rpx;
+		font-weight: bold;
+	}
+
+	.section {
+		margin-bottom: 40rpx;
+		background-color: #ffffff;
+		border-radius: 12rpx;
+		padding: 20rpx;
+	}
+
+	.section-title {
+		font-size: 28rpx;
+		color: #666666;
+		margin-bottom: 20rpx;
+	}
+
+	.sort-item {
+		background-color: #0090ff;
+		border-radius: 8rpx;
+		padding-top: 20rpx;
+		padding-bottom: 20rpx;
+		padding-left: 24rpx;
+		padding-right: 24rpx;
+		margin-bottom: 12rpx;
+	}
+
+	.sort-item-blue {
+		background-color: #07c160;
+	}
+
+	.sort-item-gray {
+		background-color: #cccccc;
+	}
+
+	.sort-item-green {
+		background-color: #07c160;
+	}
+
+	.sort-item-disabled {
+		opacity: 0.5;
+	}
+
+	.sort-item-text {
+		color: #ffffff;
+		font-size: 28rpx;
+	}
+
+	.grid-item {
+		background-color: #0090ff;
+		border-radius: 8rpx;
+		padding-top: 30rpx;
+		padding-bottom: 30rpx;
+		margin: 6rpx;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.grid-item-text {
+		color: #ffffff;
+		font-size: 32rpx;
+		font-weight: bold;
+	}
+
+	.event-log {
+		font-size: 24rpx;
+		color: #999999;
+		margin-top: 16rpx;
+	}
+</style>

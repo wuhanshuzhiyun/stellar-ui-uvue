@@ -1,0 +1,129 @@
+{
+    "name": "ste-swiper",
+    "description": "Swiper 轮播组件，基于原生高性能引擎封装，支持双向绑定、水平/垂直方向、首尾无缝循环及长胶囊指示器，专用于 uni-app x (UTS/UVUE)",
+    "example": "<ste-swiper v-model:current=\"current\" :autoplay=\"true\" :indicatorDots=\"true\"><ste-swiper-item>滑块1</ste-swiper-item></ste-swiper>",
+    "tutorial": "https://stellar-ui.intecloud.com.cn/?projectName=stellar-ui-uvue&menu=%E7%BB%84%E4%BB%B6&active=ste-swiper",
+    "attributes": [
+        {
+            "name": "current",
+            "description": "当前显示滑块的 index，支持 v-model:current 双向绑定",
+            "type": "number",
+            "default": 0
+        },
+        {
+            "name": "direction",
+            "description": "滑动方向",
+            "type": "string",
+            "default": "horizontal",
+            "values": [
+                {
+                    "name": "horizontal",
+                    "description": "水平滑动(默认)"
+                },
+                {
+                    "name": "vertical",
+                    "description": "垂直滑动"
+                }
+            ]
+        },
+        {
+            "name": "disabled",
+            "description": "是否禁用手势滑动",
+            "type": "boolean",
+            "default": false
+        },
+        {
+            "name": "width",
+            "description": "宽度，支持 rpx、px 或百分比",
+            "type": "number | string",
+            "default": "100%"
+        },
+        {
+            "name": "height",
+            "description": "高度，支持 rpx、px 或百分比",
+            "type": "number | string",
+            "default": "100%"
+        },
+        {
+            "name": "duration",
+            "description": "滑块切换动画时长，单位 ms",
+            "type": "number",
+            "default": 300
+        },
+        {
+            "name": "swipeThreshold",
+            "description": "滑动灵敏度（保留属性，当前版本未参与实际逻辑，灵敏度由原生 swiper 决定）",
+            "type": "number",
+            "default": 0.25
+        },
+        {
+            "name": "indicatorDots",
+            "description": "是否显示面板指示点",
+            "type": "boolean",
+            "default": false
+        },
+        {
+            "name": "indicatorColor",
+            "description": "指示点未激活颜色",
+            "type": "string",
+            "default": "rgba(255, 255, 255, 0.45)"
+        },
+        {
+            "name": "indicatorActiveColor",
+            "description": "当前选中的指示点颜色",
+            "type": "string",
+            "default": "#ffffff"
+        },
+        {
+            "name": "autoplay",
+            "description": "是否自动切换",
+            "type": "boolean",
+            "default": false
+        },
+        {
+            "name": "interval",
+            "description": "自动切换时间间隔，单位 ms",
+            "type": "number",
+            "default": 3000
+        },
+        {
+            "name": "circular",
+            "description": "是否采用首尾衔接无缝滑动",
+            "type": "boolean",
+            "default": false
+        },
+        {
+            "name": "[event]change",
+            "description": "监听滑块切换",
+            "params": [
+                {
+                    "name": "index",
+                    "description": "当前激活滑块的 index"
+                },
+                {
+                    "name": "source",
+                    "description": "触发切换的来源：'touch' 手势、'autoplay' 自动轮播、'indicator' 点击指示点，原生透传时可能为空字符串"
+                }
+            ]
+        },
+        {
+            "name": "[event]update:current",
+            "description": "激活滑块下标更新时触发（用于 v-model 双向绑定）",
+            "params": [
+                {
+                    "name": "index",
+                    "description": "(index: number) => void"
+                }
+            ]
+        },
+        {
+            "name": "[method]init",
+            "description": "重新初始化轮播状态信息",
+            "params": []
+        },
+        {
+            "name": "[slot]default",
+            "description": "默认插槽，请传入 ste-swiper-item 子项列表"
+        }
+    ]
+}

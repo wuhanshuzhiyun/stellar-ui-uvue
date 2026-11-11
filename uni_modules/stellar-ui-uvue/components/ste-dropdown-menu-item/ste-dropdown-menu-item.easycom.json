@@ -1,0 +1,45 @@
+{
+    "name": "ste-dropdown-menu-item",
+    "description": "下拉菜单选项项组件，作为 ste-dropdown-menu 的子项展示。",
+    "tutorial": "https://stellar-ui.intecloud.com.cn/?projectName=stellar-ui-uvue&menu=%E7%BB%84%E4%BB%B6&active=ste-dropdown-menu",
+    "attributes": [
+        {
+            "name": "value",
+            "description": "选项绑定值",
+            "type": "string",
+            "default": ""
+        },
+        {
+            "name": "title",
+            "description": "选项展示文本",
+            "type": "string",
+            "default": ""
+        },
+        {
+            "name": "disabled",
+            "description": "是否禁用当前选项点击",
+            "type": "boolean",
+            "default": false
+        },
+        {
+            "name": "readonly",
+            "description": "是否只读（不置灰但无法点击触发变动）",
+            "type": "boolean",
+            "default": false
+        },
+        {
+            "name": "[event]click",
+            "description": "点击选项项时触发",
+            "params": [
+                {
+                    "name": "value",
+                    "description": "被点击选项的绑定值"
+                }
+            ]
+        },
+        {
+            "name": "[slot]title",
+            "description": "自定义选项标题内容插槽"
+        }
+    ]
+}

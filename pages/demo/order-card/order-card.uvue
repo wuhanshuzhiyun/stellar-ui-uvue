@@ -1,0 +1,230 @@
+<template>
+	<scroll-view scroll-y="true" class="page-container">
+		<!-- 头部导航与功能简介 -->
+		<view class="page-header">
+			<text class="page-title">OrderCard 订单卡片</text>
+			<text class="page-desc">常用于电商、餐饮及本地生活订单列表，支持单商品图文排版、多商品横向滑动展示、状态标签及细粒度按钮交互。</text>
+		</view>
+
+		<view class="demo-content">
+			<!-- 用例 1：单商品基础卡片 -->
+			<view class="demo-card">
+				<text class="card-title">1. 单商品卡片 (包含标签与详情)</text>
+				<text class="card-desc">展示店铺信息、自提标签、单商品图文排版、“详情 >”入口与主要/次要按钮。</text>
+				<view class="card-inner">
+					<ste-order-card
+						title="梅姨家常菜馆（光谷天地店）"
+						image="https://image.whzb.com/chain/StellarUI/bg1.jpg"
+						statusText="待核销"
+						tagText="门店自提"
+						helperText="有效期限至：2026-10-31"
+						:data="singleGoodsData"
+						:showDetail="true"
+						price="12800"
+						mainBtnText="去核销"
+						subBtnText="查看券码"
+						@click-header="onHeaderClick"
+						@click-item="onItemClick"
+						@click-button="onButtonClick"
+					/>
+				</view>
+			</view>
+
+			<!-- 用例 2：多商品横向滚动卡片 -->
+			<view class="demo-card">
+				<text class="card-title">2. 多商品横向排布模式 (滑动浏览)</text>
+				<text class="card-desc">当商品数据超过 1 件时自动开启横向平滑滚动，并支持开启“更多”操作项。</text>
+				<view class="card-inner">
+					<ste-order-card
+						title="星瀚精品生鲜超市（科技园旗舰店）"
+						image="https://image.whzb.com/chain/StellarUI/图片.jpg"
+						statusText="配送中"
+						tagText="即时达"
+						helperText="预计今日 18:30 送达"
+						:data="multiGoodsData"
+						:showMore="true"
+						price="26850"
+						mainBtnText="确认收货"
+						subBtnText="查看物流"
+						@click-header="onHeaderClick"
+						@click-item="onItemClick"
+						@click-button="onButtonClick"
+					/>
+				</view>
+			</view>
+
+			<!-- 用例 3：已完成历史订单与自定义配色 -->
+			<view class="demo-card">
+				<text class="card-title">3. 已完成历史订单与自定义配色</text>
+				<text class="card-desc">展示已完成订单，主按钮为“再来一单”，次按钮为“申请开票”，并支持自定义背景色。</text>
+				<view class="card-inner">
+					<ste-order-card
+						title="星巴克臻选咖啡（金融港店）"
+						image="https://image.whzb.com/chain/StellarUI/bg1.jpg"
+						statusText="已完成"
+						tagText="啡快自取"
+						helperText="订单编号：NO.202609280088"
+						:data="completedGoodsData"
+						:count="2"
+						price="7600"
+						contentBg="#f8fafc"
+						mainBtnText="再来一单"
+						mainBtnBg="#0090ff"
+						subBtnText="申请开票"
+						@click-header="onHeaderClick"
+						@click-item="onItemClick"
+						@click-button="onButtonClick"
+					/>
+				</view>
+			</view>
+
+			<!-- 操作反馈日志 -->
+			<view class="demo-card">
+				<text class="card-title">操作状态反馈</text>
+				<view class="log-box">
+					<text class="log-text">{{ logText }}</text>
+				</view>
+			</view>
+		</view>
+	</scroll-view>
+</template>
+
+<script setup lang="uts">
+	/**
+	 * @file order-card.uvue
+	 * @description OrderCard 订单卡片 - uni-app x / UTS 演示页面
+	 */
+	import { ref } from 'vue'
+	import { OrderGoods } from '@/uni_modules/stellar-ui-uvue/components/ste-order-card/props.uts'
+
+	// 操作反馈日志
+	const logText = ref('等待操作中，请点击上方订单卡片测试交互...')
+
+	// ==================== 1. 单商品演示数据 ====================
+	const singleGoodsData = ref<OrderGoods[]>([
+		{
+			image: 'https://image.whzb.com/chain/StellarUI/bg1.jpg',
+			title: '超值双人招牌甄选套餐（含汽水2瓶）',
+			subTitle: '微辣 / 大份 / 配米饭2碗 / 堂食自提通用',
+		} as OrderGoods,
+	])
+
+	// ==================== 2. 多商品横向滚动数据 ====================
+	const multiGoodsData = ref<OrderGoods[]>([
+		{
+			image: 'https://image.whzb.com/chain/StellarUI/图片.jpg',
+			title: '智利进口车厘子 1kg',
+		} as OrderGoods,
+		{
+			image: 'https://image.whzb.com/chain/StellarUI/bg1.jpg',
+			title: '挪威大西洋三文鱼柳',
+		} as OrderGoods,
+		{
+			image: 'https://image.whzb.com/chain/StellarUI/图片.jpg',
+			title: '新鲜有机特级纯牛奶',
+		} as OrderGoods,
+		{
+			image: 'https://image.whzb.com/chain/StellarUI/bg1.jpg',
+			title: '法国原装进口红酒',
+		} as OrderGoods,
+	])
+
+	// ==================== 3. 已完成订单数据 ====================
+	const completedGoodsData = ref<OrderGoods[]>([
+		{
+			image: 'https://image.whzb.com/chain/StellarUI/bg1.jpg',
+			title: '香草风味红茶拿铁 (大杯/热/燕麦奶)',
+			subTitle: '标准糖 / 堂食直饮',
+		} as OrderGoods,
+	])
+
+	// ==================== 事件交互回调 ====================
+	function onHeaderClick(type : string) {
+		logText.value = `触发【头部区域点击 (click-header)】，区域类型：${type}`
+	}
+
+	function onItemClick(type : string, item : OrderGoods) {
+		logText.value = `触发【商品项点击 (click-item)】，区域：${type}，商品：${item.title ?? ''}`
+	}
+
+	function onButtonClick(type : string) {
+		logText.value = `触发【底部按钮点击 (click-button)】，按钮类别：${type}`
+	}
+</script>
+
+<style scoped>
+	/* 页面根容器 */
+	.page-container {
+		flex: 1;
+		background-color: #f7f8fa;
+	}
+
+	/* 顶部头部说明 */
+	.page-header {
+		padding: 40rpx 32rpx 24rpx;
+		background-color: #ffffff;
+		margin-bottom: 24rpx;
+	}
+
+	.page-title {
+		font-size: 40rpx;
+		font-weight: bold;
+		color: #1a1a1a;
+		margin-bottom: 12rpx;
+	}
+
+	.page-desc {
+		font-size: 26rpx;
+		color: #8c8c8c;
+		line-height: 38rpx;
+	}
+
+	/* 演示卡片列表区 */
+	.demo-content {
+		padding: 0 24rpx 48rpx;
+	}
+
+	.demo-card {
+		background-color: #ffffff;
+		border-radius: 16rpx;
+		padding: 32rpx;
+		margin-bottom: 24rpx;
+	}
+
+	.card-title {
+		font-size: 30rpx;
+		font-weight: 600;
+		color: #333333;
+		margin-bottom: 8rpx;
+	}
+
+	.card-desc {
+		font-size: 24rpx;
+		color: #999999;
+		line-height: 34rpx;
+		margin-bottom: 20rpx;
+	}
+
+	/* 卡片底色衬托盒 */
+	.card-inner {
+		background-color: #f3f4f6;
+		border-radius: 20rpx;
+		padding: 16rpx;
+	}
+
+	/* 操作日志盒子 */
+	.log-box {
+		background-color: #f9f9f9;
+		border-radius: 8rpx;
+		padding: 20rpx;
+		border-left-width: 6rpx;
+		border-left-style: solid;
+		border-left-color: #0090ff;
+	}
+
+	.log-text {
+		font-size: 24rpx;
+		color: #555555;
+		line-height: 36rpx;
+	}
+</style>

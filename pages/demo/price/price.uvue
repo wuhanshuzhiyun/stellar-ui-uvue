@@ -1,0 +1,227 @@
+<template>
+	<scroll-view direction="vertical" class="page">
+		<!-- 页面顶部说明 -->
+		<view class="header">
+			<text class="title">Price 价格</text>
+			<text class="desc">用于电商商城、订单交易与结算清单中的价格展示组件，支持分转元、精度截断、经典排版风格与原价划线展示。</text>
+		</view>
+
+		<!-- 1. 基础用法与单位转换 -->
+		<view class="section">
+			<text class="section-title">1. 基础用法 & 金额单位 (默认分转元)</text>
+			<view class="demo-row">
+				<view class="item-block">
+					<text class="label">分单位 (9527分 -> ¥95.27)</text>
+					<ste-price :value="9527" />
+				</view>
+				<view class="item-block">
+					<text class="label">元单位 (valueUnit="yuan")</text>
+					<ste-price :value="9527" valueUnit="yuan" />
+				</view>
+			</view>
+		</view>
+
+		<!-- 2. 货币符号控制 -->
+		<view class="section">
+			<text class="section-title">2. 货币符号控制 (隐藏 / 自定义符号)</text>
+			<view class="demo-row">
+				<view class="item-block">
+					<text class="label">隐藏货币符号</text>
+					<ste-price :value="8800" :showUnit="false" />
+				</view>
+				<view class="item-block">
+					<text class="label">美元符号 ($)</text>
+					<ste-price :value="1999" unitSymbol="$" />
+				</view>
+				<view class="item-block">
+					<text class="label">欧元符号 (€)</text>
+					<ste-price :value="64800" unitSymbol="€" />
+				</view>
+			</view>
+		</view>
+
+		<!-- 3. 自定义小数精度 -->
+		<view class="section">
+			<text class="section-title">3. 小数精度 (digits: -1 / 0 / 1 / 2)</text>
+			<view class="demo-row">
+				<view class="item-block">
+					<text class="label">自动去0 (digits="-1")</text>
+					<ste-price :value="9520" :digits="-1" />
+				</view>
+				<view class="item-block">
+					<text class="label">纯整数 (digits="0")</text>
+					<ste-price :value="9527" :digits="0" />
+				</view>
+				<view class="item-block">
+					<text class="label">保留一位 (digits="1")</text>
+					<ste-price :value="9520" :digits="1" />
+				</view>
+				<view class="item-block">
+					<text class="label">保留两位 (digits="2")</text>
+					<ste-price :value="9500" :digits="2" />
+				</view>
+			</view>
+		</view>
+
+		<!-- 4. 文字尺寸与色彩 -->
+		<view class="section">
+			<text class="section-title">4. 字体尺寸与色彩 (fontSize & color)</text>
+			<view class="demo-row-v">
+				<view class="row-item">
+					<text class="label">小号尺寸 (fontSize="28")</text>
+					<ste-price :value="3900" :fontSize="28" />
+				</view>
+				<view class="row-item">
+					<text class="label">常规尺寸 (fontSize="36", 翠绿)</text>
+					<ste-price :value="12800" :fontSize="36" color="#07c160" />
+				</view>
+				<view class="row-item">
+					<text class="label">大号尺寸 (fontSize="52", 经典红)</text>
+					<ste-price :value="29900" :fontSize="52" color="#FF1E19" />
+				</view>
+				<view class="row-item">
+					<text class="label">加大尺寸 (fontSize="64", 商务深蓝)</text>
+					<ste-price :value="99900" :fontSize="64" color="#007aff" />
+				</view>
+			</view>
+		</view>
+
+		<!-- 5. 划线价原价模式 -->
+		<view class="section">
+			<text class="section-title">5. 划线价模式 (isSuggestPrice)</text>
+			<view class="demo-row">
+				<view class="item-block">
+					<text class="label">常规售价与划线原价对比</text>
+					<view class="price-combo">
+						<ste-price :value="9900" :fontSize="48" bold color="#FF1E19" />
+						<ste-price
+							:value="19900"
+							:fontSize="28"
+							:isSuggestPrice="true"
+							linePriceColor="#999999"
+							:marginLeft="16"
+						/>
+					</view>
+				</view>
+			</view>
+		</view>
+
+		<!-- 6. 三种字号排版风格 -->
+		<view class="section">
+			<text class="section-title">6. 三种排版字号形态 (styleType 1 / 2 / 3)</text>
+			<view class="demo-row-v">
+				<view class="row-item">
+					<text class="label">styleType="1" (数字统一，仅符号缩微)</text>
+					<ste-price :value="128890" :fontSize="52" :styleType="1" />
+				</view>
+				<view class="row-item">
+					<text class="label">styleType="2" (经典电商，前大后小角分缩小)</text>
+					<ste-price :value="128890" :fontSize="52" :styleType="2" />
+				</view>
+				<view class="row-item">
+					<text class="label">styleType="3" (全统一尺寸展示)</text>
+					<ste-price :value="128890" :fontSize="52" :styleType="3" />
+				</view>
+			</view>
+		</view>
+
+		<!-- 7. 加粗字重与格式化器 -->
+		<view class="section">
+			<text class="section-title">7. 加粗与自定义 Formatter</text>
+			<view class="demo-row">
+				<view class="item-block">
+					<text class="label">粗体展示 (bold="true")</text>
+					<ste-price :value="6800" :fontSize="44" :bold="true" />
+				</view>
+				<view class="item-block">
+					<text class="label">自定义 Formatter (万级转化)</text>
+					<ste-price :value="360000" :fontSize="44" :formatter="customFormatter" />
+				</view>
+			</view>
+		</view>
+	</scroll-view>
+</template>
+
+<script setup lang="uts">
+/**
+ * Price 价格展示组件 Demo 页面
+ */
+function customFormatter(val: any): string {
+	const n = parseFloat(val != null ? val.toString() : '0')
+	if (n >= 10000) {
+		const wan = (n / 10000).toFixed(1)
+		return `${wan}万`
+	}
+	return n.toString()
+}
+</script>
+
+<style>
+.page {
+	padding: 24rpx;
+	background-color: #f7f8fa;
+	flex: 1;
+}
+
+.header {
+	margin-bottom: 24rpx;
+}
+
+.title {
+	font-size: 38rpx;
+	font-weight: bold;
+	color: #1a1a1a;
+}
+
+.desc {
+	font-size: 26rpx;
+	color: #888888;
+	margin-top: 8rpx;
+	line-height: 38rpx;
+}
+
+.section {
+	margin-bottom: 30rpx;
+	background-color: #ffffff;
+	border-radius: 16rpx;
+	padding: 24rpx;
+}
+
+.section-title {
+	font-size: 28rpx;
+	font-weight: 600;
+	color: #333333;
+	margin-bottom: 20rpx;
+}
+
+.demo-row {
+	flex-direction: row;
+	flex-wrap: wrap;
+}
+
+.demo-row-v {
+	flex-direction: column;
+}
+
+.item-block {
+	margin-right: 30rpx;
+	margin-bottom: 20rpx;
+	flex-direction: column;
+}
+
+.row-item {
+	margin-bottom: 20rpx;
+	flex-direction: column;
+}
+
+.label {
+	font-size: 24rpx;
+	color: #888888;
+	margin-bottom: 8rpx;
+}
+
+.price-combo {
+	flex-direction: row;
+	align-items: flex-end;
+}
+</style>

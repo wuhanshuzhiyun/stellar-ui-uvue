@@ -1,0 +1,114 @@
+{
+    "name": "ste-media-preview",
+    "description": "媒体预览",
+    "example": "<ste-media-preview />",
+    "tutorial": "https://stellar-ui.intecloud.com.cn/?projectName=stellar-ui-uvue&menu=%E7%BB%84%E4%BB%B6&active=ste-media-preview",
+    "attributes": [
+        {
+            "name": "show",
+            "description": "是否显示",
+            "type": "boolean",
+            "default": false
+        },
+        {
+            "name": "urls",
+            "description": "预览媒体资源列表（图片/视频，音频会被自动过滤）",
+            "type": "Array<string>",
+            "default": []
+        },
+        {
+            "name": "autoplay",
+            "description": "自动轮播时长，为0不自动轮播，单位ms",
+            "type": "number",
+            "default": 0
+        },
+        {
+            "name": "loop",
+            "description": "是否前后衔接播放",
+            "type": "boolean",
+            "default": false
+        },
+        {
+            "name": "index",
+            "description": "默认展示的资源下标（原始 urls 下标），支持 v-model:index",
+            "type": "number | null",
+            "default": null
+        },
+        {
+            "name": "showIndex",
+            "description": "是否显示左下角索引",
+            "type": "boolean",
+            "default": true
+        },
+        {
+            "name": "scale",
+            "description": "是否支持双指缩放，双击恢复缩放状态",
+            "type": "boolean",
+            "default": false
+        },
+        {
+            "name": "showmenu",
+            "description": "是否开启图片长按菜单（仅微信小程序端生效）",
+            "type": "boolean",
+            "default": true
+        },
+        {
+            "name": "zIndex",
+            "description": "弹出层级",
+            "type": "number",
+            "default": 997
+        },
+        {
+            "name": "[event]beforeClose",
+            "description": "关闭前触发",
+            "params": []
+        },
+        {
+            "name": "[event]close",
+            "description": "关闭后触发",
+            "params": []
+        },
+        {
+            "name": "[event]change",
+            "description": "切换时触发",
+            "params": [
+                {
+                    "name": "index",
+                    "description": "切换后的下标"
+                }
+            ]
+        },
+        {
+            "name": "[event]longpress",
+            "description": "长按时触发",
+            "params": [
+                {
+                    "name": "index",
+                    "description": "当前下标"
+                }
+            ]
+        },
+        {
+            "name": "[slot]default",
+            "description": "默认插槽：图片底部居中展示"
+        },
+        {
+            "name": "[event]update:show",
+            "params": [
+                {
+                    "name": "value",
+                    "description": "最新显示状态"
+                }
+            ]
+        },
+        {
+            "name": "[event]update:index",
+            "params": [
+                {
+                    "name": "index",
+                    "description": "最新下标"
+                }
+            ]
+        }
+    ]
+}

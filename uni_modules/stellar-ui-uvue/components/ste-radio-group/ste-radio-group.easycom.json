@@ -1,0 +1,116 @@
+{
+    "name": "ste-radio-group",
+    "description": "单选框组容器，用于管理一组 ste-radio。基于 uni-app x (UTS/UVUE) 原生架构。",
+    "example": "<ste-radio-group v-model=\"value\"><ste-radio name=\"a\">选项A</ste-radio></ste-radio-group>",
+    "attributes": [
+        {
+            "name": "v-model",
+            "description": "当前选中值，类型为 string",
+            "type": "string"
+        },
+        {
+            "name": "direction",
+            "description": "排列方向",
+            "type": "string",
+            "default": "row",
+            "values": [
+                {
+                    "name": "row",
+                    "description": "水平排列"
+                },
+                {
+                    "name": "column",
+                    "description": "垂直排列"
+                }
+            ]
+        },
+        {
+            "name": "disabled",
+            "description": "禁用组内所有单选框",
+            "type": "boolean",
+            "default": "false"
+        },
+        {
+            "name": "readonly",
+            "description": "只读整组（不置灰）：组内任何选项都不可点击，当前值不可更改",
+            "type": "boolean",
+            "default": "false"
+        },
+        {
+            "name": "shape",
+            "description": "组内单选框形状",
+            "type": "string",
+            "default": "circle"
+        },
+        {
+            "name": "iconSize",
+            "description": "组内单选框图标大小，单位rpx",
+            "type": "number | string",
+            "default": "36"
+        },
+        {
+            "name": "checkedColor",
+            "description": "组内单选框选中颜色",
+            "type": "string",
+            "default": "主题色"
+        },
+        {
+            "name": "textPosition",
+            "description": "组内单选框文本位置",
+            "type": "string",
+            "default": "right"
+        },
+        {
+            "name": "textSize",
+            "description": "组内单选框文本大小，单位rpx",
+            "type": "number | string",
+            "default": "28"
+        },
+        {
+            "name": "textInactiveColor",
+            "description": "组内单选框未选中文本颜色",
+            "type": "string",
+            "default": "#000000"
+        },
+        {
+            "name": "textActiveColor",
+            "description": "组内单选框选中文本颜色",
+            "type": "string",
+            "default": "#000000"
+        },
+        {
+            "name": "textDisabled",
+            "description": "禁用组内单选框文本点击",
+            "type": "boolean",
+            "default": "false"
+        },
+        {
+            "name": "marginLeft",
+            "description": "组内单选框左边距，单位rpx",
+            "type": "number | string",
+            "default": "0"
+        },
+        {
+            "name": "marginRight",
+            "description": "组内单选框右边距，单位rpx",
+            "type": "number | string",
+            "default": "0"
+        },
+        {
+            "name": "columnGap",
+            "description": "组内单选框和文本间距，单位rpx",
+            "type": "number | string",
+            "default": "16"
+        },
+        {
+            "name": "[event]change",
+            "description": "当绑定值变化时触发的事件",
+            "params": [
+                {
+                    "name": "value",
+                    "description": "当前选中的值"
+                }
+            ]
+        }
+    ]
+}

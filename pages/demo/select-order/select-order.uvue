@@ -1,0 +1,256 @@
+<template>
+	<scroll-view scroll-y="true" class="page-container">
+		<!-- 头部导航与功能简介 -->
+		<view class="page-header">
+			<text class="page-title">SelectOrder 订单选择</text>
+			<text class="page-desc">常用于订单列表状态筛选、快捷流转分类，具备智能计算屏幕中线自动判断向上/向下展开定位、半透明防穿透遮罩层等特性。</text>
+		</view>
+
+		<view class="demo-content">
+			<!-- 用例 1：基础用法 -->
+			<view class="demo-card">
+				<text class="card-title">1. 基础用法 (订单状态切换)</text>
+				<text class="card-desc">默认向下展开，点击条目快速切换当前状态，点击背景遮罩可收起。</text>
+				<view class="card-inner">
+					<ste-select-order
+						v-model="status1"
+						:list="statusList1"
+						placeholder="请选择订单状态"
+						@change="onChange1"
+					/>
+				</view>
+				<view class="card-tip">
+					<text class="card-tip-text">当前选中值：{{ status1 }}</text>
+				</view>
+			</view>
+
+			<!-- 用例 2：包含禁用项 -->
+			<view class="demo-card">
+				<text class="card-title">2. 包含不可选的禁用项</text>
+				<text class="card-desc">某些状态条目设置了 disabled: true，置灰且不可点击。</text>
+				<view class="card-inner">
+					<ste-select-order
+						v-model="status2"
+						:list="statusList2"
+						placeholder="请选择售后类型"
+						@change="onChange2"
+					/>
+				</view>
+				<view class="card-tip">
+					<text class="card-tip-text">当前选中值：{{ status2 }}</text>
+				</view>
+			</view>
+
+			<!-- 用例 3：自定义字段名映射 -->
+			<view class="demo-card">
+				<text class="card-title">3. 自定义字段名映射 (labelKey / valueKey)</text>
+				<text class="card-desc">适应后端自定义字段返回（如 text / code 字段结构）。</text>
+				<view class="card-inner">
+					<ste-select-order
+						v-model="status3"
+						:list="customList"
+						labelKey="text"
+						valueKey="code"
+						placeholder="请选择履约仓"
+						@change="onChange3"
+					/>
+				</view>
+				<view class="card-tip">
+					<text class="card-tip-text">当前选中值：{{ status3 }}</text>
+				</view>
+			</view>
+
+			<!-- 用例 4：整体禁用状态 -->
+			<view class="demo-card">
+				<text class="card-title">4. 整体禁用状态</text>
+				<text class="card-desc">当 disabled 为 true 时，透明度降低且无法点击呼出下拉面板。</text>
+				<view class="card-inner">
+					<ste-select-order
+						v-model="status4"
+						:list="statusList1"
+						:disabled="true"
+						placeholder="已锁定无法更改"
+					/>
+				</view>
+			</view>
+
+			<!-- 用例 5：靠近底部的选择器（智能向上展开） -->
+			<view class="demo-card">
+				<text class="card-title">5. 智能向上展开定位</text>
+				<text class="card-desc">当组件位置处于屏幕下半区时，自动反转为向上展开，避免超出可视区。</text>
+				<view class="card-inner">
+					<ste-select-order
+						v-model="status5"
+						:list="statusList1"
+						placeholder="测试向上展开"
+						@change="onChange5"
+					/>
+				</view>
+				<view class="card-tip">
+					<text class="card-tip-text">当前选中值：{{ status5 }}</text>
+				</view>
+			</view>
+
+			<!-- 操作日志面板 -->
+			<view class="demo-card">
+				<text class="card-title">交互日志</text>
+				<view class="log-box">
+					<text class="log-text">{{ eventLog }}</text>
+				</view>
+			</view>
+		</view>
+	</scroll-view>
+</template>
+
+<script setup lang="uts">
+import { ref } from 'vue';
+
+// 基础状态用例数据
+const status1 = ref<string>('all');
+const statusList1 = ref<any[]>([
+	{ label: '全部订单', value: 'all' },
+	{ label: '待付款', value: 'unpaid' },
+	{ label: '待发货', value: 'unshipped' },
+	{ label: '待收货', value: 'shipped' },
+	{ label: '交易完成', value: 'completed' },
+	{ label: '已取消', value: 'cancelled' },
+]);
+
+// 包含禁用项用例数据
+const status2 = ref<string>('refund_only');
+const statusList2 = ref<any[]>([
+	{ label: '仅退款 (未收到货)', value: 'refund_only' },
+	{ label: '退货退款 (已收到货)', value: 'return_and_refund' },
+	{ label: '换货处理 (暂不支持跨店)', value: 'exchange', disabled: true },
+	{ label: '保价索赔 (已过保价期)', value: 'price_protect', disabled: true },
+]);
+
+// 自定义键名字段用例数据
+const status3 = ref<string>('WH_01');
+const customList = ref<any[]>([
+	{ text: '华东一号中心仓 (上海)', code: 'WH_01' },
+	{ text: '华南智能协同仓 (广州)', code: 'WH_02' },
+	{ text: '华北生鲜冷链仓 (北京)', code: 'WH_03' },
+	{ text: '西南高新配送仓 (成都)', code: 'WH_04' },
+]);
+
+// 整体禁用数据
+const status4 = ref<string>('unpaid');
+
+// 向上展开数据
+const status5 = ref<string>('completed');
+
+// 日志提示
+const eventLog = ref<string>('暂无操作交互记录，点击上方选择器体验');
+
+/**
+ * 监听用例 1 切换
+ */
+function onChange1(val: any, opt: any) {
+	eventLog.value = `[用例1 状态变更] val: ${val}, item: ${JSON.stringify(opt)}`;
+}
+
+/**
+ * 监听用例 2 切换
+ */
+function onChange2(val: any, opt: any) {
+	eventLog.value = `[用例2 售后变更] val: ${val}, item: ${JSON.stringify(opt)}`;
+}
+
+/**
+ * 监听用例 3 切换
+ */
+function onChange3(val: any, opt: any) {
+	eventLog.value = `[用例3 仓库变更] val: ${val}, item: ${JSON.stringify(opt)}`;
+}
+
+/**
+ * 监听用例 5 切换
+ */
+function onChange5(val: any, opt: any) {
+	eventLog.value = `[用例5 向上展开] val: ${val}, item: ${JSON.stringify(opt)}`;
+}
+</script>
+
+<style scoped>
+.page-container {
+	flex: 1;
+	background-color: #F7F8FA;
+	padding-left: 24rpx;
+	padding-right: 24rpx;
+	padding-top: 24rpx;
+	padding-bottom: 80rpx;
+}
+
+.page-header {
+	margin-bottom: 24rpx;
+}
+
+.page-title {
+	font-size: 38rpx;
+	font-weight: bold;
+	color: #1A1A1A;
+	margin-bottom: 12rpx;
+}
+
+.page-desc {
+	font-size: 26rpx;
+	color: #7A7A7A;
+	line-height: 38rpx;
+}
+
+.demo-content {
+	flex-direction: column;
+}
+
+.demo-card {
+	background-color: #FFFFFF;
+	border-radius: 16rpx;
+	padding: 24rpx;
+	margin-bottom: 24rpx;
+	overflow: visible;
+}
+
+.card-title {
+	font-size: 30rpx;
+	font-weight: bold;
+	color: #222222;
+	margin-bottom: 8rpx;
+}
+
+.card-desc {
+	font-size: 24rpx;
+	color: #8C8C8C;
+	line-height: 34rpx;
+	margin-bottom: 20rpx;
+}
+
+.card-inner {
+	background-color: #F8F9FB;
+	border-radius: 12rpx;
+	padding: 8rpx;
+	overflow: visible;
+}
+
+.card-tip {
+	margin-top: 14rpx;
+}
+
+.card-tip-text {
+	font-size: 24rpx;
+	color: #0090FF;
+}
+
+.log-box {
+	background-color: #1E1E1E;
+	padding: 16rpx;
+	border-radius: 8rpx;
+	margin-top: 12rpx;
+}
+
+.log-text {
+	font-size: 22rpx;
+	color: #00FF88;
+	line-height: 32rpx;
+}
+</style>

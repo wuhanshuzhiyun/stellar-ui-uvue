@@ -1,0 +1,209 @@
+<template>
+	<scroll-view scroll-y="true" class="page">
+		<view class="header">
+			<text class="title">Search 搜索</text>
+		</view>
+
+		<!-- 基础用法 -->
+		<view class="demo-item">
+			<text class="demo-title">基础用法</text>
+			<ste-search v-model="value1" placeholder="请输入搜索关键词"></ste-search>
+			<text class="demo-result-text">当前值: {{ value1 }}</text>
+		</view>
+
+		<!-- 搜索按钮 -->
+		<view class="demo-item">
+			<text class="demo-title">搜索按钮</text>
+			<ste-search v-model="value2" placeholder="请输入搜索关键词" @search="onSearch2"></ste-search>
+			<text class="demo-result-text">当前值: {{ value2 }} | 搜索值: {{ search2 }}</text>
+		</view>
+
+		<!-- 隐藏搜索按钮 -->
+		<view class="demo-item">
+			<text class="demo-title">隐藏搜索按钮</text>
+			<ste-search v-model="value3" placeholder="请输入搜索关键词" :hiddenBtn="true"></ste-search>
+			<text class="demo-result-text">当前值: {{ value3 }}</text>
+		</view>
+
+		<!-- 隐藏分割线 -->
+		<view class="demo-item">
+			<text class="demo-title">隐藏分割线</text>
+			<ste-search v-model="value4" placeholder="请输入搜索关键词" :hiddenLine="true"></ste-search>
+			<text class="demo-result-text">当前值: {{ value4 }}</text>
+		</view>
+
+		<!-- 禁用 -->
+		<view class="demo-item">
+			<text class="demo-title">禁用</text>
+			<ste-search v-model="value5" placeholder="请输入搜索关键词" disabled></ste-search>
+			<text class="demo-result-text">当前值: {{ value5 }}</text>
+		</view>
+
+		<!-- 热词轮播 -->
+		<view class="demo-item">
+			<text class="demo-title">热词轮播（未输入时搜索，返回当前轮播到的热词）</text>
+			<ste-search v-model="value6" :hotWords="hotWords" :interval="2000" @search="onSearch6"></ste-search>
+			<text class="demo-result-text">当前值: {{ value6 }} | 搜索值: {{ search6 }}</text>
+		</view>
+
+		<!-- 搜索建议 -->
+		<view class="demo-item">
+			<text class="demo-title">搜索建议（输入关键词过滤，如：苹果）</text>
+			<ste-search v-model="value7" placeholder="输入触发建议" :suggestionList="suggestions"
+				@input="onInput7" @selectSuggestion="onSelectSuggestion"></ste-search>
+			<text class="demo-result-text">当前值: {{ value7 }} | 选中: {{ selectedSuggestion }}</text>
+		</view>
+
+		<!-- 自定义颜色 -->
+		<view class="demo-item">
+			<text class="demo-title">自定义颜色</text>
+			<ste-search v-model="value8" placeholder="请输入搜索关键词" btnTextColor="#ee0a24" btnBackground="#fff0f0"
+				borderColor="#ee0a24" placeholderColor="#cccccc" inputTextColor="#333333"></ste-search>
+			<text class="demo-result-text">当前值: {{ value8 }}</text>
+		</view>
+
+		<!-- 圆角矩形 -->
+		<view class="demo-item">
+			<text class="demo-title">圆角矩形</text>
+			<ste-search v-model="value9" placeholder="请输入搜索关键词" :radius="8" :height="72"></ste-search>
+			<text class="demo-result-text">当前值: {{ value9 }}</text>
+		</view>
+
+		<!-- 导航栏模式 -->
+		<view class="demo-item">
+			<text class="demo-title">导航栏模式</text>
+			<ste-search v-model="value10" placeholder="请输入搜索关键词" type="nav" @click="onNavClick"></ste-search>
+			<text class="demo-result-text">当前值: {{ value10 }} | 点击: {{ navClick }}</text>
+		</view>
+
+		<!-- 回调事件 -->
+		<view class="demo-item">
+			<text class="demo-title">回调事件</text>
+			<ste-search v-model="value11" placeholder="输入触发事件" @focus="onFocus11" @blur="onBlur11"
+				@clear="onClear11"></ste-search>
+			<text class="demo-result-text">focus: {{ focus11 }} | blur: {{ blur11 }} | clear: {{ clear11 }}</text>
+		</view>
+	</scroll-view>
+</template>
+
+<script setup lang="uts">
+	const value1 = ref('')
+	const value2 = ref('')
+	const value3 = ref('')
+	const value4 = ref('')
+	const value5 = ref('已禁用内容')
+	const value6 = ref('')
+	const value7 = ref('')
+	const value8 = ref('')
+	const value9 = ref('')
+	const value10 = ref('')
+	const value11 = ref('')
+
+	const search2 = ref('')
+	const search6 = ref('')
+	const selectedSuggestion = ref('')
+	const navClick = ref('')
+	const focus11 = ref(0)
+	const blur11 = ref(0)
+	const clear11 = ref(0)
+
+	const hotWords = ref([
+		'热门搜索1',
+		'热门搜索2',
+		'热门搜索3',
+		'热门搜索4',
+	])
+
+	// 建议全量数据（非响应式）
+	const allSuggestions : UTSJSONObject[] = [
+		{ label: '苹果手机', value: '1' } as UTSJSONObject,
+		{ label: '苹果电脑', value: '2' } as UTSJSONObject,
+		{ label: '苹果耳机', value: '3' } as UTSJSONObject,
+		{ label: '苹果手表', value: '4' } as UTSJSONObject,
+		{ label: '苹果平板', value: '5' } as UTSJSONObject,
+	]
+	// 传给组件的建议列表：输入时过滤，空时清空
+	const suggestions = ref<UTSJSONObject[]>([] as UTSJSONObject[])
+
+	const onSearch2 = (value : string) => {
+		search2.value = value
+	}
+
+	// 输入过滤建议列表：有关键词时按 label 包含匹配，清空时隐藏建议
+	const onInput7 = (v : string) => {
+		if (v == '') {
+			suggestions.value = [] as UTSJSONObject[]
+			return
+		}
+		const list : UTSJSONObject[] = []
+		for (let i = 0; i < allSuggestions.length; i++) {
+			const label = allSuggestions[i]['label'] as string
+			if (label.indexOf(v) != -1) {
+				list.push(allSuggestions[i])
+			}
+		}
+		suggestions.value = list
+	}
+
+	// 热词轮播：未输入时点搜索 / 回车，应返回当前轮播到的热词
+	const onSearch6 = (value : string) => {
+		search6.value = value
+	}
+
+	const onSelectSuggestion = (item : UTSJSONObject) => {
+		selectedSuggestion.value = item['label'] as string
+	}
+
+	const onNavClick = (value : string) => {
+		navClick.value = value
+	}
+
+	const onFocus11 = (value : string) => {
+		focus11.value = focus11.value + 1
+	}
+
+	const onBlur11 = (value : string) => {
+		blur11.value = blur11.value + 1
+	}
+
+	const onClear11 = () => {
+		clear11.value = clear11.value + 1
+	}
+</script>
+
+<style>
+	.page {
+		padding: 20rpx;
+		flex: 1
+	}
+
+	.header {
+		margin-bottom: 20rpx;
+	}
+
+	.title {
+		font-size: 36rpx;
+		font-weight: bold;
+	}
+
+	.demo-item {
+		background-color: #ffffff;
+		border-radius: 12rpx;
+		padding: 24rpx;
+		margin-bottom: 20rpx;
+		flex-direction: column;
+	}
+
+	.demo-title {
+		font-size: 28rpx;
+		font-weight: bold;
+		margin-bottom: 16rpx;
+		color: #333333;
+	}
+
+	.demo-result-text {
+		font-size: 26rpx;
+		color: #666666;
+		margin-top: 12rpx;
+	}
+</style>

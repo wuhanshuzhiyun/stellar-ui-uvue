@@ -1,0 +1,439 @@
+<template>
+	<scroll-view direction="vertical" class="page">
+		<!-- 顶部标题与说明 -->
+		<view class="header">
+			<text class="title">Table 表格</text>
+			<text class="desc">用于展示大量结构化数据的场景，支持边框、斑马纹、多选/单选、合计行、固定高度滚动及单元格多态定制。</text>
+		</view>
+
+		<!-- 1. 基础用法 -->
+		<view class="section">
+			<text class="section-title">1. 基础用法 (斑马纹)</text>
+			<view class="demo-card">
+				<ste-table :data="baseRows">
+					<template v-slot="{ row }">
+						<ste-table-column :row="row" label="姓名" prop="name" />
+						<ste-table-column :row="row" label="生日" prop="birth" />
+						<ste-table-column :row="row" label="性别" prop="sex" />
+					</template>
+				</ste-table>
+			</view>
+		</view>
+
+		<!-- 2. 带边框与无斑马纹 -->
+		<view class="section">
+			<text class="section-title">2. 带边框与无斑马纹 (border=true, stripe=false)</text>
+			<view class="demo-card">
+				<ste-table :data="baseRows" :border="true" :stripe="false">
+					<template v-slot="{ row }">
+						<ste-table-column :row="row" label="姓名" prop="name" />
+						<ste-table-column :row="row" label="生日" prop="birth" />
+						<ste-table-column :row="row" label="性别" prop="sex" />
+					</template>
+				</ste-table>
+			</view>
+		</view>
+
+		<!-- 3. 空数据显示与自定义空插槽 -->
+		<view class="section">
+			<text class="section-title">3. 空数据显示 (emptyText 与 #empty 插槽)</text>
+			<view class="demo-card">
+				<ste-table :data="emptyDataRows" :border="true" emptyText="--">
+					<template v-slot="{ row }">
+						<ste-table-column :row="row" label="姓名" prop="name">
+							<template #empty>
+								<text class="tag-empty">未登记</text>
+							</template>
+						</ste-table-column>
+						<ste-table-column :row="row" label="生日" prop="birth" />
+						<ste-table-column :row="row" label="性别" prop="sex" />
+					</template>
+				</ste-table>
+			</view>
+		</view>
+
+		<!-- 4. 特殊列类型（序号、多选、单选） -->
+		<view class="section">
+			<text class="section-title">4. 序号列与多选列 (type="index" / "checkbox")</text>
+			<view class="demo-card">
+				<ste-table
+					ref="tableRef1"
+					:data="baseRows"
+					:border="true"
+					:highlightSelectionRow="true"
+					@select="onTableSelect"
+					@selectAll="onTableSelectAll"
+				>
+					<template v-slot="{ row, rowIndex }">
+						<ste-table-column :row="row" :rowIndex="rowIndex" type="checkbox" width="80" align="center" />
+						<ste-table-column :row="row" :rowIndex="rowIndex" type="index" label="序号" width="100" align="center" />
+						<ste-table-column :row="row" label="姓名" prop="name" />
+						<ste-table-column :row="row" label="性别" prop="sex" />
+					</template>
+				</ste-table>
+				<view class="api-btn-row">
+					<ste-button size="small" @click="handleGetSelection1">获取已选 ({{ selectionCount }})</ste-button>
+					<ste-button size="small" style="margin-left: 16rpx;" @click="handleToggleAll1">切换全选</ste-button>
+					<ste-button size="small" style="margin-left: 16rpx;" @click="handleClear1">清空</ste-button>
+				</view>
+			</view>
+		</view>
+
+		<!-- 5. 单选框模式 -->
+		<view class="section">
+			<text class="section-title">5. 单选框模式 (type="radio" 与 行点击高亮)</text>
+			<view class="demo-card">
+				<ste-table
+					:data="baseRows"
+					:border="true"
+					:highlightCurrentRow="true"
+					@rowClick="onRowClick"
+				>
+					<template v-slot="{ row, rowIndex }">
+						<ste-table-column :row="row" :rowIndex="rowIndex" type="radio" width="90" align="center" />
+						<ste-table-column :row="row" label="姓名" prop="name" />
+						<ste-table-column :row="row" label="生日" prop="birth" />
+					</template>
+				</ste-table>
+				<text class="tip-text">当前点击选中项：{{ currentClickRowName }}</text>
+			</view>
+		</view>
+
+		<!-- 6. 禁用勾选与只读勾选 -->
+		<view class="section">
+			<text class="section-title">6. 禁用选择与只读 (selectable / readable)</text>
+			<view class="demo-card">
+				<ste-table
+					:data="statusRows"
+					:border="true"
+					:selectable="isRowSelectable"
+					:readable="isRowReadable"
+				>
+					<template v-slot="{ row, rowIndex }">
+						<ste-table-column :row="row" :rowIndex="rowIndex" type="checkbox" width="90" align="center" />
+						<ste-table-column :row="row" label="姓名" prop="name" />
+						<ste-table-column :row="row" label="状态描述" prop="desc" />
+					</template>
+				</ste-table>
+			</view>
+		</view>
+
+		<!-- 7. 对齐方式 -->
+		<view class="section">
+			<text class="section-title">7. 对齐方式 (居左、居中、居右)</text>
+			<view class="demo-card">
+				<ste-table :data="baseRows" :border="true">
+					<template v-slot="{ row }">
+						<ste-table-column :row="row" label="姓名(左对齐)" prop="name" align="left" />
+						<ste-table-column :row="row" label="生日(居中)" prop="birth" align="center" headerAlign="center" />
+						<ste-table-column :row="row" label="性别(居右)" prop="sex" align="right" headerAlign="right" />
+					</template>
+				</ste-table>
+			</view>
+		</view>
+
+		<!-- 8. 固定列宽与最小宽度 -->
+		<view class="section">
+			<text class="section-title">8. 列宽与最小列宽 (width="180", minWidth="150")</text>
+			<view class="demo-card">
+				<ste-table :data="baseRows" :border="true">
+					<template v-slot="{ row }">
+						<ste-table-column :row="row" label="姓名" prop="name" width="180" />
+						<ste-table-column :row="row" label="生日" prop="birth" minWidth="220" />
+						<ste-table-column :row="row" label="性别" prop="sex" width="160" align="center" />
+					</template>
+				</ste-table>
+			</view>
+		</view>
+
+		<!-- 9. 单元格格式化器 -->
+		<view class="section">
+			<text class="section-title">9. 自定义格式化器 (formatter)</text>
+			<view class="demo-card">
+				<ste-table :data="salaryRows" :border="true" :formatter="formatSalary">
+					<template v-slot="{ row }">
+						<ste-table-column :row="row" label="员工姓名" prop="name" />
+						<ste-table-column :row="row" label="薪资标准" prop="salary" customKey="salary" align="right" />
+					</template>
+				</ste-table>
+			</view>
+		</view>
+
+		<!-- 10. 表尾合计行 -->
+		<view class="section">
+			<text class="section-title">10. 表尾合计行 (showSummary & summaryMethod)</text>
+			<view class="demo-card">
+				<ste-table
+					:data="scoreRows"
+					:border="true"
+					:showSummary="true"
+					sumText="总分汇总"
+					:summaryMethod="calcTotalScore"
+				>
+					<template v-slot="{ row }">
+						<ste-table-column :row="row" label="科目" prop="subject" />
+						<ste-table-column :row="row" label="平时分" prop="score1" align="right" />
+						<ste-table-column :row="row" label="期末分" prop="score2" align="right" />
+					</template>
+				</ste-table>
+			</view>
+		</view>
+
+		<!-- 11. 嵌套子表格单元格 (SubTable) -->
+		<view class="section">
+			<text class="section-title">11. 嵌套多行子表格 (字段为数组时自动合并)</text>
+			<view class="demo-card">
+				<ste-table :data="subTableData" :border="true">
+					<template v-slot="{ row }">
+						<ste-table-column :row="row" label="员工姓名" prop="name" width="200" />
+						<ste-table-column :row="row" label="负责权限角色" prop="roles" />
+					</template>
+				</ste-table>
+			</view>
+		</view>
+
+		<!-- 12. 超长省略与 Popover 提示 -->
+		<view class="section">
+			<text class="section-title">12. 内容超长 Popover 提示 (长按/点击查看)</text>
+			<view class="demo-card">
+				<ste-table :data="longTextRows" :border="true" :isPopover="true" :popoverLine="1">
+					<template v-slot="{ row }">
+						<ste-table-column :row="row" label="项目名称" prop="title" width="200" />
+						<ste-table-column :row="row" label="需求简介" prop="intro" />
+					</template>
+				</ste-table>
+			</view>
+		</view>
+
+		<!-- 13. 固定高度与纵向滚动 -->
+		<view class="section">
+			<text class="section-title">13. 固定高度与纵向滚动 (height="320rpx")</text>
+			<view class="demo-card">
+				<ste-table :data="longListRows" :border="true" height="320rpx" @scrollToLower="onScrollToLower">
+					<template v-slot="{ row, rowIndex }">
+						<ste-table-column :row="row" :rowIndex="rowIndex" type="index" label="序号" width="100" align="center" />
+						<ste-table-column :row="row" label="姓名" prop="name" />
+						<ste-table-column :row="row" label="岗位" prop="post" />
+					</template>
+				</ste-table>
+				<text class="tip-text">滚动触底次数：{{ scrollBottomCount }}</text>
+			</view>
+		</view>
+
+		<view class="footer-space" />
+	</scroll-view>
+</template>
+
+<script setup lang="uts">
+	/**
+	 * @file table.uvue
+	 * @description Table 表格全功能真机交互式演示与测试用例页面
+	 */
+	import { ref } from 'vue'
+
+	// ==================== 1. 基础数据源 ====================
+	const baseRows = ref<Array<UTSJSONObject>>([
+		{ name: '张三', birth: '2023.12.31', sex: '男' } as UTSJSONObject,
+		{ name: '李四', birth: '2024.01.01', sex: '女' } as UTSJSONObject,
+		{ name: '王五', birth: '2024.11.01', sex: '女' } as UTSJSONObject,
+		{ name: '赵六', birth: '2024.05.20', sex: '男' } as UTSJSONObject,
+	])
+
+	// ==================== 2. 空数据测试源 ====================
+	const emptyDataRows = ref<Array<UTSJSONObject>>([
+		{ name: '张三', birth: '2024.01.01', sex: '男' } as UTSJSONObject,
+		{ name: '', birth: '', sex: '女' } as UTSJSONObject,
+		{ name: '王五', birth: '2024.06.01', sex: '' } as UTSJSONObject,
+	])
+
+	// ==================== 3. 状态控制测试源 ====================
+	const statusRows = ref<Array<UTSJSONObject>>([
+		{ name: '张三', desc: '正常可选状态', status: 1 } as UTSJSONObject,
+		{ name: '李四', desc: '已被系统锁定(禁用)', status: 2 } as UTSJSONObject,
+		{ name: '王五', desc: '默认只读勾选', status: 3 } as UTSJSONObject,
+		{ name: '赵六', desc: '正常可选状态', status: 1 } as UTSJSONObject,
+	])
+
+	function isRowSelectable(row : UTSJSONObject, _index : number) : boolean {
+		const st = row['status'] as number | null
+		return st != 2
+	}
+
+	function isRowReadable(row : UTSJSONObject, _index : number) : boolean {
+		const st = row['status'] as number | null
+		return st == 3
+	}
+
+	// ==================== 4. 薪资格式化源 ====================
+	const salaryRows = ref<Array<UTSJSONObject>>([
+		{ name: '技术总监', salary: 35000 } as UTSJSONObject,
+		{ name: '架构工程师', salary: 28000 } as UTSJSONObject,
+		{ name: '前端工程师', salary: 18500 } as UTSJSONObject,
+	])
+
+	function formatSalary(row : UTSJSONObject, key : string) : string {
+		if (key == 'salary') {
+			const sal = row['salary'] as number | null
+			return sal != null ? '¥ ' + sal!.toString() : '-'
+		}
+		return ''
+	}
+
+	// ==================== 5. 合计分测试源 ====================
+	const scoreRows = ref<Array<UTSJSONObject>>([
+		{ subject: '高等数学', score1: 85, score2: 90 } as UTSJSONObject,
+		{ subject: '大学物理', score1: 78, score2: 82 } as UTSJSONObject,
+		{ subject: '计算机网络', score1: 92, score2: 95 } as UTSJSONObject,
+	])
+
+	function calcTotalScore(params : UTSJSONObject) : string[] {
+		const data = params['data'] as Array<UTSJSONObject>
+		let total1 = 0
+		let total2 = 0
+		for (let i = 0; i < data.length; i++) {
+			const item = data[i]
+			total1 += (item['score1'] as number | null) ?? 0
+			total2 += (item['score2'] as number | null) ?? 0
+		}
+		return ['总计', total1.toString() + ' 分', total2.toString() + ' 分']
+	}
+
+	// ==================== 6. 嵌套子表格数据源 ====================
+	const subTableData = ref<Array<UTSJSONObject>>([
+		{ name: '张经理', roles: ['系统管理员', '财务总审', '运营决策人'] as any[] } as UTSJSONObject,
+		{ name: '李工程师', roles: ['代码仓库负责人', '自动化发布人员'] as any[] } as UTSJSONObject,
+		{ name: '王专员', roles: ['售后客服'] as any[] } as UTSJSONObject,
+	])
+
+	// ==================== 7. 长文本 Popover 测试源 ====================
+	const longTextRows = ref<Array<UTSJSONObject>>([
+		{
+			title: 'Stellar UI uvue',
+			intro: '下一代跨端原生高性能组件库，基于 uni-app x UTS/UVUE 体系全面重构，支持双端原生编译。'
+		} as UTSJSONObject,
+		{
+			title: 'Table 架构升级',
+			intro: '彻底移除旧版 Vue 虚拟 DOM 依赖，通过 UTS 强静态上下文提供全选、单选与多态单元格支持。'
+		} as UTSJSONObject,
+	])
+
+	// ==================== 8. 固定滚动长列表 ====================
+	const longListRows = ref<Array<UTSJSONObject>>([
+		{ name: '员工 01', post: '产品经理' } as UTSJSONObject,
+		{ name: '员工 02', post: 'UI 设计师' } as UTSJSONObject,
+		{ name: '员工 03', post: '前端开发' } as UTSJSONObject,
+		{ name: '员工 04', post: '后端开发' } as UTSJSONObject,
+		{ name: '员工 05', post: '测试工程师' } as UTSJSONObject,
+		{ name: '员工 06', post: '运维工程师' } as UTSJSONObject,
+		{ name: '员工 07', post: '市场运营' } as UTSJSONObject,
+		{ name: '员工 08', post: '用户体验' } as UTSJSONObject,
+	])
+
+	// ==================== 交互反馈与 API 引用 ====================
+	const tableRef1 = ref<SteTableComponentPublicInstance | null>(null)
+	const selectionCount = ref<number>(0)
+	const currentClickRowName = ref<string>('无')
+	const scrollBottomCount = ref<number>(0)
+
+	function onTableSelect(selectionList : UTSJSONObject[], _row : UTSJSONObject) {
+		selectionCount.value = selectionList.length
+	}
+
+	function onTableSelectAll(selectionList : UTSJSONObject[]) {
+		selectionCount.value = selectionList.length
+	}
+
+	function handleGetSelection1() {
+		uni.showToast({
+			title: '当前已勾选 ' + selectionCount.value.toString() + ' 项',
+			icon: 'none',
+		})
+	}
+
+	function handleToggleAll1() {
+		tableRef1.value?.toggleAllSelection()
+	}
+
+	function handleClear1() {
+		tableRef1.value?.clearSelection()
+		selectionCount.value = 0
+	}
+
+	function onRowClick(row : UTSJSONObject, _rowIndex : number) {
+		currentClickRowName.value = (row['name'] as string | null) ?? '未知'
+	}
+
+	function onScrollToLower() {
+		scrollBottomCount.value++
+	}
+</script>
+
+<style scoped>
+.page {
+	width: 100%;
+	flex: 1;
+	background-color: #f5f7fa;
+	padding: 24rpx;
+	box-sizing: border-box;
+}
+
+.header {
+	margin-bottom: 32rpx;
+}
+
+.title {
+	font-size: 38rpx;
+	font-weight: bold;
+	color: #1a1a1a;
+	margin-bottom: 12rpx;
+}
+
+.desc {
+	font-size: 26rpx;
+	color: #666666;
+	line-height: 38rpx;
+}
+
+.section {
+	margin-bottom: 36rpx;
+}
+
+.section-title {
+	font-size: 30rpx;
+	font-weight: bold;
+	color: #333333;
+	margin-bottom: 16rpx;
+}
+
+.demo-card {
+	background-color: #ffffff;
+	border-radius: 16rpx;
+	padding: 20rpx;
+	box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+}
+
+.tag-empty {
+	font-size: 22rpx;
+	color: #ff9900;
+	background-color: #fff9e6;
+	padding: 4rpx 12rpx;
+	border-radius: 6rpx;
+}
+
+.api-btn-row {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	margin-top: 20rpx;
+}
+
+.tip-text {
+	font-size: 24rpx;
+	color: #0090ff;
+	margin-top: 16rpx;
+}
+
+.footer-space {
+	height: 80rpx;
+}
+</style>

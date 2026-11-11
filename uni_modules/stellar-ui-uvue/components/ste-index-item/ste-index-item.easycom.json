@@ -1,0 +1,27 @@
+{
+    "name": "ste-index-item",
+    "description": "索引列表分组项组件，承载单个分组（如 A、B、C）的标题与行数据列表。",
+    "tutorial": "https://stellar-ui.intecloud.com.cn/?projectName=stellar-ui-uvue&menu=%E7%BB%84%E4%BB%B6&active=ste-index-list",
+    "attributes": [
+        {
+            "name": "title",
+            "description": "分组索引标题（如 A、B），必填项",
+            "type": "string",
+            "default": ""
+        },
+        {
+            "name": "list",
+            "description": "该分组下的文本列表数组（未提供时可通过默认插槽自定义）",
+            "type": "array",
+            "default": []
+        },
+        {
+            "name": "[slot]default",
+            "description": "默认插槽，用于自定义当前分组下的数据行列表"
+        },
+        {
+            "name": "[slot]title",
+            "description": "自定义分组标题栏内容插槽"
+        }
+    ]
+}

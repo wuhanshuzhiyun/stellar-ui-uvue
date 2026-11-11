@@ -1,0 +1,70 @@
+{
+    "name": "ste-index-list",
+    "description": "IndexList 索引列表组件，支持字母锚点手势触摸滑动快速定位、大字气泡指示与分组标题吸顶，专用于 (UTS/UVUE)",
+    "example": "<ste-index-list @clickItem=\"handleClick\"><ste-index-item title=\"A\" :list=\"['鞍山', '安阳']\" /></ste-index-list>",
+    "tutorial": "https://stellar-ui.intecloud.com.cn/?projectName=stellar-ui-uvue&menu=%E7%BB%84%E4%BB%B6&active=ste-index-list",
+    "attributes": [
+        {
+            "name": "active",
+            "description": "当前激活的索引分组下标",
+            "type": "number",
+            "default": 0
+        },
+        {
+            "name": "height",
+            "description": "滚动容器区域高度，支持 rpx、px 或百分比（如 '100%'）",
+            "type": "number | string",
+            "default": "100%"
+        },
+        {
+            "name": "sticky",
+            "description": "是否开启分组标题滚动吸顶效果",
+            "type": "boolean",
+            "default": true
+        },
+        {
+            "name": "inactiveColor",
+            "description": "右侧索引条未激活字母颜色",
+            "type": "string",
+            "default": "#666666"
+        },
+        {
+            "name": "activeColor",
+            "description": "右侧索引条激活高亮字母颜色（未设置时默认使用主题蓝）",
+            "type": "string",
+            "default": "#1890ff"
+        },
+        {
+            "name": "[event]change",
+            "description": "当前激活的索引分组改变时触发",
+            "params": [
+                {
+                    "name": "index",
+                    "description": "(index: number) => void，当前激活的分组下标"
+                }
+            ]
+        },
+        {
+            "name": "[event]clickItem",
+            "description": "点击列表项时触发",
+            "params": [
+                {
+                    "name": "data",
+                    "description": "(title: string, text: string) => void，分别对应分组标题与条目文本"
+                }
+            ]
+        },
+        {
+            "name": "[event]update:active",
+            "description": "激活下标变化时触发，配合 v-model:active 双向绑定使用"
+        },
+        {
+            "name": "[method]init",
+            "description": "初始化并重新测量锚点与索引条几何坐标"
+        },
+        {
+            "name": "[slot]default",
+            "description": "容纳 ste-index-item 子分组组件的容器插槽"
+        }
+    ]
+}

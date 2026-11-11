@@ -1,0 +1,116 @@
+<template>
+	<scroll-view direction="vertical" class="page">
+		<view class="section">
+			<text class="section-title">按钮大小</text>
+			<view class="demo-row">
+				<ste-button :mode="100">小号按钮</ste-button>
+				<ste-button>默认按钮</ste-button>
+				<ste-button :mode="300">大号按钮</ste-button>
+				<ste-button :mode="400">超大按钮</ste-button>
+			</view>
+		</view>
+
+		<view class="section">
+			<text class="section-title">按钮颜色</text>
+			<view class="demo-row">
+				<ste-button background="#07c160">绿色按钮</ste-button>
+				<ste-button background="#ff5a5f">红色按钮</ste-button>
+				<ste-button background="#ff9900">橙色按钮</ste-button>
+			</view>
+		</view>
+
+		<view class="section">
+			<text class="section-title">渐变色按钮</text>
+			<view class="demo-row">
+				<ste-button :mode="400" background="linear-gradient(to right, #4253d8, #d533ba)">渐变色</ste-button>
+			</view>
+		</view>
+
+		<view class="section">
+			<text class="section-title">禁用状态</text>
+			<view class="demo-row">
+				<ste-button disabled>禁用按钮</ste-button>
+			</view>
+		</view>
+
+		<view class="section">
+			<text class="section-title">加载状态</text>
+			<view class="demo-row">
+				<ste-button :loading="loading" @click="onClickLoading">点击加载</ste-button>
+			</view>
+		</view>
+
+		<view class="section">
+			<text class="section-title">边框按钮</text>
+			<view class="demo-row">
+				<ste-button borderColor="#0090FF" :borderWidth="2" color="#0090FF" background="#ffffff" :round="false">边框按钮</ste-button>
+			</view>
+		</view>
+
+		<view class="section">
+			<text class="section-title">直角按钮</text>
+			<view class="demo-row">
+				<ste-button :round="false" background="#07c160">直角按钮</ste-button>
+			</view>
+		</view>
+
+		<view class="section">
+			<text class="section-title">加粗按钮</text>
+			<view class="demo-row">
+				<ste-button :bold="true" background="#ff5a5f">加粗字体</ste-button>
+			</view>
+		</view>
+
+		<view class="section">
+			<text class="section-title">rootStyle 覆盖</text>
+			<view class="demo-row">
+				<ste-button width="100%" :rootStyle="rootBtnStyle">rootStyle 覆盖</ste-button>
+			</view>
+		</view>
+	</scroll-view>
+</template>
+
+<script setup lang="uts">
+	defineOptions({ name: 'demo-button' })
+
+	const loading = ref(false)
+
+	const onClickLoading = () => {
+		loading.value = true
+		setTimeout(() => {
+			loading.value = false
+		}, 1500)
+	}
+
+	const rootBtnStyle = {
+		color: '#333',
+		backgroundColor: '#f5f5f5',
+		borderRadius: '40rpx',
+	}
+</script>
+
+<style>
+	.page {
+		padding: 20rpx;
+		background-color: #f5f5f5;
+		flex: 1;
+	}
+
+	.section {
+		margin-bottom: 30rpx;
+		background-color: #ffffff;
+		border-radius: 16rpx;
+		padding: 24rpx;
+	}
+
+	.section-title {
+		font-size: 28rpx;
+		font-weight: bold;
+		color: #333333;
+		margin-bottom: 20rpx;
+	}
+
+	.demo-row {
+		flex-direction: column;
+	}
+</style>

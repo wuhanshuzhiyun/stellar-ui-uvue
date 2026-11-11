@@ -1,0 +1,386 @@
+<template>
+	<!--
+		ste-scroll-to 滚动锚点容器组件
+		模块职责：提供基于锚点的视口滚动容器，支持锚点跳转定位与滚动事件双向联动
+	-->
+	<view class="ste-scroll-to-root" :style="rootStyle">
+		<scroll-view
+			:id="scrollId"
+			class="ste-scroll-to-scroll"
+			scroll-y="true"
+			:scroll-into-view="scrollIntoViewId"
+			@scroll="handleScroll"
+		>
+			<view :id="contentId" class="ste-scroll-to-content">
+				<slot></slot>
+			</view>
+		</scroll-view>
+	</view>
+</template>
+
+<script setup lang="uts">
+	import { ref, computed, watch, provide, onMounted, onUnmounted, nextTick } from 'vue'
+	import { SCROLL_TO_KEY, ScrollToContext, ScrollToItemRegisterData } from './constants.uts'
+
+	defineOptions({
+		name: 'ste-scroll-to',
+		options: {
+			virtualHost: true
+		}
+	})
+
+	/**
+	 * 组件属性类型定义
+	 */
+	type ScrollToProps = {
+		/** 当前激活的子项下标 */
+		active ?: number
+		/** 滚动区域高度，支持 rpx、px、% 或数字 */
+		height ?: any
+	}
+
+	const props = withDefaults(defineProps<ScrollToProps>(), {
+		active: 0,
+		height: '100%'
+	})
+
+	/**
+	 * 事件派发契约
+	 */
+	const emit = defineEmits<{
+		(e : 'change', index : number) : void
+		(e : 'update:active', index : number) : void
+	}>()
+
+	/** 内部当前激活下标 */
+	const dataActiveIndex = ref(0)
+
+	/** 滚动视口节点唯一 ID：多实例下必须按实例精确测量，不能靠全局 class 选择器 */
+	const scrollId = ref<string>('ste-scroll-to-scroll-' + Math.floor(Math.random() * 1000000).toString())
+
+	/** 内容承载层唯一 ID：偏移量以它为基准，slot 里放了前置内容也能算准 */
+	const contentId = ref<string>('ste-scroll-to-content-' + Math.floor(Math.random() * 1000000).toString())
+
+	/** 滚动视口高度与最大可滚动距离缓存 */
+	let viewportHeight = 0.0
+	let maxScrollTop = 0.0
+
+	/** 本次程序化滚动的目标滚动位置（-1 表示尚未测量到，无法判定落地） */
+	let programmaticTargetOffset = -1.0
+
+	/** 滚动容器当前定位的锚点 DOM ID */
+	const scrollIntoViewId = ref('')
+
+	/** 已注册的子项列表 */
+	const registeredItems = ref<Array<ScrollToItemRegisterData>>([] as Array<ScrollToItemRegisterData>)
+
+	/** 各锚点子项在内容区域内的相对纵向偏移量 */
+	const itemOffsets = ref<Array<number>>([] as Array<number>)
+
+	/** 是否处于程序化滚动动画锁定期（防止滚动监听反复派发造成抖动与死循环） */
+	const isProgrammaticScrolling = ref(false)
+
+	/** 程序化滚动防抖恢复定时器 ID */
+	let programmaticTimer : number | null = null
+
+	/** 延迟测量布局防抖定时器 ID */
+	let refreshTimer : number | null = null
+
+	/** 首帧定位定时器 ID（挂载后按初始 active 定位用） */
+	let initScrollTimer : number | null = null
+
+	/** 根容器计算样式 */
+	const rootStyle = computed(() : UTSJSONObject => {
+		const style : UTSJSONObject = {}
+		if (typeof props.height == 'number') {
+			style['height'] = `${props.height}px`
+		} else if (typeof props.height == 'string') {
+			style['height'] = `${props.height}`
+		}
+		return style
+	})
+
+	/**
+	 * 滚动到指定下标的锚点位置
+	 * @param index 目标子项下标
+	 */
+	function scrollToIndex(index : number) {
+		const items = registeredItems.value
+		if (index < 0 || index >= items.length) return
+		const targetItem = items[index]
+
+		// 开启程序化滚动锁定
+		isProgrammaticScrolling.value = true
+
+		// 记录目标滚动位置：落地后据此立即解锁，不必死等 400ms
+		const offsets = itemOffsets.value
+		if (index < offsets.length) {
+			let target = offsets[index]
+			// 末尾分组顶不到容器顶部，实际最多只能滚到最大滚动距离
+			if (maxScrollTop > 0 && target > maxScrollTop) {
+				target = maxScrollTop
+			}
+			programmaticTargetOffset = target
+		} else {
+			programmaticTargetOffset = -1.0
+		}
+
+		if (programmaticTimer != null) {
+			clearTimeout(programmaticTimer!)
+			programmaticTimer = null
+		}
+		programmaticTimer = setTimeout(() => {
+			isProgrammaticScrolling.value = false
+			programmaticTargetOffset = -1.0
+			programmaticTimer = null
+		}, 400)
+
+		// 清空并重新赋值 scroll-into-view 触发原生平滑滚动
+		scrollIntoViewId.value = ''
+		nextTick(() => {
+			scrollIntoViewId.value = targetItem.id
+			if (index != dataActiveIndex.value) {
+				dataActiveIndex.value = index
+				emit('change', index)
+				emit('update:active', index)
+			}
+		})
+	}
+
+	/**
+	 * 重新测量并刷新所有子项在滚动区域中的物理高度与相对偏移量
+	 */
+	function refreshLayoutOffsets() {
+		const items = registeredItems.value
+		if (items.length == 0) {
+			itemOffsets.value = []
+			return
+		}
+
+		// 逐项按注册 id 精确查询，不能用 selectAll('.ste-scroll-to-item-root')：
+		// 那是全页面查询，同页存在第二个锚点容器时会把对方的子项一起量进来，
+		// 偏移数组长度与注册表不一致，滚动联动整体错位。
+		// res[0] = 滚动视口（换算最大可滚动距离），res[1] = 内容承载层（偏移基准），其余按下标对应各锚点。
+		const query = uni.createSelectorQuery()
+		query.select('#' + scrollId.value).boundingClientRect()
+		query.select('#' + contentId.value).boundingClientRect()
+		for (let i = 0; i < items.length; i++) {
+			query.select('#' + items[i].id).boundingClientRect()
+		}
+		query.exec((res : Array<any>) => {
+			if (res == null || res.length == 0) return
+
+			const scrollNode = res[0] as NodeInfo | null
+			if (scrollNode != null) {
+				viewportHeight = scrollNode.height ?? 0.0
+			}
+			// 基准取内容层顶部：带前置内容时用首项 top 当基准会把整段偏移量算少
+			const contentNode = res.length > 1 ? (res[1] as NodeInfo | null) : null
+			const contentTop = contentNode != null ? (contentNode.top ?? 0.0) : 0.0
+			let baseTop = contentTop
+			let hasBase = contentNode != null
+
+			const newOffsets : Array<number> = []
+			let lastBottom = 0.0
+			let hasBottom = false
+			for (let i = 0; i < items.length; i++) {
+				const raw = i + 2 < res.length ? res[i + 2] : null
+				const node = raw as NodeInfo | null
+				if (node == null) {
+					// 该项尚未挂载或查询失败：沿用上一项偏移占位，避免后续项整体前移错位
+					newOffsets.push(newOffsets.length > 0 ? newOffsets[newOffsets.length - 1] : 0.0)
+					continue
+				}
+				const nodeTop = node.top ?? 0.0
+				if (!hasBase) {
+					baseTop = nodeTop
+					hasBase = true
+				}
+				newOffsets.push(nodeTop - baseTop)
+				lastBottom = node.bottom ?? 0.0
+				hasBottom = true
+			}
+			itemOffsets.value = newOffsets
+
+			// 内容总高 = 末项 bottom - 首项 top，最大可滚动距离 = 内容总高 - 视口高
+			if (hasBase && hasBottom && viewportHeight > 0) {
+				const contentHeight = lastBottom - baseTop
+				const m = contentHeight - viewportHeight
+				maxScrollTop = m > 0 ? m : 0.0
+			} else {
+				maxScrollTop = 0.0
+			}
+		})
+	}
+
+	/**
+	 * 延迟调度测量，合并连续的注册请求
+	 */
+	function scheduleRefreshOffsets() {
+		if (refreshTimer != null) {
+			clearTimeout(refreshTimer!)
+			refreshTimer = null
+		}
+		refreshTimer = setTimeout(() => {
+			refreshTimer = null
+			refreshLayoutOffsets()
+		}, 100)
+	}
+
+	/**
+	 * 监听容器滚动，计算当前所处的子项下标并反向联动
+	 * @param e 滚动事件对象
+	 */
+	function handleScroll(e : UniScrollEvent) {
+		const scrollTop = e.detail.scrollTop
+
+		if (isProgrammaticScrolling.value) {
+			// 锁定期间丢弃跳转过程中的中间位置（否则从第 1 项跳到第 5 项会沿途逐项派发 change）。
+			// 但一旦落到目标位置就立刻解锁：死等 400ms 会把用户紧接着的主动拖动整段吞掉，
+			// 表现为「高亮停在上一次点击的楼层不动」。
+			if (programmaticTargetOffset >= 0 && Math.abs(scrollTop - programmaticTargetOffset) <= 3) {
+				isProgrammaticScrolling.value = false
+				if (programmaticTimer != null) {
+					clearTimeout(programmaticTimer!)
+					programmaticTimer = null
+				}
+			}
+			return
+		}
+
+		const offsets = itemOffsets.value
+		if (offsets.length == 0) return
+
+		// 末尾若干分组内容不足一屏时，锚点顶不到容器顶部，scrollTop 会停在最大滚动距离。
+		// 此时若仍按 offsets 递增比较，最后几个分组永远点亮不了（点“常见疑问”高亮会回落到“用户评价”）。
+		if (maxScrollTop > 0 && scrollTop >= maxScrollTop - 2) {
+			const lastIdx = offsets.length - 1
+			if (lastIdx != dataActiveIndex.value) {
+				dataActiveIndex.value = lastIdx
+				emit('change', lastIdx)
+				emit('update:active', lastIdx)
+			}
+			return
+		}
+
+		let targetIndex = 0
+		for (let i = 0; i < offsets.length; i++) {
+			if (scrollTop >= offsets[i] - 10) {
+				targetIndex = i
+			} else {
+				break
+			}
+		}
+
+		if (targetIndex != dataActiveIndex.value) {
+			dataActiveIndex.value = targetIndex
+			emit('change', targetIndex)
+			emit('update:active', targetIndex)
+		}
+	}
+
+	/**
+	 * 注册子项
+	 * 拷贝后整体回写而不是原地 push：App 端对 ref 数组的原地变更通知不可靠；
+	 * 同时按 id 覆盖，重复注册（如 HMR 或父级重渲染）不会产生重复锚点。
+	 * @param item 子项注册数据
+	 */
+	function registerItem(item : ScrollToItemRegisterData) {
+		const list = registeredItems.value.slice()
+		let exists = false
+		for (let i = 0; i < list.length; i++) {
+			if (list[i].id == item.id) {
+				list[i] = item
+				exists = true
+				break
+			}
+		}
+		if (!exists) {
+			list.push(item)
+		}
+		registeredItems.value = list
+		scheduleRefreshOffsets()
+	}
+
+	/**
+	 * 注销子项
+	 * @param id 锚点 ID
+	 */
+	function unregisterItem(id : string) {
+		const list = registeredItems.value.slice()
+		const idx = list.findIndex((it : ScrollToItemRegisterData) : boolean => it.id == id)
+		if (idx >= 0) {
+			list.splice(idx, 1)
+			registeredItems.value = list
+			scheduleRefreshOffsets()
+		}
+	}
+
+	// 依赖注入，暴露给子组件调用
+	provide<ScrollToContext>(SCROLL_TO_KEY, {
+		registerItem: registerItem,
+		unregisterItem: unregisterItem
+	} as ScrollToContext)
+
+	// 监听外部 active 属性变化
+	watch(
+		() : number => props.active,
+		(newVal : number) => {
+			if (newVal != dataActiveIndex.value) {
+				scrollToIndex(newVal)
+			}
+		}
+	)
+
+	onMounted(() => {
+		dataActiveIndex.value = props.active
+		scheduleRefreshOffsets()
+		if (props.active > 0) {
+			// 句柄必须持有：组件在这 200ms 内被销毁时仍会回调，对已卸载实例发起滚动
+			initScrollTimer = setTimeout(() => {
+				initScrollTimer = null
+				scrollToIndex(props.active)
+			}, 200)
+		}
+	})
+
+	onUnmounted(() => {
+		if (programmaticTimer != null) {
+			clearTimeout(programmaticTimer!)
+			programmaticTimer = null
+		}
+		if (refreshTimer != null) {
+			clearTimeout(refreshTimer!)
+			refreshTimer = null
+		}
+		if (initScrollTimer != null) {
+			clearTimeout(initScrollTimer!)
+			initScrollTimer = null
+		}
+	})
+
+	/**
+	 * 暴露公共实例方法
+	 */
+	defineExpose({
+		init: () => {
+			refreshLayoutOffsets()
+		}
+	})
+</script>
+
+<style scoped>
+	.ste-scroll-to-root {
+		width: 100%;
+	}
+
+	.ste-scroll-to-scroll {
+		width: 100%;
+		height: 100%;
+	}
+
+	.ste-scroll-to-content {
+		width: 100%;
+		flex-direction: column;
+	}
+</style>

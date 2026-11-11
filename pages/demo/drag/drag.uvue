@@ -1,0 +1,102 @@
+<template>
+	<scroll-view direction="vertical" class="page">
+		<view class="section">
+			<text class="section-title">基础拖拽</text>
+			<view class="drag-area">
+				<ste-drag @start="onStart" @end="onEnd">
+					<view class="drag-box">
+						<text class="drag-text">拖我</text>
+					</view>
+				</ste-drag>
+			</view>
+		</view>
+
+		<view class="section">
+			<text class="section-title">仅水平拖拽</text>
+			<view class="drag-area">
+				<ste-drag direction="x">
+					<view class="drag-box">
+						<text class="drag-text">水平</text>
+					</view>
+				</ste-drag>
+			</view>
+		</view>
+
+		<view class="section">
+			<text class="section-title">仅垂直拖拽</text>
+			<view class="drag-area">
+				<ste-drag direction="y">
+					<view class="drag-box">
+						<text class="drag-text">垂直</text>
+					</view>
+				</ste-drag>
+			</view>
+		</view>
+
+		<view class="section">
+			<text class="section-title">自动吸边</text>
+			<view class="drag-area">
+				<ste-drag :attract="true">
+					<view class="drag-box">
+						<text class="drag-text">吸边</text>
+					</view>
+				</ste-drag>
+			</view>
+		</view>
+
+		<view class="section">
+			<text class="section-title">边界限制（内缩20px）</text>
+			<view class="drag-area">
+				<ste-drag :boundary="{ top: 20, left: 20, right: 20, bottom: 20 }">
+					<view class="drag-box">
+						<text class="drag-text">受限</text>
+					</view>
+				</ste-drag>
+			</view>
+		</view>
+	</scroll-view>
+</template>
+
+<script setup lang="uts">
+	function onStart() {
+		console.log('drag start')
+	}
+
+	function onEnd(position : any) {
+		console.log('drag end', JSON.stringify(position))
+	}
+</script>
+
+<style>
+.page {
+	padding: 20rpx;
+	flex: 1;
+}
+.section {
+	margin-bottom: 30rpx;
+}
+.section-title {
+	font-size: 28rpx;
+	font-weight: bold;
+	margin-bottom: 16rpx;
+	color: #333333;
+}
+.drag-area {
+	height: 300rpx;
+	background-color: #f2f3f5;
+	border-radius: 12rpx;
+}
+.drag-box {
+	width: 100rpx;
+	height: 100rpx;
+	background-color: #0090FF;
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+.drag-text {
+	font-size: 28rpx;
+	color: #ffffff;
+}
+</style>

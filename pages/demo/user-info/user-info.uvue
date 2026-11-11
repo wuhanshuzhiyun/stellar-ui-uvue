@@ -1,0 +1,393 @@
+<template>
+	<scroll-view scroll-y="true" class="page-container">
+		<!-- 头部导航与组件定位描述 -->
+		<view class="page-header">
+			<text class="page-title">UserInfo 用户信息卡片</text>
+			<text class="page-desc">
+				常用于个人中心、会员中心与首页顶部，聚合展示用户头像、昵称、身份标签、业务统计资产项（如余额、积分、优惠券）、功能码及未登录状态引导。
+			</text>
+		</view>
+
+		<view class="demo-content">
+			<!-- 用例 1：基础已登录状态 (单项/双项/三项数据) -->
+			<view class="demo-card">
+				<text class="card-title">1. 基础已登录状态 (不同统计数据项)</text>
+				<text class="card-desc">展示用户头像、昵称、身份标签及右侧功能核销码；中间支持 1~3 项业务统计数据。</text>
+
+				<!-- 1.1 双数据项列表 (推荐规范) -->
+				<text class="sub-card-title">1.1 双数据项卡片 (余额 / 订餐数)</text>
+				<view class="card-inner mb-24">
+					<ste-user-info
+						avatar="https://image.whzb.com/chain/StellarUI/图片.jpg"
+						nickname="星瀚体验官"
+						:list="listTwo"
+						codeSrc="https://image.whzb.com/chain/StellarUI/image/code1.png"
+						codeTitle="核销码"
+						codeTitleColor="#EC3E1A"
+						@user-click="handleActionToast('点击了用户信息')"
+						@code-click="handleActionToast('点击了核销码')"
+						@data-click="handleDataClick"
+					>
+						<template #desc>
+							<view class="custom-desc-row">
+								<ste-icon code="&#xe670;" color="#EC3E1A" :size="24" />
+								<text class="custom-desc-text">中百智慧食堂</text>
+							</view>
+						</template>
+					</ste-user-info>
+				</view>
+
+				<!-- 1.2 三数据项卡片 (余额 / 积分 / 优惠券) -->
+				<text class="sub-card-title">1.2 三数据项卡片 (资产总览)</text>
+				<view class="card-inner mb-24">
+					<ste-user-info
+						avatar="https://image.whzb.com/chain/StellarUI/图片.jpg"
+						nickname="极客开发者"
+						:list="listThree"
+						codeSrc="https://image.whzb.com/chain/StellarUI/image/code1.png"
+						codeTitle="会员码"
+						codeTitleColor="#0090FF"
+						@user-click="handleActionToast('点击了开发者信息')"
+						@code-click="handleActionToast('点击了会员码')"
+						@data-click="handleDataClick"
+					>
+						<template #desc>
+							<view class="custom-desc-row">
+								<text class="badge-text">SVIP 8 级</text>
+							</view>
+						</template>
+					</ste-user-info>
+				</view>
+
+				<!-- 1.3 单数据项卡片 -->
+				<text class="sub-card-title">1.3 单数据项卡片 (快捷钱包)</text>
+				<view class="card-inner">
+					<ste-user-info
+						avatar="https://image.whzb.com/chain/StellarUI/图片.jpg"
+						nickname="商务贵宾"
+						:list="listOne"
+						codeSrc="https://image.whzb.com/chain/StellarUI/image/code1.png"
+						codeTitle="核销码"
+						@user-click="handleActionToast('点击了贵宾信息')"
+						@code-click="handleActionToast('点击了核销码')"
+						@data-click="handleDataClick"
+					>
+						<template #desc>
+							<view class="custom-desc-row">
+								<text class="badge-gold-text">企业专属账户</text>
+							</view>
+						</template>
+					</ste-user-info>
+				</view>
+			</view>
+
+			<!-- 用例 2：未登录引导状态 -->
+			<view class="demo-card">
+				<text class="card-title">2. 未登录引导状态 (loginStatus = 0)</text>
+				<text class="card-desc">当用户未登录时，自动切换为默认占位头像、引导标题与操作按钮，资产数据展示为占位横杠 '-'。</text>
+				<view class="card-inner">
+					<ste-user-info
+						:loginStatus="0"
+						loginTitle="登录注册解锁权益"
+						loginInfo="享专属就餐补贴与积分福利"
+						loginBtnText="去登录"
+						loginBtnBg="#0090FF"
+						:list="listTwo"
+						@login-btn-click="handleActionToast('点击了去登录按钮')"
+						@user-click="handleActionToast('点击了未登录头像区')"
+					/>
+				</view>
+			</view>
+
+			<!-- 用例 3：无功能码与无用户区域组合模式 -->
+			<view class="demo-card">
+				<text class="card-title">3. 灵活组合模式 (隐藏功能码 / 隐藏用户信息)</text>
+				<text class="card-desc">支持通过 showCode 或 showUserInfo 按需隐藏特定区域，实现纯数据卡片或纯展示卡片。</text>
+
+				<!-- 3.1 隐藏功能码 (showCode = false) -->
+				<text class="sub-card-title">3.1 隐藏功能码</text>
+				<view class="card-inner mb-24">
+					<ste-user-info
+						avatar="https://image.whzb.com/chain/StellarUI/图片.jpg"
+						nickname="普通会员"
+						:showCode="false"
+						:list="listTwo"
+						@data-click="handleDataClick"
+					>
+						<template #desc>
+							<view class="custom-desc-row">
+								<text class="custom-desc-text">注册会员</text>
+							</view>
+						</template>
+					</ste-user-info>
+				</view>
+
+				<!-- 3.2 隐藏用户信息，仅展示数据与功能码 (showUserInfo = false) -->
+				<text class="sub-card-title">3.2 纯数据与功能码卡片 (showUserInfo = false)</text>
+				<view class="card-inner">
+					<ste-user-info
+						:showUserInfo="false"
+						:list="listThree"
+						codeSrc="https://image.whzb.com/chain/StellarUI/image/code1.png"
+						codeTitle="核销码"
+						codeTitleColor="#EC3E1A"
+						@code-click="handleActionToast('点击了核销码')"
+						@data-click="handleDataClick"
+					/>
+				</view>
+			</view>
+
+			<!-- 用例 4：动态交互与登录态模拟 -->
+			<view class="demo-card">
+				<text class="card-title">4. 动态响应式切换演示</text>
+				<text class="card-desc">点击下方按钮可动态切换登录态，模拟已登录与未登录时的卡片过渡呈现。</text>
+
+				<view class="card-inner mb-24">
+					<ste-user-info
+						:loginStatus="dynamicLoginStatus"
+						:avatar="dynamicAvatar"
+						:nickname="dynamicNickname"
+						:list="listTwo"
+						codeSrc="https://image.whzb.com/chain/StellarUI/image/code1.png"
+						codeTitle="动态卡"
+						loginTitle="欢迎来到 Stellar UI"
+						loginInfo="登录后查看您的资产"
+						loginBtnText="快速登录"
+						@user-click="handleActionToast('点击了动态卡片用户信息')"
+						@code-click="handleActionToast('点击了动态功能码')"
+						@data-click="handleDataClick"
+						@login-btn-click="handleDynamicLogin"
+					>
+						<template #desc>
+							<view class="custom-desc-row">
+								<text class="badge-text">动态账户</text>
+							</view>
+						</template>
+					</ste-user-info>
+				</view>
+
+				<!-- 操作按钮组 -->
+				<view class="btn-group">
+					<view class="btn-item">
+						<ste-button
+							:mode="dynamicLoginStatus == 1 ? 100 : 200"
+							@click="toggleDynamicStatus"
+						>
+							<text class="ctrl-btn-text">
+								{{ dynamicLoginStatus == 1 ? '切换为：未登录态' : '切换为：已登录态' }}
+							</text>
+						</ste-button>
+					</view>
+				</view>
+			</view>
+		</view>
+	</scroll-view>
+</template>
+
+<script setup lang="uts">
+	/**
+	 * @file user-info.uvue
+	 * @description ste-user-info 用户信息卡片组件演示与回归测试页面
+	 */
+	import { ref } from 'vue'
+	import { UserInfoDataItem } from '@/uni_modules/stellar-ui-uvue/components/ste-user-info/props.uts'
+
+	// ==================== 演示数据源 ====================
+
+	/**
+	 * 单数据项配置
+	 */
+	const listOne = ref<UserInfoDataItem[]>([
+		{ title: '账户余额', value: '￥258.00' },
+	])
+
+	/**
+	 * 双数据项配置
+	 */
+	const listTwo = ref<UserInfoDataItem[]>([
+		{ title: '钱包余额', value: '￥680.50' },
+		{ title: '待就餐数', value: '3 次' },
+	])
+
+	/**
+	 * 三数据项配置
+	 */
+	const listThree = ref<UserInfoDataItem[]>([
+		{ title: '账户余额', value: '￥1,280' },
+		{ title: '会员积分', value: '9,980' },
+		{ title: '优惠券', value: '12 张' },
+	])
+
+	// ==================== 动态切换登录态状态 ====================
+	const dynamicLoginStatus = ref(1)
+	const dynamicNickname = ref('活跃体验官')
+	const dynamicAvatar = ref('https://image.whzb.com/chain/StellarUI/图片.jpg')
+
+	/**
+	 * 切换登录状态
+	 */
+	const toggleDynamicStatus = () => {
+		if (dynamicLoginStatus.value == 1) {
+			dynamicLoginStatus.value = 0
+		} else {
+			dynamicLoginStatus.value = 1
+		}
+	}
+
+	/**
+	 * 模拟未登录时的登录按钮点击
+	 */
+	const handleDynamicLogin = () => {
+		dynamicLoginStatus.value = 1
+		uni.showToast({
+			title: '登录成功，已切换为登录态！',
+			icon: 'success',
+		})
+	}
+
+	// ==================== 统一 Toast 交互反馈 ====================
+
+	/**
+	 * 弹窗提示通用反馈
+	 * @param {string} msg 提示内容
+	 */
+	const handleActionToast = (msg : string) => {
+		uni.showToast({
+			title: msg,
+			icon: 'none',
+		})
+	}
+
+	/**
+	 * 点击数据项回调
+	 * @param {number} index 项索引
+	 */
+	const handleDataClick = (index : number) => {
+		uni.showToast({
+			title: `点击了第 ${index + 1} 个数据项`,
+			icon: 'none',
+		})
+	}
+</script>
+
+<style scoped>
+	.page-container {
+		flex: 1;
+		background-color: #f7f8fa;
+		padding: 24rpx;
+	}
+
+	.page-header {
+		margin-bottom: 24rpx;
+		padding: 16rpx 8rpx;
+	}
+
+	.page-title {
+		font-size: 38rpx;
+		font-weight: bold;
+		color: #1a1a1a;
+	}
+
+	.page-desc {
+		font-size: 26rpx;
+		color: #666666;
+		margin-top: 10rpx;
+		line-height: 38rpx;
+	}
+
+	.demo-content {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.demo-card {
+		background-color: #ffffff;
+		border-radius: 16rpx;
+		padding: 24rpx;
+		margin-bottom: 28rpx;
+	}
+
+	.card-title {
+		font-size: 30rpx;
+		font-weight: bold;
+		color: #333333;
+		margin-bottom: 8rpx;
+	}
+
+	.sub-card-title {
+		font-size: 26rpx;
+		font-weight: 500;
+		color: #555555;
+		margin-top: 16rpx;
+		margin-bottom: 12rpx;
+	}
+
+	.card-desc {
+		font-size: 24rpx;
+		color: #888888;
+		margin-bottom: 20rpx;
+		line-height: 34rpx;
+	}
+
+	.card-inner {
+		background-color: #f5f6f8;
+		border-radius: 12rpx;
+		padding: 16rpx 0;
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
+	}
+
+	.mb-16 {
+		margin-bottom: 16rpx;
+	}
+
+	.mb-24 {
+		margin-bottom: 24rpx;
+	}
+
+	/* 自定义副标题插槽排版 */
+	.custom-desc-row {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+	}
+
+	.custom-desc-text {
+		font-size: 22rpx;
+		color: #ec3e1a;
+		margin-left: 6rpx;
+	}
+
+	.badge-text {
+		font-size: 20rpx;
+		color: #0090ff;
+		background-color: #e6f4ff;
+		padding: 2rpx 10rpx;
+		border-radius: 6rpx;
+	}
+
+	.badge-gold-text {
+		font-size: 20rpx;
+		color: #b45309;
+		background-color: #fef3c7;
+		padding: 2rpx 10rpx;
+		border-radius: 6rpx;
+	}
+
+	/* 控制按钮栏 */
+	.btn-group {
+		margin-top: 16rpx;
+		display: flex;
+		flex-direction: row;
+	}
+
+	.btn-item {
+		flex: 1;
+	}
+
+	.ctrl-btn-text {
+		font-size: 28rpx;
+		color: #ffffff;
+	}
+</style>

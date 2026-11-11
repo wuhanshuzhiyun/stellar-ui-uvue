@@ -1,0 +1,130 @@
+<template>
+	<scroll-view direction="vertical" class="page">
+		<!-- 页面头部说明 -->
+		<view class="header">
+			<text class="title">PieChart 饼图</text>
+			<text class="desc">极坐标系扇区占比展示，直观呈现各分类在整体中的份额，支持顺时针弧度展开动画。</text>
+		</view>
+
+		<!-- 1. 基础饼图 -->
+		<view class="section">
+			<text class="section-title">1. 基础份额占比饼图</text>
+			<text class="section-desc">扇区弧度按数据百分比自动映射，扇区内显示数据占比</text>
+			<view class="chart-card">
+				<ste-pie-chart :series="series1" height="420" />
+			</view>
+		</view>
+
+		<!-- 2. 多分类结构饼图 -->
+		<view class="section">
+			<text class="section-title">2. 多分类构成 (带图例)</text>
+			<text class="section-desc">底部图例对应各扇区，点击图例可隐藏/显示指定扇区并重新计算百分比</text>
+			<view class="chart-card">
+				<ste-pie-chart :series="series2" height="420" />
+			</view>
+		</view>
+
+		<!-- 3. 动态刷新 -->
+		<view class="section">
+			<text class="section-title">3. 动态数据弧度展开动画</text>
+			<text class="section-desc">点击按钮随机生成新比例，扇区平滑顺时针展开</text>
+			<view class="chart-card">
+				<ste-pie-chart :series="dynamicSeries" height="420" />
+			</view>
+			<view class="btn-box">
+				<button class="action-btn" size="mini" @click="randomizeData">随机新比例</button>
+			</view>
+		</view>
+	</scroll-view>
+</template>
+
+<script setup lang="uts">
+/**
+ * @file pie-chart.uvue
+ * @description PieChart 饼图全功能交互式 Demo
+ */
+
+const series1: UTSJSONObject[] = [
+	{ name: '移动端流量', value: 55, color: '#165DFF' },
+	{ name: '桌面端流量', value: 30, color: '#14C9C9' },
+	{ name: '平板端流量', value: 15, color: '#F7BA1E' }
+];
+
+const series2: UTSJSONObject[] = [
+	{ name: '餐饮美食', value: 35, color: '#165DFF' },
+	{ name: '数码家电', value: 25, color: '#14C9C9' },
+	{ name: '服饰鞋包', value: 20, color: '#722ED1' },
+	{ name: '美妆个护', value: 12, color: '#F7BA1E' },
+	{ name: '其他百货', value: 8, color: '#9FDB1D' }
+];
+
+const dynamicSeries = ref<UTSJSONObject[]>([
+	{ name: '核心客户', value: 40, color: '#165DFF' },
+	{ name: '潜在客户', value: 35, color: '#14C9C9' },
+	{ name: '流失预警', value: 25, color: '#FF7D00' }
+]);
+
+function randomizeData() {
+	const v1 = Math.floor(Math.random() * 40) + 20;
+	const v2 = Math.floor(Math.random() * 40) + 20;
+	const v3 = Math.floor(Math.random() * 30) + 10;
+	dynamicSeries.value = [
+		{ name: '核心客户', value: v1, color: '#165DFF' },
+		{ name: '潜在客户', value: v2, color: '#14C9C9' },
+		{ name: '流失预警', value: v3, color: '#FF7D00' }
+	];
+}
+</script>
+
+<style>
+.page {
+	padding: 24rpx;
+	background-color: #f7f8fa;
+	flex: 1;
+}
+.header {
+	margin-bottom: 28rpx;
+}
+.title {
+	font-size: 38rpx;
+	font-weight: bold;
+	color: #1f2329;
+}
+.desc {
+	font-size: 26rpx;
+	color: #646a73;
+	margin-top: 10rpx;
+	line-height: 38rpx;
+}
+.section {
+	margin-bottom: 32rpx;
+}
+.section-title {
+	font-size: 30rpx;
+	font-weight: bold;
+	color: #1f2329;
+}
+.section-desc {
+	font-size: 24rpx;
+	color: #8f959e;
+	margin-top: 6rpx;
+	margin-bottom: 14rpx;
+}
+.chart-card {
+	background-color: #ffffff;
+	border-radius: 16rpx;
+	padding: 16rpx;
+	box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
+}
+.btn-box {
+	margin-top: 16rpx;
+	flex-direction: row;
+	justify-content: center;
+}
+.action-btn {
+	background-color: #165dff;
+	color: #ffffff;
+	border-radius: 8rpx;
+	font-size: 26rpx;
+}
+</style>

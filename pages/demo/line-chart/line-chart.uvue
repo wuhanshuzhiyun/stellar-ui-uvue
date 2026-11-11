@@ -1,0 +1,177 @@
+<template>
+	<scroll-view direction="vertical" class="page">
+		<!-- 页面头部说明 -->
+		<view class="header">
+			<text class="title">LineChart 折线图</text>
+			<text class="desc">用于展示连续时间或有序分类内的数据变化趋势，支持直线折线、贝塞尔平滑曲线与触控吸附准星。</text>
+		</view>
+
+		<!-- 1. 基础用法 -->
+		<view class="section">
+			<text class="section-title">1. 基础单序列折线</text>
+			<text class="section-desc">单组数据随月份波动走势，触摸折线可触发十字吸附线与浮层</text>
+			<view class="chart-card">
+				<ste-line-chart :categories="categories1" :series="series1" height="420" />
+			</view>
+		</view>
+
+		<!-- 2. 多系列对比折线图 -->
+		<view class="section">
+			<text class="section-title">2. 多系列对比 (带图例交互)</text>
+			<text class="section-desc">支持点击底部图例动态隐藏/显示对应序列</text>
+			<view class="chart-card">
+				<ste-line-chart :categories="categories2" :series="series2" height="420" />
+			</view>
+		</view>
+
+		<!-- 3. 贝塞尔平滑曲线 -->
+		<view class="section">
+			<text class="section-title">3. 平滑曲线模式 (type="curve")</text>
+			<text class="section-desc">三次贝塞尔曲线算法，自然柔和，消除锐角折点</text>
+			<view class="chart-card">
+				<ste-line-chart
+					:categories="categories1"
+					:series="series3"
+					:extra="curveExtra"
+					height="420"
+				/>
+			</view>
+		</view>
+
+		<!-- 4. 动态随机数据刷新 -->
+		<view class="section">
+			<text class="section-title">4. 动态数据更新与动画</text>
+			<text class="section-desc">点击下方按钮触发数据实时刷新与入场补间动画</text>
+			<view class="chart-card">
+				<ste-line-chart :categories="categories1" :series="dynamicSeries" height="420" />
+			</view>
+			<view class="btn-box">
+				<button class="action-btn" size="mini" @click="randomizeData">随机生成新数据</button>
+			</view>
+		</view>
+	</scroll-view>
+</template>
+
+<script setup lang="uts">
+/**
+ * @file line-chart.uvue
+ * @description LineChart 折线图全功能交互式 Demo
+ */
+
+// 1. 基础单序列数据
+const categories1 = ['1月', '2月', '3月', '4月', '5月', '6月'];
+const series1: UTSJSONObject[] = [
+	{
+		name: '活跃用户',
+		data: [35, 52, 40, 68, 55, 84],
+		color: '#165DFF'
+	}
+];
+
+// 2. 多系列数据
+const categories2 = ['2019', '2020', '2021', '2022', '2023'];
+const series2: UTSJSONObject[] = [
+	{
+		name: '目标值',
+		data: [35, 45, 52, 60, 78],
+		color: '#165DFF'
+	},
+	{
+		name: '完成值',
+		data: [30, 48, 46, 65, 85],
+		color: '#14C9C9'
+	}
+];
+
+// 3. 曲线序列数据
+const series3: UTSJSONObject[] = [
+	{
+		name: '温度趋势',
+		data: [15, 22, 18, 28, 24, 30],
+		color: '#722ED1'
+	}
+];
+
+const curveExtra: UTSJSONObject = {
+	line: {
+		type: 'curve',
+		width: 3
+	}
+};
+
+// 4. 动态受控序列
+const dynamicSeries = ref<UTSJSONObject[]>([
+	{
+		name: '实时监测',
+		data: [20, 32, 28, 50, 42, 65],
+		color: '#F7BA1E'
+	}
+]);
+
+function randomizeData() {
+	const newNums: number[] = [];
+	for (let i = 0; i < 6; i++) {
+		newNums.push(Math.floor(Math.random() * 70) + 20);
+	}
+	dynamicSeries.value = [
+		{
+			name: '实时监测',
+			data: newNums,
+			color: '#F7BA1E'
+		}
+	];
+}
+</script>
+
+<style>
+.page {
+	padding: 24rpx;
+	background-color: #f7f8fa;
+	flex: 1;
+}
+.header {
+	margin-bottom: 28rpx;
+}
+.title {
+	font-size: 38rpx;
+	font-weight: bold;
+	color: #1f2329;
+}
+.desc {
+	font-size: 26rpx;
+	color: #646a73;
+	margin-top: 10rpx;
+	line-height: 38rpx;
+}
+.section {
+	margin-bottom: 32rpx;
+}
+.section-title {
+	font-size: 30rpx;
+	font-weight: bold;
+	color: #1f2329;
+}
+.section-desc {
+	font-size: 24rpx;
+	color: #8f959e;
+	margin-top: 6rpx;
+	margin-bottom: 14rpx;
+}
+.chart-card {
+	background-color: #ffffff;
+	border-radius: 16rpx;
+	padding: 16rpx;
+	box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
+}
+.btn-box {
+	margin-top: 16rpx;
+	flex-direction: row;
+	justify-content: center;
+}
+.action-btn {
+	background-color: #165dff;
+	color: #ffffff;
+	border-radius: 8rpx;
+	font-size: 26rpx;
+}
+</style>

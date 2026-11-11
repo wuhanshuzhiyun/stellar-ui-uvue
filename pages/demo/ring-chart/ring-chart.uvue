@@ -1,0 +1,148 @@
+<template>
+	<scroll-view direction="vertical" class="page">
+		<!-- 页面头部说明 -->
+		<view class="header">
+			<text class="title">RingChart 环形图</text>
+			<text class="desc">中空环形结构，中心区域用于展示核心聚合指标、总览数值或层级标题。</text>
+		</view>
+
+		<!-- 1. 基础环形图 -->
+		<view class="section">
+			<text class="section-title">1. 基础环形指标图 (带中心指标标题)</text>
+			<text class="section-desc">中心镂空区域展示聚合标题与说明，圆环展示结构占比</text>
+			<view class="chart-card">
+				<ste-ring-chart
+					:series="series1"
+					title="8,520"
+					subtitle="总访问量"
+					height="420"
+				/>
+			</view>
+		</view>
+
+		<!-- 2. 多分类环形图 -->
+		<view class="section">
+			<text class="section-title">2. 多分类资产占比 (带图例)</text>
+			<text class="section-desc">环带显示各资产比重，支持点击图例动态过滤重绘</text>
+			<view class="chart-card">
+				<ste-ring-chart
+					:series="series2"
+					title="100%"
+					subtitle="资产配置"
+					height="420"
+				/>
+			</view>
+		</view>
+
+		<!-- 3. 动态刷新 -->
+		<view class="section">
+			<text class="section-title">3. 动态数据圆环展开</text>
+			<text class="section-desc">点击按钮更新环形比例与中心总数</text>
+			<view class="chart-card">
+				<ste-ring-chart
+					:series="dynamicSeries"
+					:title="dynamicTotal"
+					subtitle="实时总数"
+					height="420"
+				/>
+			</view>
+			<view class="btn-box">
+				<button class="action-btn" size="mini" @click="randomizeData">随机更新比例</button>
+			</view>
+		</view>
+	</scroll-view>
+</template>
+
+<script setup lang="uts">
+/**
+ * @file ring-chart.uvue
+ * @description RingChart 环形图全功能交互式 Demo
+ */
+
+const series1: UTSJSONObject[] = [
+	{ name: '新访客', value: 5200, color: '#165DFF' },
+	{ name: '老访客', value: 3320, color: '#14C9C9' }
+];
+
+const series2: UTSJSONObject[] = [
+	{ name: '股票证券', value: 45, color: '#165DFF' },
+	{ name: '银行存款', value: 25, color: '#14C9C9' },
+	{ name: '基金理财', value: 20, color: '#722ED1' },
+	{ name: '现金资产', value: 10, color: '#F7BA1E' }
+];
+
+const dynamicSeries = ref<UTSJSONObject[]>([
+	{ name: '已完成', value: 70, color: '#165DFF' },
+	{ name: '进行中', value: 20, color: '#F7BA1E' },
+	{ name: '已逾期', value: 10, color: '#F53F3F' }
+]);
+
+const dynamicTotal = ref('100');
+
+function randomizeData() {
+	const done = Math.floor(Math.random() * 50) + 40;
+	const doing = Math.floor(Math.random() * 30) + 10;
+	const overdue = Math.floor(Math.random() * 20) + 5;
+	const sum = done + doing + overdue;
+
+	dynamicTotal.value = sum.toString();
+	dynamicSeries.value = [
+		{ name: '已完成', value: done, color: '#165DFF' },
+		{ name: '进行中', value: doing, color: '#F7BA1E' },
+		{ name: '已逾期', value: overdue, color: '#F53F3F' }
+	];
+}
+</script>
+
+<style>
+.page {
+	padding: 24rpx;
+	background-color: #f7f8fa;
+	flex: 1;
+}
+.header {
+	margin-bottom: 28rpx;
+}
+.title {
+	font-size: 38rpx;
+	font-weight: bold;
+	color: #1f2329;
+}
+.desc {
+	font-size: 26rpx;
+	color: #646a73;
+	margin-top: 10rpx;
+	line-height: 38rpx;
+}
+.section {
+	margin-bottom: 32rpx;
+}
+.section-title {
+	font-size: 30rpx;
+	font-weight: bold;
+	color: #1f2329;
+}
+.section-desc {
+	font-size: 24rpx;
+	color: #8f959e;
+	margin-top: 6rpx;
+	margin-bottom: 14rpx;
+}
+.chart-card {
+	background-color: #ffffff;
+	border-radius: 16rpx;
+	padding: 16rpx;
+	box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
+}
+.btn-box {
+	margin-top: 16rpx;
+	flex-direction: row;
+	justify-content: center;
+}
+.action-btn {
+	background-color: #165dff;
+	color: #ffffff;
+	border-radius: 8rpx;
+	font-size: 26rpx;
+}
+</style>

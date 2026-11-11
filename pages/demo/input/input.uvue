@@ -1,0 +1,213 @@
+<template>
+	<scroll-view direction="vertical" class="page">
+		<view class="section">
+			<text class="section-title">基础输入框</text>
+			<view class="demo-row">
+				<ste-input placeholder="请输入内容" border borderColor="#d9d9d9"></ste-input>
+			</view>
+		</view>
+
+		<view class="section">
+			<text class="section-title">带初始值</text>
+			<view class="demo-row">
+				<ste-input value="Hello Stellar UI" border borderColor="#d9d9d9"></ste-input>
+			</view>
+		</view>
+
+		<view class="section">
+			<text class="section-title">输入框类型</text>
+			<view class="demo-col">
+				<ste-input type="number" placeholder="数字输入框" border borderColor="#d9d9d9"></ste-input>
+				<view class="gap"></view>
+				<ste-input type="digit" placeholder="小数输入框" border borderColor="#d9d9d9"></ste-input>
+				<view class="gap"></view>
+				<ste-input type="tel" placeholder="电话输入框" border borderColor="#d9d9d9"></ste-input>
+			</view>
+		</view>
+
+		<view class="section">
+			<text class="section-title">密码输入框</text>
+			<view class="demo-row">
+				<ste-input type="password" placeholder="请输入密码" border borderColor="#d9d9d9"></ste-input>
+			</view>
+		</view>
+
+		<view class="section">
+			<text class="section-title">文本域</text>
+			<view class="demo-row">
+				<ste-input type="textarea" placeholder="请输入多行文本" :maxlength="200" :showWordLimit="true" border borderColor="#d9d9d9"></ste-input>
+			</view>
+		</view>
+
+		<view class="section">
+			<text class="section-title">禁用状态</text>
+			<view class="demo-col">
+				<ste-input value="禁用输入框" disabled border borderColor="#d9d9d9"></ste-input>
+				<view class="gap"></view>
+				<ste-input value="只读输入框" readonly border borderColor="#d9d9d9"></ste-input>
+			</view>
+		</view>
+
+		<view class="section">
+			<text class="section-title">形状</text>
+			<view class="demo-col">
+				<ste-input placeholder="方形输入框 (默认)" shape="square" border borderColor="#d9d9d9"></ste-input>
+				<view class="gap"></view>
+				<ste-input placeholder="圆形输入框" shape="circle" border borderColor="#d9d9d9"></ste-input>
+				<view class="gap"></view>
+				<ste-input placeholder="下划线输入框" shape="line" background="#f5f5f5"></ste-input>
+			</view>
+		</view>
+
+		<view class="section">
+			<text class="section-title">边框</text>
+			<view class="demo-col">
+				<ste-input placeholder="无边框 (默认)" background="#f5f5f5"></ste-input>
+				<view class="gap"></view>
+				<ste-input placeholder="带边框" border borderColor="#d9d9d9"></ste-input>
+				<view class="gap"></view>
+				<ste-input placeholder="自定义边框颜色" border borderColor="#0090FF"></ste-input>
+			</view>
+		</view>
+
+		<view class="section">
+			<text class="section-title">文本对齐</text>
+			<view class="demo-col">
+				<ste-input placeholder="左对齐 (默认)" inputAlign="left" border borderColor="#d9d9d9"></ste-input>
+				<view class="gap"></view>
+				<ste-input placeholder="居中对齐" inputAlign="center" border borderColor="#d9d9d9"></ste-input>
+				<view class="gap"></view>
+				<ste-input placeholder="右对齐" inputAlign="right" border borderColor="#d9d9d9"></ste-input>
+			</view>
+		</view>
+
+		<view class="section">
+			<text class="section-title">高度</text>
+			<view class="demo-col">
+				<ste-input placeholder="默认高度（88rpx 兜底）" border borderColor="#d9d9d9"></ste-input>
+				<view class="gap"></view>
+				<ste-input placeholder="120rpx" :height="120" border borderColor="#d9d9d9"></ste-input>
+				<view class="gap"></view>
+				<ste-input placeholder="60rpx（小于兜底高度）" :height="60" border borderColor="#d9d9d9"></ste-input>
+				<view class="gap"></view>
+				<ste-input placeholder="60px" height="60px" border borderColor="#d9d9d9"></ste-input>
+			</view>
+		</view>
+
+		<view class="section">
+			<text class="section-title">字体大小和颜色</text>
+			<view class="demo-col">
+				<ste-input placeholder="小号字体 20" :fontSize="20" border borderColor="#d9d9d9"></ste-input>
+				<view class="gap"></view>
+				<ste-input placeholder="默认字体 24" :fontSize="24" border borderColor="#d9d9d9"></ste-input>
+				<view class="gap"></view>
+				<ste-input placeholder="大号字体 32" :fontSize="32" border borderColor="#d9d9d9"></ste-input>
+				<view class="gap"></view>
+				<ste-input value="自定义颜色" fontColor="#0090FF" border borderColor="#d9d9d9"></ste-input>
+			</view>
+		</view>
+
+		<view class="section">
+			<text class="section-title">背景色</text>
+			<view class="demo-col">
+				<ste-input placeholder="浅灰背景" background="#f5f5f5"></ste-input>
+				<view class="gap"></view>
+				<ste-input placeholder="浅蓝背景" background="#e8f4fd"></ste-input>
+			</view>
+		</view>
+
+		<view class="section">
+			<text class="section-title">前后插槽</text>
+			<view class="demo-col">
+				<ste-input placeholder="请输入手机号" shape="circle" border borderColor="#d9d9d9">
+					<template v-slot:prefix>
+						<text class="slot-text">+86</text>
+					</template>
+				</ste-input>
+				<view class="gap"></view>
+				<ste-input placeholder="请输入验证码" shape="square" border borderColor="#d9d9d9">
+					<template v-slot:suffix>
+						<text class="slot-link">获取验证码</text>
+					</template>
+				</ste-input>
+			</view>
+		</view>
+
+		<view class="section">
+			<text class="section-title">占位符样式</text>
+			<view class="demo-row">
+				<ste-input placeholder="自定义占位符颜色" placeholderStyle="color: #999999" border borderColor="#d9d9d9"></ste-input>
+			</view>
+		</view>
+
+		<view class="section">
+			<text class="section-title">输入过滤（filter）</text>
+			<view class="demo-row">
+				<ste-input placeholder="只能输入数字" :filter="onlyNumber" border borderColor="#d9d9d9"></ste-input>
+			</view>
+		</view>
+
+		<view class="section">
+			<text class="section-title">自动聚焦</text>
+			<view class="demo-row">
+				<ste-input placeholder="自动聚焦" focus border borderColor="#d9d9d9"></ste-input>
+			</view>
+		</view>
+	
+	</scroll-view>
+</template>
+
+<script setup lang="uts">
+	defineOptions({ name: 'demo-input' })
+
+	/** 只保留数字，验证 filter 前置过滤 */
+	function onlyNumber(value : string) : string {
+		return value.replace(/[^\d]/g, '')
+	}
+</script>
+
+<style>
+	.page {
+		padding: 20rpx;
+		background-color: #f5f5f5;
+		flex: 1;
+	}
+
+	.section {
+		margin-bottom: 30rpx;
+		background-color: #ffffff;
+		border-radius: 16rpx;
+		padding: 24rpx;
+	}
+
+	.section-title {
+		font-size: 28rpx;
+		font-weight: bold;
+		color: #333333;
+		margin-bottom: 20rpx;
+	}
+
+	.demo-row {
+		flex-direction: column;
+	}
+
+	.demo-col {
+		flex-direction: column;
+	}
+
+	.gap {
+		height: 20rpx;
+	}
+
+	.slot-text {
+		font-size: 28rpx;
+		color: #333333;
+		padding-right: 12rpx;
+	}
+
+	.slot-link {
+		font-size: 28rpx;
+		color: #0090FF;
+		padding-left: 12rpx;
+	}
+</style>

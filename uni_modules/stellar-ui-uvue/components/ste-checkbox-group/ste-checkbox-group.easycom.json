@@ -1,0 +1,149 @@
+{
+    "name": "ste-checkbox-group",
+    "description": "复选框组组件，用于管理和统一控制多个复选框的状态与排版。",
+    "tutorial": "https://stellar-ui.intecloud.com.cn/?projectName=stellar-ui-uvue&menu=%E7%BB%84%E4%BB%B6&active=ste-checkbox",
+    "attributes": [
+        {
+            "name": "modelValue",
+            "description": "绑定值数组（支持 v-model 双向绑定）",
+            "type": "array",
+            "default": []
+        },
+        {
+            "name": "direction",
+            "description": "排列方向",
+            "type": "string",
+            "default": "column",
+            "values": [
+                {
+                    "name": "row",
+                    "description": "横向水平排列"
+                },
+                {
+                    "name": "column",
+                    "description": "纵向垂直排列"
+                }
+            ]
+        },
+        {
+            "name": "max",
+            "description": "最大可选数量，0 为不限制",
+            "type": "number",
+            "default": 0
+        },
+        {
+            "name": "disabled",
+            "description": "统一禁用组内所有复选框",
+            "type": "boolean",
+            "default": false
+        },
+        {
+            "name": "readonly",
+            "description": "统一设置组内所有复选框为只读状态（整组当前值不可更改）",
+            "type": "boolean",
+            "default": false
+        },
+        {
+            "name": "shape",
+            "description": "统一设置复选框图标形状",
+            "type": "string",
+            "default": "circle",
+            "values": [
+                {
+                    "name": "circle",
+                    "description": "圆形"
+                },
+                {
+                    "name": "square",
+                    "description": "矩形方形"
+                }
+            ]
+        },
+        {
+            "name": "iconSize",
+            "description": "统一设置复选框图标尺寸（单位 px/rpx）",
+            "type": "number | string"
+        },
+        {
+            "name": "checkedColor",
+            "description": "统一设置选中状态下的主题色",
+            "type": "string"
+        },
+        {
+            "name": "textPosition",
+            "description": "统一设置文本相对于图标的位置",
+            "type": "string",
+            "default": "right",
+            "values": [
+                {
+                    "name": "left",
+                    "description": "文本在图标左侧"
+                },
+                {
+                    "name": "right",
+                    "description": "文本在图标右侧"
+                }
+            ]
+        },
+        {
+            "name": "textSize",
+            "description": "统一设置文本字号大小（单位 px/rpx）",
+            "type": "number | string"
+        },
+        {
+            "name": "textInactiveColor",
+            "description": "统一设置未选中状态下的文本颜色",
+            "type": "string"
+        },
+        {
+            "name": "textActiveColor",
+            "description": "统一设置选中状态下的文本颜色",
+            "type": "string"
+        },
+        {
+            "name": "textDisabled",
+            "description": "是否统一禁用文本点击切换",
+            "type": "boolean",
+            "default": false
+        },
+        {
+            "name": "marginLeft",
+            "description": "统一设置复选框左边距",
+            "type": "number | string"
+        },
+        {
+            "name": "marginRight",
+            "description": "统一设置复选框右边距",
+            "type": "number | string"
+        },
+        {
+            "name": "columnGap",
+            "description": "复选框图标与文本之间的间距",
+            "type": "number | string"
+        },
+        {
+            "name": "[event]change",
+            "description": "当组内选中的值数组发生变化时触发",
+            "params": [
+                {
+                    "name": "value",
+                    "description": "改变后的当前选中值数组"
+                }
+            ]
+        },
+        {
+            "name": "[event]update:modelValue",
+            "description": "双向绑定值更新时触发",
+            "params": [
+                {
+                    "name": "value",
+                    "description": "更新后的选中值数组"
+                }
+            ]
+        },
+        {
+            "name": "[slot]default",
+            "description": "默认插槽，用于承载 ste-checkbox 列表"
+        }
+    ]
+}

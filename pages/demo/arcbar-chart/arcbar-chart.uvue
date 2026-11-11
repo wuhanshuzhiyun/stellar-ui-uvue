@@ -1,0 +1,194 @@
+<template>
+	<scroll-view direction="vertical" class="page">
+		<!-- 页面头部说明 -->
+		<view class="header">
+			<text class="title">ArcbarChart 弧形进度环</text>
+			<text class="desc">弧形开角进度条与环形柱状图，常用于展示核心 KPI 达成率、百分比打分与环形仪表量规。</text>
+		</view>
+
+		<!-- 1. 基础单圆弧进度条 -->
+		<view class="section">
+			<text class="section-title">1. 基础圆弧进度 (带中心标题)</text>
+			<text class="section-desc">单条圆弧进度展示，默认 270 度展开角，附带圆角端点与指标文字</text>
+			<view class="chart-card">
+				<ste-arcbar-chart
+					:series="series1"
+					title="75%"
+					subtitle="月度达成率"
+					width="702"
+					height="360"
+				/>
+			</view>
+		</view>
+
+		<!-- 2. 自定义颜色与粗细开角 -->
+		<view class="section">
+			<text class="section-title">2. 自定义圆弧粗细与底轨颜色</text>
+			<text class="section-desc">配置圆弧线条宽度为 16px，设置绿色健康主题色</text>
+			<view class="chart-card">
+				<ste-arcbar-chart
+					:series="series2"
+					title="88 分"
+					subtitle="健康评分"
+					width="702"
+					height="360"
+					:extra="extraCustom"
+				/>
+			</view>
+		</view>
+
+		<!-- 3. 双圆弧对比与高亮切换 -->
+		<view class="section">
+			<text class="section-title">3. 双圆弧指标对比与高亮交互</text>
+			<text class="section-desc">展示多个序列圆弧对比，支持切换 activeIndex 聚焦高亮特定圆弧</text>
+			<view class="chart-card">
+				<ste-arcbar-chart
+					:series="multiSeries"
+					:activeIndex="currentActive"
+					:inactiveOpacity="0.25"
+					title="双轨指标"
+					subtitle="实际 vs 目标"
+					width="702"
+					height="360"
+				/>
+			</view>
+			<view class="btn-box">
+				<button class="action-btn" size="mini" @click="toggleActive">切换高亮项 (当前: {{ currentActive }})</button>
+			</view>
+		</view>
+
+		<!-- 4. 动态补间动画更新 -->
+		<view class="section">
+			<text class="section-title">4. 动态数据补间展开</text>
+			<text class="section-desc">点击按钮随机生成新数据，平滑补间动画展开至目标数值</text>
+			<view class="chart-card">
+				<ste-arcbar-chart
+					:series="dynamicSeries"
+					:title="dynamicText"
+					subtitle="实时进度"
+					width="702"
+					height="360"
+				/>
+			</view>
+			<view class="btn-box">
+				<button class="action-btn" size="mini" @click="randomizeData">随机更新进度</button>
+			</view>
+		</view>
+	</scroll-view>
+</template>
+
+<script setup lang="uts">
+/**
+ * @file arcbar-chart.uvue
+ * @description ArcbarChart 弧形进度环全功能交互式 Demo (uni-app x / UTS 原生)
+ */
+
+// 1. 基础单圆弧数据 (75%)
+const series1: UTSJSONObject[] = [
+	{ name: '月度达成', value: 0.75, color: '#165DFF' }
+];
+
+// 2. 自定义圆弧数据 (88分)
+const series2: UTSJSONObject[] = [
+	{ name: '健康评分', value: 0.88, color: '#00B42A' }
+];
+
+const extraCustom: UTSJSONObject = {
+	arcbar: {
+		width: 16.0,
+		backgroundColor: '#E5E6EB',
+		lineCap: 'round'
+	}
+};
+
+// 3. 双圆弧对比数据
+const multiSeries = ref<UTSJSONObject[]>([
+	{ name: '实际完成', value: 0.82, color: '#165DFF' },
+	{ name: '同期基准', value: 0.65, color: '#F7BA1E' }
+]);
+const currentActive = ref<number>(-1);
+
+function toggleActive() {
+	if (currentActive.value === -1) {
+		currentActive.value = 0;
+	} else if (currentActive.value === 0) {
+		currentActive.value = 1;
+	} else {
+		currentActive.value = -1;
+	}
+}
+
+// 4. 动态随机更新数据
+const dynamicPercent = ref<number>(60);
+const dynamicText = ref<string>('60%');
+const dynamicSeries = ref<UTSJSONObject[]>([
+	{ name: '实时指标', value: 0.6, color: '#722ED1' }
+]);
+
+function randomizeData() {
+	const rand = Math.floor(Math.random() * 80) + 20; // 20 ~ 100
+	dynamicPercent.value = rand;
+	dynamicText.value = rand.toString() + '%';
+	dynamicSeries.value = [
+		{ name: '实时指标', value: rand / 100.0, color: '#722ED1' }
+	];
+}
+</script>
+
+<style>
+.page {
+	padding: 24rpx;
+	background-color: #f7f8fa;
+	flex: 1;
+}
+.header {
+	margin-bottom: 28rpx;
+}
+.title {
+	font-size: 38rpx;
+	font-weight: bold;
+	color: #1f2329;
+}
+.desc {
+	font-size: 26rpx;
+	color: #646a73;
+	margin-top: 10rpx;
+	line-height: 38rpx;
+}
+.section {
+	margin-bottom: 32rpx;
+}
+.section-title {
+	font-size: 30rpx;
+	font-weight: bold;
+	color: #1f2329;
+}
+.section-desc {
+	font-size: 24rpx;
+	color: #8f959e;
+	margin-top: 6rpx;
+	margin-bottom: 14rpx;
+}
+.chart-card {
+	background-color: #ffffff;
+	border-radius: 16rpx;
+	padding: 16rpx;
+	box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+}
+.btn-box {
+	margin-top: 16rpx;
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+}
+.action-btn {
+	background-color: #165dff;
+	color: #ffffff;
+	border-radius: 8rpx;
+	font-size: 26rpx;
+}
+</style>

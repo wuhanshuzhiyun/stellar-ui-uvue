@@ -1,0 +1,460 @@
+<template>
+	<scroll-view scroll-y="true" class="page-container">
+		<!-- 头部导航与功能简介 -->
+		<view class="page-header">
+			<text class="page-title">SelectSeat 在线选座</text>
+			<text class="page-desc">基于高性能 2D Canvas 硬件渲染，支持万级网格、多点触控缩放与拖拽、过道空位镂空、售出锁定置灰、浮动行号数字轴及已选票夹联动。</text>
+		</view>
+
+		<view class="demo-content">
+			<!-- 用例 1：标准影院购票选座 -->
+			<view class="demo-card">
+				<text class="card-title">1. 标准影院购票选座 (图例与实时票夹联动)</text>
+				<text class="card-desc">双指缩放、单指平移、点击选座；左侧附带浮动行号轴，底部展示选票结果卡片与合计总价。</text>
+
+				<!-- 图例说明区 -->
+				<view class="legend-row">
+					<view class="legend-item">
+						<view class="legend-box available" />
+						<text class="legend-text">可选</text>
+					</view>
+					<view class="legend-item">
+						<view class="legend-box selected" />
+						<text class="legend-text">已选</text>
+					</view>
+					<view class="legend-item">
+						<view class="legend-box disabled" />
+						<text class="legend-text">已售</text>
+					</view>
+					<view class="legend-item">
+						<view class="legend-box couple" />
+						<text class="legend-text">情侣座</text>
+					</view>
+				</view>
+
+				<!-- 荧幕视觉指示区 -->
+				<view class="screen-box">
+					<view class="screen-line" />
+					<text class="screen-title">1 号杜比全景声激光巨幕厅 (银幕中央)</text>
+				</view>
+
+				<!-- 选座主画布 -->
+				<view class="seat-container">
+					<ste-select-seat
+						v-model="selectedSeats1"
+						:rows="8"
+						:cols="10"
+						:width="canvasWidth"
+						:height="320"
+						:seats="customSeats1"
+						@seat-click="onSeatClick"
+						@move="onSeatMove"
+					/>
+				</view>
+
+				<!-- 已选座位票夹面板 -->
+				<view class="ticket-panel">
+					<text class="ticket-panel-title">已选座位 ({{ selectedSeats1.length }}/4)</text>
+					<view v-if="selectedSeats1.length > 0" class="ticket-tags-row">
+						<view
+							v-for="(item, index) in selectedSeats1"
+							:key="index"
+							class="ticket-tag"
+							@click="removeSeat(index)"
+						>
+							<text class="ticket-tag-text">{{ item.row + 1 }}排{{ item.col + 1 }}座</text>
+							<text class="ticket-tag-close">×</text>
+						</view>
+					</view>
+					<text v-else class="ticket-empty-text">请在上方座位图挑选心仪的座位</text>
+
+					<!-- 底部结算栏 -->
+					<view class="checkout-row">
+						<view class="checkout-info">
+							<text class="price-symbol">¥</text>
+							<text class="price-value">{{ selectedSeats1.length * 45 }}</text>
+							<text class="price-label">（单价 ¥45/座）</text>
+						</view>
+						<ste-button
+							:round="true"
+							background="#0090FF"
+							color="#FFFFFF"
+							:disabled="selectedSeats1.length == 0"
+							@click="onConfirmBuy"
+						>
+							立即购票
+						</ste-button>
+					</view>
+				</view>
+			</view>
+
+			<!-- 用例 2：VIP 贵宾包厢自定义配色 -->
+			<view class="demo-card">
+				<text class="card-title">2. VIP 贵宾包厢 (奢华黑金配色)</text>
+				<text class="card-desc">自定义背景色、边框色、选中色与禁用色，满足剧院、音乐会等高品质场景需求。</text>
+				<view class="seat-container">
+					<ste-select-seat
+						v-model="selectedSeats2"
+						:rows="5"
+						:cols="8"
+						:width="canvasWidth"
+						:height="260"
+						:seats="vipSeats"
+						bgColor="#2C2C2C"
+						borderColor="#444444"
+						selectedBgColor="#D4AF37"
+						selectedColor="#1A1A1A"
+						disabledBgColor="#555555"
+					/>
+				</view>
+				<view class="card-tip">
+					<text class="card-tip-text">VIP 已选：{{ selectedSeats2.length }} 个座席</text>
+				</view>
+			</view>
+
+			<!-- 交互日志输出 -->
+			<view class="demo-card">
+				<text class="card-title">视口手势实时监控</text>
+				<view class="log-box">
+					<text class="log-text">{{ moveLog }}</text>
+				</view>
+			</view>
+		</view>
+	</scroll-view>
+</template>
+
+<script setup lang="uts">
+	import { ref, onMounted } from 'vue'
+	import {
+		SteSelectSeatValue,
+		SteSelectSeatItem,
+		SteSelectSeatMoveEvent,
+	} from '../../../uni_modules/stellar-ui-uvue/components/ste-select-seat/types.uts'
+
+	// 动态计算画布宽度（适配整屏边距）
+	const canvasWidth = ref<number>(340)
+
+	// 用例 1：已选座位数据
+	const selectedSeats1 = ref<SteSelectSeatValue[]>([
+		{ row: 4, col: 4 } as SteSelectSeatValue,
+		{ row: 4, col: 5 } as SteSelectSeatValue,
+	])
+
+	// 用例 1：自定义影院座位（已售、通道空位与情侣座）
+	const customSeats1 = ref<SteSelectSeatItem[]>([
+		// 中间过道走廊空位
+		{ row: 0, col: 4, empty: true } as SteSelectSeatItem,
+		{ row: 1, col: 4, empty: true } as SteSelectSeatItem,
+		{ row: 2, col: 4, empty: true } as SteSelectSeatItem,
+		{ row: 3, col: 4, empty: true } as SteSelectSeatItem,
+		{ row: 4, col: 4, empty: true } as SteSelectSeatItem,
+		{ row: 5, col: 4, empty: true } as SteSelectSeatItem,
+		{ row: 6, col: 4, empty: true } as SteSelectSeatItem,
+		{ row: 7, col: 4, empty: true } as SteSelectSeatItem,
+		// 已售出不可选座位
+		{ row: 2, col: 2, disabled: true } as SteSelectSeatItem,
+		{ row: 2, col: 3, disabled: true } as SteSelectSeatItem,
+		{ row: 3, col: 6, disabled: true } as SteSelectSeatItem,
+		{ row: 3, col: 7, disabled: true } as SteSelectSeatItem,
+		{ row: 5, col: 2, disabled: true } as SteSelectSeatItem,
+		// 最后一排情侣座
+		{ row: 7, col: 0, bgColor: '#FFF0F5', borderColor: '#FFB6C1', selectedBgColor: '#FF69B4' } as SteSelectSeatItem,
+		{ row: 7, col: 1, bgColor: '#FFF0F5', borderColor: '#FFB6C1', selectedBgColor: '#FF69B4' } as SteSelectSeatItem,
+		{ row: 7, col: 8, bgColor: '#FFF0F5', borderColor: '#FFB6C1', selectedBgColor: '#FF69B4' } as SteSelectSeatItem,
+		{ row: 7, col: 9, bgColor: '#FFF0F5', borderColor: '#FFB6C1', selectedBgColor: '#FF69B4' } as SteSelectSeatItem,
+	])
+
+	// 用例 2：VIP 贵宾座
+	const selectedSeats2 = ref<SteSelectSeatValue[]>([
+		{ row: 1, col: 3 } as SteSelectSeatValue,
+	])
+
+	const vipSeats = ref<SteSelectSeatItem[]>([
+		{ row: 0, col: 0, disabled: true } as SteSelectSeatItem,
+		{ row: 0, col: 7, disabled: true } as SteSelectSeatItem,
+		{ row: 2, col: 3, empty: true } as SteSelectSeatItem,
+		{ row: 2, col: 4, empty: true } as SteSelectSeatItem,
+	])
+
+	// 手势监控日志
+	const moveLog = ref<string>('滑动或双指缩放画布可在此观察物理视口变换参数')
+
+	/**
+	 * 移除已选座位
+	 */
+	function removeSeat(index : number) {
+		selectedSeats1.value.splice(index, 1)
+	}
+
+	/**
+	 * 座位点击响应
+	 */
+	function onSeatClick(seat : SteSelectSeatItem) {
+		moveLog.value = `[点击座位] ${seat.row + 1}排${seat.col + 1}座`
+	}
+
+	/**
+	 * 视口平移与缩放监听
+	 */
+	function onSeatMove(e : SteSelectSeatMoveEvent) {
+		moveLog.value = `[视口手势] scale: ${e.scale.toFixed(2)}, tx: ${e.translateX.toFixed(1)}, ty: ${e.translateY.toFixed(1)}`
+	}
+
+	/**
+	 * 确认购票
+	 */
+	function onConfirmBuy() {
+		uni.showToast({
+			title: `成功选定 ${selectedSeats1.value.length} 张电影票`,
+			icon: 'success',
+		})
+	}
+
+	onMounted(() => {
+		// 根据屏幕窗口宽度计算最佳画布宽度
+		const sys = uni.getWindowInfo()
+		const screenW = sys.windowWidth
+		if (screenW > 40) {
+			canvasWidth.value = screenW - 32
+		}
+	})
+</script>
+
+<style scoped>
+.page-container {
+	flex: 1;
+	background-color: #F7F8FA;
+	padding-left: 24rpx;
+	padding-right: 24rpx;
+	padding-top: 24rpx;
+	padding-bottom: 80rpx;
+}
+
+.page-header {
+	margin-bottom: 24rpx;
+}
+
+.page-title {
+	font-size: 38rpx;
+	font-weight: bold;
+	color: #1A1A1A;
+	margin-bottom: 12rpx;
+}
+
+.page-desc {
+	font-size: 26rpx;
+	color: #7A7A7A;
+	line-height: 38rpx;
+}
+
+.demo-content {
+	flex-direction: column;
+}
+
+.demo-card {
+	background-color: #FFFFFF;
+	border-radius: 16rpx;
+	padding: 24rpx;
+	margin-bottom: 24rpx;
+}
+
+.card-title {
+	font-size: 30rpx;
+	font-weight: bold;
+	color: #222222;
+	margin-bottom: 8rpx;
+}
+
+.card-desc {
+	font-size: 24rpx;
+	color: #8C8C8C;
+	line-height: 34rpx;
+	margin-bottom: 20rpx;
+}
+
+/* 图例区 */
+.legend-row {
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+	padding-bottom: 20rpx;
+}
+
+.legend-item {
+	flex-direction: row;
+	align-items: center;
+	margin-left: 16rpx;
+	margin-right: 16rpx;
+}
+
+.legend-box {
+	width: 28rpx;
+	height: 28rpx;
+	border-radius: 6rpx;
+	margin-right: 8rpx;
+}
+
+.legend-box.available {
+	background-color: #FFFFFF;
+	border-width: 1px;
+	border-style: solid;
+	border-color: #E5E5E5;
+}
+
+.legend-box.selected {
+	background-color: #0090FF;
+}
+
+.legend-box.disabled {
+	background-color: #CCCCCC;
+}
+
+.legend-box.couple {
+	background-color: #FFF0F5;
+	border-width: 1px;
+	border-style: solid;
+	border-color: #FFB6C1;
+}
+
+.legend-text {
+	font-size: 22rpx;
+	color: #666666;
+}
+
+/* 荧幕区域 */
+.screen-box {
+	align-items: center;
+	margin-bottom: 16rpx;
+}
+
+.screen-line {
+	width: 380rpx;
+	height: 6rpx;
+	background-color: #E2E8F0;
+	border-radius: 999px;
+	margin-bottom: 8rpx;
+}
+
+.screen-title {
+	font-size: 20rpx;
+	color: #94A3B8;
+}
+
+/* 画布包装容器 */
+.seat-container {
+	border-radius: 16rpx;
+	overflow: hidden;
+	align-items: center;
+	justify-content: center;
+}
+
+/* 票夹面板 */
+.ticket-panel {
+	margin-top: 24rpx;
+	padding-top: 20rpx;
+	border-top-width: 1px;
+	border-top-style: solid;
+	border-top-color: #F1F5F9;
+}
+
+.ticket-panel-title {
+	font-size: 26rpx;
+	font-weight: bold;
+	color: #334155;
+	margin-bottom: 14rpx;
+}
+
+.ticket-tags-row {
+	flex-direction: row;
+	flex-wrap: wrap;
+}
+
+.ticket-tag {
+	flex-direction: row;
+	align-items: center;
+	background-color: #F0F7FF;
+	border-width: 1px;
+	border-style: solid;
+	border-color: #BAE0FF;
+	border-radius: 8rpx;
+	padding-left: 14rpx;
+	padding-right: 12rpx;
+	padding-top: 6rpx;
+	padding-bottom: 6rpx;
+	margin-right: 14rpx;
+	margin-bottom: 12rpx;
+}
+
+.ticket-tag-text {
+	font-size: 22rpx;
+	color: #0090FF;
+	margin-right: 8rpx;
+}
+
+.ticket-tag-close {
+	font-size: 24rpx;
+	color: #0090FF;
+	font-weight: bold;
+}
+
+.ticket-empty-text {
+	font-size: 24rpx;
+	color: #94A3B8;
+	margin-top: 8rpx;
+	margin-bottom: 8rpx;
+}
+
+/* 结算行 */
+.checkout-row {
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+	margin-top: 20rpx;
+}
+
+.checkout-info {
+	flex-direction: row;
+	align-items: flex-end;
+}
+
+.price-symbol {
+	font-size: 24rpx;
+	font-weight: bold;
+	color: #FF4D4F;
+}
+
+.price-value {
+	font-size: 42rpx;
+	font-weight: bold;
+	color: #FF4D4F;
+	margin-right: 8rpx;
+}
+
+.price-label {
+	font-size: 22rpx;
+	color: #8C8C8C;
+}
+
+.card-tip {
+	margin-top: 14rpx;
+}
+
+.card-tip-text {
+	font-size: 24rpx;
+	color: #D4AF37;
+}
+
+/* 监控日志 */
+.log-box {
+	background-color: #1E1E1E;
+	padding: 16rpx;
+	border-radius: 8rpx;
+	margin-top: 12rpx;
+}
+
+.log-text {
+	font-size: 22rpx;
+	color: #00FF88;
+	line-height: 32rpx;
+}
+</style>

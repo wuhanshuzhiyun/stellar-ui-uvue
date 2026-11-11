@@ -1,0 +1,198 @@
+<template>
+	<scroll-view scroll-y="true" class="page">
+		<view class="header">
+			<text class="title">CodeInput 验证码输入</text>
+			<text class="desc">用于输入验证码、密码等场景</text>
+		</view>
+
+		<!-- 基础用法 -->
+		<view class="demo-item">
+			<text class="demo-title">基础用法</text>
+			<view class="demo-content">
+				<ste-code-input v-model="code1" @finish="onFinish" />
+			</view>
+			<view class="demo-result">
+			<text class="demo-result-text">当前值：{{ code1 }}</text>
+		</view>
+		</view>
+
+		<!-- 自定义长度 -->
+		<view class="demo-item">
+			<text class="demo-title">4 位验证码</text>
+			<view class="demo-content">
+				<ste-code-input v-model="code2" :maxlength="4" @finish="onFinish" />
+			</view>
+			<view class="demo-result">
+			<text class="demo-result-text">当前值：{{ code2 }}</text>
+		</view>
+		</view>
+
+		<!-- 下划线模式 -->
+		<view class="demo-item">
+			<text class="demo-title">下划线模式</text>
+			<view class="demo-content">
+				<ste-code-input v-model="code3" mode="line" :maxlength="6" @finish="onFinish" />
+			</view>
+			<view class="demo-result">
+			<text class="demo-result-text">当前值：{{ code3 }}</text>
+		</view>
+		</view>
+
+		<!-- 密码模式 -->
+		<view class="demo-item">
+			<text class="demo-title">密码模式（使用 formatter）</text>
+			<view class="demo-content">
+				<ste-code-input v-model="code4" formatter="*" :maxlength="6" @finish="onFinish" />
+			</view>
+			<view class="demo-result">
+			<text class="demo-result-text">当前值：{{ code4 }}</text>
+		</view>
+		</view>
+
+		<!-- 自定义样式 -->
+		<view class="demo-item">
+			<text class="demo-title">自定义样式</text>
+			<view class="demo-content">
+				<ste-code-input
+					v-model="code5"
+					:maxlength="6"
+					:size="80"
+					:space="20"
+					fontColor="#e74c3c"
+					borderColor="#e74c3c"
+					@finish="onFinish"
+				/>
+			</view>
+			<view class="demo-result">
+			<text class="demo-result-text">当前值：{{ code5 }}</text>
+		</view>
+		</view>
+
+		<!-- 无间距盒子模式 -->
+		<view class="demo-item">
+			<text class="demo-title">无间距盒子模式</text>
+			<view class="demo-content">
+				<ste-code-input v-model="code6" :space="0" :maxlength="6" @finish="onFinish" />
+			</view>
+			<view class="demo-result">
+			<text class="demo-result-text">当前值：{{ code6 }}</text>
+		</view>
+		</view>
+
+		<!-- 只读模式 -->
+		<view class="demo-item">
+			<text class="demo-title">只读模式</text>
+			<view class="demo-content">
+				<ste-code-input v-model="code7" :readonly="true" :maxlength="6" />
+			</view>
+			<view class="demo-result">
+			<text class="demo-result-text">当前值：{{ code7 }}（不可编辑）</text>
+		</view>
+		</view>
+
+		<!-- 事件监听 -->
+		<view class="demo-item">
+			<text class="demo-title">事件监听</text>
+			<view class="demo-content">
+				<ste-code-input
+					v-model="code8"
+					:maxlength="6"
+					@change="onChange"
+					@finish="onFinish"
+				/>
+			</view>
+			<view class="demo-result">
+			<text class="demo-result-text">change 次数：{{ changeCount }}</text>
+			<text class="demo-result-text">finish 次数：{{ finishCount }}</text>
+			<text class="demo-result-text">当前值：{{ code8 }}</text>
+		</view>
+		</view>
+	</scroll-view>
+</template>
+
+<script setup lang="uts">
+	import { ref } from 'vue'
+
+	const code1 = ref('')
+	const code2 = ref('')
+	const code3 = ref('')
+	const code4 = ref('')
+	const code5 = ref('')
+	const code6 = ref('')
+	const code7 = ref('123456')
+	const code8 = ref('')
+
+	const changeCount = ref(0)
+	const finishCount = ref(0)
+
+	const onChange = (value : string) => {
+		changeCount.value++
+	}
+
+	const onFinish = (value : string) => {
+		finishCount.value++
+		uni.showToast({
+			title: '输入完成：' + value,
+			icon: 'none',
+		})
+	}
+</script>
+
+<style>
+	.page {
+		padding: 20rpx;
+		flex: 1;
+	}
+
+	.header {
+		padding: 20rpx 0;
+		margin-bottom: 20rpx;
+	}
+
+	.title {
+		font-size: 40rpx;
+		font-weight: bold;
+		color: #333;
+	}
+
+	.desc {
+		font-size: 28rpx;
+		color: #666;
+		margin-top: 10rpx;
+	}
+
+	.demo-item {
+		background: #fff;
+		border-radius: 16rpx;
+		margin-bottom: 24rpx;
+		overflow: hidden;
+		box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+	}
+
+	.demo-title {
+		padding: 24rpx 30rpx;
+		font-size: 30rpx;
+		font-weight: 500;
+		color: #333;
+		border-bottom: 1rpx solid #f0f0f0;
+	}
+
+	.demo-content {
+		padding: 40rpx 30rpx;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.demo-result {
+		padding: 20rpx 30rpx;
+		background: #f9f9f9;
+		border-top: 1rpx solid #f0f0f0;
+	}
+
+	.demo-result-text {
+		font-size: 26rpx;
+		color: #666;
+		line-height: 40rpx;
+	}
+</style>

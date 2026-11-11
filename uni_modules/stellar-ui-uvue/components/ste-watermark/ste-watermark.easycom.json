@@ -1,0 +1,78 @@
+{
+    "name": "ste-watermark",
+    "description": "水印组件，采用轻量原生 VDOM 网格平铺引擎，支持全屏与局部平铺、多行文本、图片水印及自定义旋转角度与字体样式",
+    "example": "<ste-watermark content=\"Stellar UI uvue\"></ste-watermark>",
+    "tutorial": "https://stellar-ui.intecloud.com.cn/?projectName=stellar-ui-uvue&menu=%E7%BB%84%E4%BB%B6&active=ste-watermark",
+    "attributes": [
+        {
+            "name": "width",
+            "description": "单个水印宽度，单位 px",
+            "type": "number",
+            "default": 120
+        },
+        {
+            "name": "height",
+            "description": "单个水印高度，单位 px",
+            "type": "number",
+            "default": 64
+        },
+        {
+            "name": "rotate",
+            "description": "水印旋转角度，单位 °",
+            "type": "number",
+            "default": -22
+        },
+        {
+            "name": "zIndex",
+            "description": "水印元素的 z-index 层级",
+            "type": "number",
+            "default": 9
+        },
+        {
+            "name": "image",
+            "description": "水印图片链接或本地资源路径，优先级高于文字",
+            "type": "string"
+        },
+        {
+            "name": "content",
+            "description": "水印文本内容，可为字符串或多行字符串数组",
+            "type": "string / array",
+            "default": "ste-watermark"
+        },
+        {
+            "name": "font",
+            "description": "文字样式对象（color, fontSize, fontWeight, fontStyle, fontFamily, textAlign）",
+            "type": "object"
+        },
+        {
+            "name": "gapX",
+            "description": "水印之间的水平间距，单位 px",
+            "type": "number",
+            "default": 50
+        },
+        {
+            "name": "gapY",
+            "description": "水印之间的垂直间距，单位 px",
+            "type": "number",
+            "default": 50
+        },
+        {
+            "name": "imageWidth",
+            "description": "使用图片水印时图片的宽度，单位 px",
+            "type": "number",
+            "default": 120
+        },
+        {
+            "name": "imageHeight",
+            "description": "使用图片水印时图片的高度，单位 px",
+            "type": "number",
+            "default": 64
+        },
+        {
+            "name": "fullPage",
+            "description": "是否覆盖整个页面（true 为全屏固定，false 为局部容器）",
+            "type": "boolean",
+            "default": true
+        }
+    ]
+}

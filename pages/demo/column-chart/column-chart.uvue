@@ -1,0 +1,174 @@
+<template>
+	<scroll-view direction="vertical" class="page">
+		<!-- 页面头部说明 -->
+		<view class="header">
+			<text class="title">ColumnChart 柱状图</text>
+			<text class="desc">纵向柱状排列展示不同类目的数值对比，支持单列/多列并列、圆角立柱与入场向上拔高动画。</text>
+		</view>
+
+		<!-- 1. 基础单序列柱状图 -->
+		<view class="section">
+			<text class="section-title">1. 基础单列柱状图</text>
+			<text class="section-desc">单序列柱状对比，顶部微圆角与数值文案标注</text>
+			<view class="chart-card">
+				<ste-column-chart :categories="categories1" :series="series1" height="420" />
+			</view>
+		</view>
+
+		<!-- 2. 多系列并列对比 -->
+		<view class="section">
+			<text class="section-title">2. 多系列并列对比 (图例支持)</text>
+			<text class="section-desc">同一分类下多根柱体并排对比，支持点击图例过滤序列</text>
+			<view class="chart-card">
+				<ste-column-chart :categories="categories2" :series="series2" height="420" />
+			</view>
+		</view>
+
+		<!-- 3. 自定义圆角与柱宽 -->
+		<view class="section">
+			<text class="section-title">3. 定制粗柱与大圆角</text>
+			<text class="section-desc">通过 extra.column 定制立柱宽度与圆角半径</text>
+			<view class="chart-card">
+				<ste-column-chart
+					:categories="categories1"
+					:series="series3"
+					:extra="customColExtra"
+					height="420"
+				/>
+			</view>
+		</view>
+
+		<!-- 4. 动态刷新 -->
+		<view class="section">
+			<text class="section-title">4. 动态数据拔高动画</text>
+			<text class="section-desc">点击按钮更新数据，立柱重新向上平滑拔高生长</text>
+			<view class="chart-card">
+				<ste-column-chart :categories="categories1" :series="dynamicSeries" height="420" />
+			</view>
+			<view class="btn-box">
+				<button class="action-btn" size="mini" @click="randomizeData">随机更新数据</button>
+			</view>
+		</view>
+	</scroll-view>
+</template>
+
+<script setup lang="uts">
+/**
+ * @file column-chart.uvue
+ * @description ColumnChart 柱状图全功能交互式 Demo
+ */
+
+const categories1 = ['一季度', '二季度', '三季度', '四季度'];
+
+const series1: UTSJSONObject[] = [
+	{
+		name: '营收 (万元)',
+		data: [65, 82, 96, 120],
+		color: '#165DFF'
+	}
+];
+
+const categories2 = ['北京', '上海', '广州', '深圳', '杭州'];
+const series2: UTSJSONObject[] = [
+	{
+		name: '去年同期',
+		data: [42, 58, 45, 60, 38],
+		color: '#14C9C9'
+	},
+	{
+		name: '今年业绩',
+		data: [56, 72, 60, 80, 52],
+		color: '#165DFF'
+	}
+];
+
+const series3: UTSJSONObject[] = [
+	{
+		name: '能耗指标',
+		data: [30, 48, 65, 52],
+		color: '#722ED1'
+	}
+];
+
+const customColExtra: UTSJSONObject = {
+	column: {
+		width: 28,
+		borderRadius: 8
+	}
+};
+
+const dynamicSeries = ref<UTSJSONObject[]>([
+	{
+		name: '月度销售',
+		data: [45, 70, 60, 95],
+		color: '#F7BA1E'
+	}
+]);
+
+function randomizeData() {
+	const newNums: number[] = [];
+	for (let i = 0; i < 4; i++) {
+		newNums.push(Math.floor(Math.random() * 80) + 30);
+	}
+	dynamicSeries.value = [
+		{
+			name: '月度销售',
+			data: newNums,
+			color: '#F7BA1E'
+		}
+	];
+}
+</script>
+
+<style>
+.page {
+	padding: 24rpx;
+	background-color: #f7f8fa;
+	flex: 1;
+}
+.header {
+	margin-bottom: 28rpx;
+}
+.title {
+	font-size: 38rpx;
+	font-weight: bold;
+	color: #1f2329;
+}
+.desc {
+	font-size: 26rpx;
+	color: #646a73;
+	margin-top: 10rpx;
+	line-height: 38rpx;
+}
+.section {
+	margin-bottom: 32rpx;
+}
+.section-title {
+	font-size: 30rpx;
+	font-weight: bold;
+	color: #1f2329;
+}
+.section-desc {
+	font-size: 24rpx;
+	color: #8f959e;
+	margin-top: 6rpx;
+	margin-bottom: 14rpx;
+}
+.chart-card {
+	background-color: #ffffff;
+	border-radius: 16rpx;
+	padding: 16rpx;
+	box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
+}
+.btn-box {
+	margin-top: 16rpx;
+	flex-direction: row;
+	justify-content: center;
+}
+.action-btn {
+	background-color: #165dff;
+	color: #ffffff;
+	border-radius: 8rpx;
+	font-size: 26rpx;
+}
+</style>

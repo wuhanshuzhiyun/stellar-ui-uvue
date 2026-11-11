@@ -1,0 +1,124 @@
+{
+    "name": "ste-message-box",
+    "description": "模拟系统的消息提示框而实现的一套模态对话框组件，用于消息提示、确认消息和提交内容。",
+    "example": "<ste-message-box></ste-message-box>",
+    "tutorial": "https://stellar-ui.intecloud.com.cn/?projectName=stellar-ui-uvue&menu=%E7%BB%84%E4%BB%B6&active=ste-message-box",
+    "attributes": [
+        {
+            "name": "selector",
+            "description": "弹窗专属选择器标识 (用于单页面多实例隔离)",
+            "type": "string",
+            "default": ""
+        },
+        {
+            "name": "show",
+            "description": "是否显示弹窗，支持 v-model:show 双向绑定 (增强)",
+            "type": "boolean",
+            "default": false
+        },
+        {
+            "name": "title",
+            "description": "提示的标题",
+            "type": "string",
+            "default": "提示"
+        },
+        {
+            "name": "content",
+            "description": "提示的内容文本",
+            "type": "string",
+            "default": ""
+        },
+        {
+            "name": "icon",
+            "description": "提示区域显示图标，此时 content 会失效",
+            "type": "string",
+            "default": "",
+            "values": [
+                {
+                    "name": "info",
+                    "description": "信息提示图标"
+                },
+                {
+                    "name": "success",
+                    "description": "成功提示图标"
+                },
+                {
+                    "name": "error",
+                    "description": "错误提示图标"
+                }
+            ]
+        },
+        {
+            "name": "showCancel",
+            "description": "是否显示取消按钮",
+            "type": "boolean",
+            "default": true
+        },
+        {
+            "name": "cancelText",
+            "description": "取消按钮的文字",
+            "type": "string",
+            "default": "取消"
+        },
+        {
+            "name": "cancelColor",
+            "description": "取消按钮的文字颜色",
+            "type": "string",
+            "default": "#333333"
+        },
+        {
+            "name": "confirmText",
+            "description": "确认按钮的文字",
+            "type": "string",
+            "default": "确认"
+        },
+        {
+            "name": "confirmColor",
+            "description": "确认按钮的文字颜色",
+            "type": "string",
+            "default": "#0090FF"
+        },
+        {
+            "name": "editable",
+            "description": "是否显示输入框 (Prompt 模式)",
+            "type": "boolean",
+            "default": false
+        },
+        {
+            "name": "placeholderText",
+            "description": "显示输入框时的提示文本",
+            "type": "string",
+            "default": "请输入"
+        },
+        {
+            "name": "zIndex",
+            "description": "自定义层级 z-index (增强)",
+            "type": "number",
+            "default": 99999
+        },
+        {
+            "name": "closeOnClickOverlay",
+            "description": "是否允许点击背景遮罩层关闭 (增强)",
+            "type": "boolean",
+            "default": false
+        },
+        {
+            "name": "confirm",
+            "description": "点击确认的回调函数",
+            "type": "Function",
+            "default": null
+        },
+        {
+            "name": "cancel",
+            "description": "点击取消的回调函数",
+            "type": "Function",
+            "default": null
+        },
+        {
+            "name": "complete",
+            "description": "弹框关闭的回调函数（无论是确认关闭还是取消关闭）",
+            "type": "Function",
+            "default": null
+        }
+    ]
+}

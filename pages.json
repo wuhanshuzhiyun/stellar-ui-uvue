@@ -1,0 +1,511 @@
+{
+	"pages": [
+		{
+			"path": "pages/index/index",
+			"style": {
+				"navigationBarTitleText": "Stellar UI uvue",
+				"disableScroll": false
+			}
+		}
+	],
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "Stellar UI uvue",
+		"navigationBarBackgroundColor": "#F8F8F8",
+		"backgroundColor": "#F8F8F8"
+	},
+	"uniIdRouter": {},
+	"subPackages": [
+		{
+			"root": "pages/demo",
+			"pages": [
+				{
+					"path": "animate/animate",
+					"style": {
+						"navigationBarTitleText": "animate"
+					}
+				},
+				{
+					"path": "app-update/app-update",
+					"style": {
+						"navigationBarTitleText": "app-update"
+					}
+				},
+				{
+					"path": "arcbar-chart/arcbar-chart",
+					"style": {
+						"navigationBarTitleText": "arcbar-chart"
+					}
+				},
+				{
+					"path": "area-chart/area-chart",
+					"style": {
+						"navigationBarTitleText": "area-chart"
+					}
+				},
+				{
+					"path": "badge/badge",
+					"style": {
+						"navigationBarTitleText": "badge"
+					}
+				},
+				{
+					"path": "bar-chart/bar-chart",
+					"style": {
+						"navigationBarTitleText": "bar-chart"
+					}
+				},
+				{
+					"path": "barcode/barcode",
+					"style": {
+						"navigationBarTitleText": "barcode"
+					}
+				},
+				{
+					"path": "button/button",
+					"style": {
+						"navigationBarTitleText": "button"
+					}
+				},
+				{
+					"path": "calendar/calendar",
+					"style": {
+						"navigationBarTitleText": "calendar"
+					}
+				},
+				{
+					"path": "category/category",
+					"style": {
+						"navigationBarTitleText": "category"
+					}
+				},
+				{
+					"path": "checkbox/checkbox",
+					"style": {
+						"navigationBarTitleText": "checkbox"
+					}
+				},
+				{
+					"path": "code-input/code-input",
+					"style": {
+						"navigationBarTitleText": "code-input"
+					}
+				},
+				{
+					"path": "column-chart/column-chart",
+					"style": {
+						"navigationBarTitleText": "column-chart"
+					}
+				},
+				{
+					"path": "comment/comment",
+					"style": {
+						"navigationBarTitleText": "comment"
+					}
+				},
+				{
+					"path": "coupon-list/coupon-list",
+					"style": {
+						"navigationBarTitleText": "coupon-list"
+					}
+				},
+				{
+					"path": "custom-keyboard/custom-keyboard",
+					"style": {
+						"navigationBarTitleText": "custom-keyboard"
+					}
+				},
+				{
+					"path": "date-picker/date-picker",
+					"style": {
+						"navigationBarTitleText": "date-picker"
+					}
+				},
+				{
+					"path": "date-user/date-user",
+					"style": {
+						"navigationBarTitleText": "date-user"
+					}
+				},
+				{
+					"path": "drag/drag",
+					"style": {
+						"navigationBarTitleText": "drag"
+					}
+				},
+				{
+					"path": "drag-sort/drag-sort",
+					"style": {
+						"navigationBarTitleText": "drag-sort"
+					}
+				},
+				{
+					"path": "dropdown-menu/dropdown-menu",
+					"style": {
+						"navigationBarTitleText": "dropdown-menu"
+					}
+				},
+				{
+					"path": "filter-tool/filter-tool",
+					"style": {
+						"navigationBarTitleText": "filter-tool"
+					}
+				},
+				{
+					"path": "function-list/function-list",
+					"style": {
+						"navigationBarTitleText": "function-list"
+					}
+				},
+				{
+					"path": "funnel-chart/funnel-chart",
+					"style": {
+						"navigationBarTitleText": "funnel-chart"
+					}
+				},
+				{
+					"path": "goods-info/goods-info",
+					"style": {
+						"navigationBarTitleText": "goods-info"
+					}
+				},
+				{
+					"path": "goods-list/goods-list",
+					"style": {
+						"navigationBarTitleText": "goods-list"
+					}
+				},
+				{
+					"path": "guide-qa/guide-qa",
+					"style": {
+						"navigationBarTitleText": "guide-qa"
+					}
+				},
+				{
+					"path": "icon/icon",
+					"style": {
+						"navigationBarTitleText": "icon"
+					}
+				},
+				{
+					"path": "image/image",
+					"style": {
+						"navigationBarTitleText": "image"
+					}
+				},
+				{
+					"path": "index-list/index-list",
+					"style": {
+						"navigationBarTitleText": "index-list"
+					}
+				},
+				{
+					"path": "input/input",
+					"style": {
+						"navigationBarTitleText": "input"
+					}
+				},
+				{
+					"path": "line-chart/line-chart",
+					"style": {
+						"navigationBarTitleText": "line-chart"
+					}
+				},
+				{
+					"path": "loading/loading",
+					"style": {
+						"navigationBarTitleText": "loading"
+					}
+				},
+				{
+					"path": "login/login",
+					"style": {
+						"navigationBarTitleText": "login"
+					}
+				},
+				{
+					"path": "login-info/login-info",
+					"style": {
+						"navigationBarTitleText": "login-info"
+					}
+				},
+				{
+					"path": "marquee/marquee",
+					"style": {
+						"navigationBarTitleText": "marquee"
+					}
+				},
+				{
+					"path": "media-preview/media-preview",
+					"style": {
+						"navigationBarTitleText": "media-preview"
+					}
+				},
+				{
+					"path": "message-box/message-box",
+					"style": {
+						"navigationBarTitleText": "message-box"
+					}
+				},
+				{
+					"path": "navbar/navbar",
+					"style": {
+						"navigationBarTitleText": "navbar"
+					}
+				},
+				{
+					"path": "notice-bar/notice-bar",
+					"style": {
+						"navigationBarTitleText": "notice-bar"
+					}
+				},
+				{
+					"path": "number-keyboard/number-keyboard",
+					"style": {
+						"navigationBarTitleText": "number-keyboard"
+					}
+				},
+				{
+					"path": "order-card/order-card",
+					"style": {
+						"navigationBarTitleText": "order-card"
+					}
+				},
+				{
+					"path": "pie-chart/pie-chart",
+					"style": {
+						"navigationBarTitleText": "pie-chart"
+					}
+				},
+				{
+					"path": "popup/popup",
+					"style": {
+						"navigationBarTitleText": "popup"
+					}
+				},
+				{
+					"path": "price/price",
+					"style": {
+						"navigationBarTitleText": "price"
+					}
+				},
+				{
+					"path": "progress/progress",
+					"style": {
+						"navigationBarTitleText": "progress"
+					}
+				},
+				{
+					"path": "qrcode/qrcode",
+					"style": {
+						"navigationBarTitleText": "qrcode"
+					}
+				},
+				{
+					"path": "radio/radio",
+					"style": {
+						"navigationBarTitleText": "radio"
+					}
+				},
+				{
+					"path": "rate/rate",
+					"style": {
+						"navigationBarTitleText": "rate"
+					}
+				},
+				{
+					"path": "read-more/read-more",
+					"style": {
+						"navigationBarTitleText": "read-more"
+					}
+				},
+				{
+					"path": "rich-text/rich-text",
+					"style": {
+						"navigationBarTitleText": "rich-text"
+					}
+				},
+				{
+					"path": "ring-chart/ring-chart",
+					"style": {
+						"navigationBarTitleText": "ring-chart"
+					}
+				},
+				{
+					"path": "scroll-to/scroll-to",
+					"style": {
+						"navigationBarTitleText": "scroll-to"
+					}
+				},
+				{
+					"path": "search/search",
+					"style": {
+						"navigationBarTitleText": "search"
+					}
+				},
+				{
+					"path": "search-box/search-box",
+					"style": {
+						"navigationBarTitleText": "search-box"
+					}
+				},
+				{
+					"path": "select/select",
+					"style": {
+						"navigationBarTitleText": "select"
+					}
+				},
+				{
+					"path": "select-order/select-order",
+					"style": {
+						"navigationBarTitleText": "select-order"
+					}
+				},
+				{
+					"path": "select-seat/select-seat",
+					"style": {
+						"navigationBarTitleText": "select-seat"
+					}
+				},
+				{
+					"path": "signature/signature",
+					"style": {
+						"navigationBarTitleText": "signature"
+					}
+				},
+				{
+					"path": "simple-calendar/simple-calendar",
+					"style": {
+						"navigationBarTitleText": "simple-calendar"
+					}
+				},
+				{
+					"path": "skeleton/skeleton",
+					"style": {
+						"navigationBarTitleText": "skeleton"
+					}
+				},
+				{
+					"path": "slide-verify/slide-verify",
+					"style": {
+						"navigationBarTitleText": "slide-verify"
+					}
+				},
+				{
+					"path": "slider/slider",
+					"style": {
+						"navigationBarTitleText": "slider"
+					}
+				},
+				{
+					"path": "stepper/stepper",
+					"style": {
+						"navigationBarTitleText": "stepper"
+					}
+				},
+				{
+					"path": "steps/steps",
+					"style": {
+						"navigationBarTitleText": "steps"
+					}
+				},
+				{
+					"path": "sticky/sticky",
+					"style": {
+						"navigationBarTitleText": "sticky"
+					}
+				},
+				{
+					"path": "swipe-action/swipe-action",
+					"style": {
+						"navigationBarTitleText": "swipe-action"
+					}
+				},
+				{
+					"path": "swiper/swiper",
+					"style": {
+						"navigationBarTitleText": "swiper"
+					}
+				},
+				{
+					"path": "switch/switch",
+					"style": {
+						"navigationBarTitleText": "switch"
+					}
+				},
+				{
+					"path": "table/table",
+					"style": {
+						"navigationBarTitleText": "table"
+					}
+				},
+				{
+					"path": "tabs/tabs",
+					"style": {
+						"navigationBarTitleText": "tabs"
+					}
+				},
+				{
+					"path": "text/text",
+					"style": {
+						"navigationBarTitleText": "text"
+					}
+				},
+				{
+					"path": "toast/toast",
+					"style": {
+						"navigationBarTitleText": "toast"
+					}
+				},
+				{
+					"path": "tooltip/tooltip",
+					"style": {
+						"navigationBarTitleText": "tooltip"
+					}
+				},
+				{
+					"path": "touch-swipe/touch-swipe",
+					"style": {
+						"navigationBarTitleText": "touch-swipe"
+					}
+				},
+				{
+					"path": "tour/tour",
+					"style": {
+						"navigationBarTitleText": "tour"
+					}
+				},
+				{
+					"path": "tree/tree",
+					"style": {
+						"navigationBarTitleText": "tree"
+					}
+				},
+				{
+					"path": "upload/upload",
+					"style": {
+						"navigationBarTitleText": "upload"
+					}
+				},
+				{
+					"path": "user-info/user-info",
+					"style": {
+						"navigationBarTitleText": "user-info"
+					}
+				},
+				{
+					"path": "video/video",
+					"style": {
+						"navigationBarTitleText": "video"
+					}
+				},
+				{
+					"path": "watermark/watermark",
+					"style": {
+						"navigationBarTitleText": "watermark"
+					}
+				}
+			]
+		}
+	]
+}

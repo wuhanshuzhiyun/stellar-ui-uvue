@@ -1,0 +1,93 @@
+{
+    "name": "ste-login-info",
+    "description": "登录信息",
+    "example": "<ste-login-info></ste-login-info>",
+    "tutorial": "https://stellar-ui.intecloud.com.cn/?projectName=stellar-ui-uvue&menu=%E7%BB%84%E4%BB%B6&active=ste-login-info",
+    "attributes": [
+        {
+            "name": "avatar",
+            "description": "头像url",
+            "type": "string",
+            "default": ""
+        },
+        {
+            "name": "nickname",
+            "description": "昵称",
+            "type": "string",
+            "default": ""
+        },
+        {
+            "name": "subTitle",
+            "description": "描述",
+            "type": "string",
+            "default": ""
+        },
+        {
+            "name": "subTitleIcon",
+            "description": "描述icon",
+            "type": "string",
+            "default": ""
+        },
+        {
+            "name": "subColor",
+            "description": "描述和描述icon的颜色",
+            "type": "string",
+            "default": "主题色"
+        },
+        {
+            "name": "showTitleIcon",
+            "description": "是否显示主标题后面的图标",
+            "type": "boolean",
+            "default": false
+        },
+        {
+            "name": "fontFamily",
+            "description": "icon的字体名",
+            "type": "string",
+            "default": ""
+        },
+        {
+            "name": "loginStatus",
+            "description": "登录状态",
+            "type": "Number",
+            "default": 1,
+            "values": [
+                {
+                    "name": 0,
+                    "description": "未登录"
+                },
+                {
+                    "name": 1,
+                    "description": "登录"
+                }
+            ]
+        },
+        {
+            "name": "loginSrc",
+            "description": "未登录头像",
+            "type": "string",
+            "default": ""
+        },
+        {
+            "name": "loginTitle",
+            "description": "未登录标题",
+            "type": "string",
+            "default": ""
+        },
+        {
+            "name": "[event]avatar-click",
+            "description": "头像点击时触发",
+            "params": []
+        },
+        {
+            "name": "[event]user-click",
+            "description": "用户信息点击时触发",
+            "params": []
+        },
+        {
+            "name": "[event]loginTitleClick",
+            "description": "未登录文本点击时触发",
+            "params": []
+        }
+    ]
+}

@@ -1,0 +1,321 @@
+<template>
+	<scroll-view direction="vertical" class="page">
+		<view class="header">
+			<text class="app-title">Stellar UI uvue</text>
+			<text class="app-desc">uni-app x 组件库 Demo</text>
+		</view>
+
+		<!-- 全局字号设置：调用组件库 setFontScale，立即作用于已接入的组件 -->
+		<view class="font-panel">
+			<view class="font-panel-head">
+				<text class="font-panel-title">全局字号</text>
+				<text class="font-panel-value">{{ fontScaleText }}</text>
+			</view>
+			<view class="font-panel-actions">
+				<view class="font-btn" @click="changeFontScale(-0.1)">
+					<text class="font-btn-text">A－</text>
+				</view>
+				<view class="font-btn" @click="changeFontScale(0.1)">
+					<text class="font-btn-text">A＋</text>
+				</view>
+				<view class="font-btn font-btn-reset" @click="resetFontScale">
+					<text class="font-btn-text font-btn-reset-text">重置</text>
+				</view>
+			</view>
+			<view class="font-preview-list">
+				<text class="font-preview" :style="previewStyle(24)">24rpx · Stellar 组件库字号预览</text>
+				<text class="font-preview" :style="previewStyle(28)">28rpx · Stellar 组件库字号预览</text>
+				<text class="font-preview" :style="previewStyle(32)">32rpx · Stellar 组件库字号预览</text>
+			</view>
+			<text class="font-panel-tip">缩放范围 80% ~ 150%，设置自动持久化；已接入全局字号的组件（ste-button、ste-icon、ste-calendar 等）会同步变化</text>
+		</view>
+
+		<view class="search-bar">
+			<input class="search-input" placeholder="搜索组件" :value="searchText" @input="onSearch" />
+		</view>
+
+		<view class="group-list">
+			<view v-for="(group, gi) in filteredGroups" :key="gi" class="group">
+				<text class="group-title">{{ group.groupName }}</text>
+				<view class="item-grid">
+					<view v-for="(item, ii) in group.items" :key="ii" class="item"
+						@click="navigateTo(item.key, item.title)">
+						<text class="item-title">{{ item.title }}</text>
+					</view>
+				</view>
+			</view>
+		</view>
+	</scroll-view>
+</template>
+
+<script setup lang="uts">
+	import demoNavData from '@/static/demo-nav.json'
+	// 相对路径引入，避免别名在 uts 模块解析上的差异
+	import { getFontScale, setFontScale, normalizeFontSize } from '../../uni_modules/stellar-ui-uvue/config/index.uts'
+	import { ref, computed } from 'vue'
+
+	defineOptions({ name: 'index' })
+
+	type NavItem = {
+		key : string,
+		title : string,
+		component : string,
+	}
+
+	type NavGroup = {
+		groupName : string,
+		key : string,
+		items : NavItem[],
+	}
+
+	const searchText = ref('')
+
+	// ==================== 全局字号设置 ====================
+	/** 当前缩放倍率（直接读持久化配置，避免首帧显示 100% 再跳变） */
+	const fontScale = ref<number>(getFontScale())
+
+	const fontScaleText = computed(() : string => {
+		return `${Math.round(fontScale.value * 100)}%`
+	})
+
+	/** 按步长调整字号，范围 0.8 ~ 1.5 */
+	const changeFontScale = (delta : number) => {
+		let next = Math.round((fontScale.value + delta) * 10) / 10
+		if (next < 0.8) next = 0.8
+		if (next > 1.5) next = 1.5
+		if (next == fontScale.value) return
+		fontScale.value = next
+		// 组件库内部用 ref 承载 scale，这一行会让所有已接入的组件立即重渲染
+		setFontScale(next)
+	}
+
+	const resetFontScale = () => {
+		fontScale.value = 1
+		setFontScale(1)
+	}
+
+	/**
+	 * 预览文字样式
+	 * normalizeFontSize 内部读取响应式 scale，渲染期间调用即可自动跟随字号变化
+	 */
+	const previewStyle = (rpx : number) : UTSJSONObject => {
+		const style : UTSJSONObject = {}
+		style['fontSize'] = normalizeFontSize(rpx)
+		return style
+	}
+
+	const allGroups = ref([] as NavGroup[])
+
+	const loadNavData = () => {
+		const navArr = (demoNavData as UTSJSONObject[])
+		const result : NavGroup[] = []
+		for (let i = 0; i < navArr.length; i++) {
+			const g = navArr[i]
+			const contents = g['contents'] as UTSJSONObject[]
+			const items : NavItem[] = []
+			for (let j = 0; j < contents.length; j++) {
+				const c = contents[j]
+				const item : NavItem = {
+					key: c['key'] as string,
+					title: c['title'] as string,
+					component: c['component'] as string,
+				}
+				items.push(item)
+			}
+			const group : NavGroup = {
+				groupName: g['group'] as string,
+				key: g['key'] as string,
+				items: items,
+			}
+			result.push(group)
+		}
+		allGroups.value = result
+	}
+
+	loadNavData()
+
+	const filteredGroups = computed(() : NavGroup[] => {
+		const keyword = searchText.value.toLowerCase()
+		if (keyword === '') return allGroups.value
+
+		const result : NavGroup[] = []
+		const groups = allGroups.value
+		for (let i = 0; i < groups.length; i++) {
+			const g = groups[i]
+			const filtered : NavItem[] = []
+			for (let j = 0; j < g.items.length; j++) {
+				const item = g.items[j]
+				if (item.title.toLowerCase().indexOf(keyword) >= 0 || item.key.toLowerCase().indexOf(keyword) >= 0) {
+					filtered.push(item)
+				}
+			}
+			if (filtered.length > 0) {
+				result.push({
+					groupName: g.groupName,
+					key: g.key,
+					items: filtered,
+				})
+			}
+		}
+		return result
+	})
+
+	const onSearch = (e : InputEvent) => {
+		searchText.value = e.detail.value
+	}
+
+	const navigateTo = (key : string, title : string) => {
+		uni.navigateTo({
+			url: `/pages/demo/${key}/${key}`,
+		})
+	}
+</script>
+
+<style>
+	.page {
+		padding: 20rpx;
+		background-color: #f5f5f5;
+		flex: 1;
+	}
+
+	.header {
+		padding: 30rpx;
+		background-color: #ffffff;
+		border-radius: 16rpx;
+		margin-bottom: 20rpx;
+	}
+
+	.app-title {
+		font-size: 44rpx;
+		font-weight: bold;
+		color: #333333;
+	}
+
+	.app-desc {
+		font-size: 28rpx;
+		color: #999999;
+		margin-top: 8rpx;
+	}
+
+	/* ==================== 全局字号设置 ==================== */
+	.font-panel {
+		padding: 24rpx 30rpx;
+		background-color: #ffffff;
+		border-radius: 16rpx;
+		margin-bottom: 20rpx;
+	}
+
+	.font-panel-head {
+		flex-direction: row;
+		align-items: center;
+		justify-content: space-between;
+		margin-bottom: 16rpx;
+	}
+
+	.font-panel-title {
+		font-size: 28rpx;
+		font-weight: bold;
+		color: #333333;
+	}
+
+	.font-panel-value {
+		font-size: 26rpx;
+		color: #4a7dff;
+	}
+
+	.font-panel-actions {
+		flex-direction: row;
+		align-items: center;
+		margin-bottom: 16rpx;
+	}
+
+	.font-btn {
+		background-color: #f2f4f8;
+		border-radius: 10rpx;
+		padding: 12rpx 24rpx;
+		margin-right: 16rpx;
+	}
+
+	.font-btn-text {
+		font-size: 26rpx;
+		color: #333333;
+	}
+
+	.font-btn-reset {
+		background-color: #eef2ff;
+	}
+
+	.font-btn-reset-text {
+		color: #4a7dff;
+	}
+
+	.font-preview-list {
+		background-color: #fafbfc;
+		border-radius: 10rpx;
+		padding: 16rpx 20rpx;
+		margin-bottom: 14rpx;
+	}
+
+	.font-preview {
+		color: #333333;
+		margin-bottom: 8rpx;
+	}
+
+	.font-panel-tip {
+		font-size: 22rpx;
+		color: #999999;
+		line-height: 34rpx;
+	}
+
+	.search-bar {
+		margin-bottom: 20rpx;
+	}
+
+	.search-input {
+		background-color: #ffffff;
+		border-radius: 12rpx;
+		padding-left: 24rpx;
+		padding-right: 24rpx;
+		padding-top: 16rpx;
+		padding-bottom: 16rpx;
+		font-size: 28rpx;
+		height: 72rpx;
+	}
+
+	.group-list {
+		flex-direction: column;
+	}
+
+	.group {
+		margin-bottom: 24rpx;
+	}
+
+	.group-title {
+		font-size: 28rpx;
+		font-weight: bold;
+		color: #666666;
+		margin-bottom: 16rpx;
+		padding-left: 8rpx;
+	}
+
+	.item-grid {
+		flex-direction: row;
+		flex-wrap: wrap;
+	}
+
+	.item {
+		width: 33.3%;
+		padding: 8rpx;
+	}
+
+	.item-title {
+		font-size: 26rpx;
+		color: #333333;
+		background-color: #ffffff;
+		border-radius: 12rpx;
+		padding: 24rpx 16rpx;
+		text-align: center;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+</style>

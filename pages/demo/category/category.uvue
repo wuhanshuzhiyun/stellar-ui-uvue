@@ -1,0 +1,243 @@
+<template>
+	<!-- Category 分类演示页面 -->
+	<scroll-view scroll-y="true" class="page-root">
+		<!-- 页面头部标题介绍 -->
+		<view class="demo-header">
+			<text class="demo-title">Category 分类</text>
+			<text class="demo-subtitle">用于侧边纵向分类导航菜单，支持徽标、内凹圆角平滑过渡与插槽自定义</text>
+		</view>
+
+		<!-- 示例 1：基础用法与双向绑定 -->
+		<view class="demo-card">
+			<text class="card-title">基础用法</text>
+			<text class="card-desc">选中分类：{{ currentCategory1 }}</text>
+			<view class="category-box">
+				<ste-category
+					:data="categoryList1"
+					v-model:value="currentCategory1"
+					@change="onCategoryChange1"
+				></ste-category>
+				<!-- 右侧商品/内容区联动示意 -->
+				<view class="content-panel">
+					<text class="content-panel-title">当前浏览分类</text>
+					<text class="content-panel-text">{{ getCurrentTitle1 }}</text>
+					<text class="content-panel-tip">点击左侧切换不同分类，自动联动更新右侧内容</text>
+				</view>
+			</view>
+		</view>
+
+		<!-- 示例 2：带徽标角标联动 -->
+		<view class="demo-card">
+			<text class="card-title">徽标角标提示</text>
+			<text class="card-desc">支持在分类项右上角配置数量或文字徽标 (badge)</text>
+			<view class="category-box">
+				<ste-category
+					:data="categoryList2"
+					v-model:value="currentCategory2"
+					@change="onCategoryChange2"
+				></ste-category>
+				<view class="content-panel">
+					<text class="content-panel-title">热门专区</text>
+					<text class="content-panel-text">{{ getCurrentTitle2 }}</text>
+				</view>
+			</view>
+		</view>
+
+		<!-- 示例 3：作用域插槽自定义副标题 -->
+		<view class="demo-card">
+			<text class="card-title">插槽模式 (副标题扩展)</text>
+			<text class="card-desc">通过作用域插槽自定义副标题与数量统计标签</text>
+			<view class="category-box">
+				<ste-category
+					:data="categoryList3"
+					v-model:value="currentCategory3"
+				>
+					<template #default="{ item }">
+						<text class="slot-sub-text">余{{ getItemCount(item!) }}件</text>
+					</template>
+				</ste-category>
+				<view class="content-panel">
+					<text class="content-panel-title">精选清单</text>
+					<text class="content-panel-text">{{ getCurrentTitle3 }}</text>
+				</view>
+			</view>
+		</view>
+	</scroll-view>
+</template>
+
+<script setup lang="uts">
+/**
+ * @file category.uvue
+ * @description Category 分类侧边栏组件 Demo 页面
+ */
+
+import { ref, computed } from 'vue';
+import type { CategoryItem } from '@/uni_modules/stellar-ui-uvue/components/ste-category/constants.uts';
+
+/**
+ * 安全读取插槽传递的 item 数量信息
+ * @param item 插槽注入的分类项实体（Kotlin 强类型 Any）
+ * @returns 分类项库存件数
+ */
+// #ifdef APP-ANDROID || APP-IOS
+function getItemCount(item: Any): number {
+// #endif
+// #ifndef APP-ANDROID || APP-IOS
+function getItemCount(item: any): number {
+// #endif
+	const obj = item as CategoryItem;
+	return obj.count != null ? obj.count! : 0;
+}
+
+// ==================== 示例 1 数据 ====================
+const currentCategory1 = ref('snacks');
+
+const categoryList1 = ref<CategoryItem[]>([
+	{ title: '全部商品', value: 'all' } as CategoryItem,
+	{ title: '休闲零食', value: 'snacks' } as CategoryItem,
+	{ title: '清洁日用', value: 'clean' } as CategoryItem,
+	{ title: '粮油调味', value: 'oil' } as CategoryItem,
+	{ title: '时令生鲜', value: 'fresh' } as CategoryItem,
+	{ title: '饮品水饮', value: 'drink' } as CategoryItem
+]);
+
+const getCurrentTitle1 = computed((): string => {
+	const item = categoryList1.value.find((it: CategoryItem): boolean => it.value === currentCategory1.value);
+	return item != null ? item.title : '未知分类';
+});
+
+function onCategoryChange1(val: string) {
+	uni.showToast({
+		title: '切换到: ' + val,
+		icon: 'none'
+	});
+}
+
+// ==================== 示例 2 数据 (带徽章) ====================
+const currentCategory2 = ref('hot');
+
+const categoryList2 = ref<CategoryItem[]>([
+	{ title: '爆款热销', value: 'hot', badge: 'HOT' } as CategoryItem,
+	{ title: '新品上架', value: 'new', badge: 8 } as CategoryItem,
+	{ title: '限时特惠', value: 'sale', badge: 99 } as CategoryItem,
+	{ title: '数码电器', value: 'digital' } as CategoryItem,
+	{ title: '服饰箱包', value: 'clothes' } as CategoryItem
+]);
+
+const getCurrentTitle2 = computed((): string => {
+	const item = categoryList2.value.find((it: CategoryItem): boolean => it.value === currentCategory2.value);
+	return item != null ? item.title : '未知分类';
+});
+
+function onCategoryChange2(val: string) {
+	console.log('示例2切换:', val);
+}
+
+// ==================== 示例 3 数据 (带插槽计数) ====================
+const currentCategory3 = ref('fruit');
+
+const categoryList3 = ref<CategoryItem[]>([
+	{ title: '热带水果', value: 'fruit', count: 18 } as CategoryItem,
+	{ title: '新鲜蔬菜', value: 'vegetable', count: 32 } as CategoryItem,
+	{ title: '优质禽肉', value: 'meat', count: 12 } as CategoryItem,
+	{ title: '海鲜水产', value: 'seafood', count: 8 } as CategoryItem
+]);
+
+const getCurrentTitle3 = computed((): string => {
+	const item = categoryList3.value.find((it: CategoryItem): boolean => it.value === currentCategory3.value);
+	return item != null ? item.title : '未知分类';
+});
+
+
+</script>
+
+<style>
+/* 页面根容器 */
+.page-root {
+	flex: 1;
+	background-color: #f8f8f8;
+	padding: 24rpx;
+}
+
+/* 顶部标题区 */
+.demo-header {
+	margin-bottom: 24rpx;
+}
+
+.demo-title {
+	font-size: 36rpx;
+	font-weight: bold;
+	color: #1a1a1a;
+}
+
+.demo-subtitle {
+	font-size: 24rpx;
+	color: #8c8c8c;
+	margin-top: 8rpx;
+}
+
+/* 示例卡片容器 */
+.demo-card {
+	background-color: #ffffff;
+	border-radius: 16rpx;
+	padding: 24rpx;
+	margin-bottom: 24rpx;
+}
+
+.card-title {
+	font-size: 28rpx;
+	font-weight: bold;
+	color: #262626;
+}
+
+.card-desc {
+	font-size: 22rpx;
+	color: #8c8c8c;
+	margin-top: 6rpx;
+	margin-bottom: 16rpx;
+}
+
+/* 分类展示视口容器（固定高度模拟真实页面） */
+.category-box {
+	height: 400rpx;
+	border-radius: 12rpx;
+	overflow: hidden;
+	background-color: #ffffff;
+	display: flex;
+	flex-direction: row;
+}
+
+/* 右侧内容展示面板 */
+.content-panel {
+	flex: 1;
+	background-color: #ffffff;
+	padding: 32rpx;
+	justify-content: center;
+	align-items: center;
+}
+
+.content-panel-title {
+	font-size: 24rpx;
+	color: #8c8c8c;
+}
+
+.content-panel-text {
+	font-size: 36rpx;
+	font-weight: bold;
+	color: #3da7ff;
+	margin-top: 12rpx;
+	margin-bottom: 16rpx;
+}
+
+.content-panel-tip {
+	font-size: 20rpx;
+	color: #bfbfbf;
+	text-align: center;
+}
+
+/* 插槽副标题样式 */
+.slot-sub-text {
+	font-size: 18rpx;
+	color: #999999;
+}
+</style>

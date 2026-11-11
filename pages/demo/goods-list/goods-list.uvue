@@ -1,0 +1,188 @@
+<template>
+	<scroll-view scroll-y="true" class="page-root">
+		<!-- 顶部导航标题区 -->
+		<view class="demo-header">
+			<text class="demo-title">GoodsList 商品信息清单</text>
+			<text class="demo-subtitle">用于以键值清单展示商品参数、调价记录、仓储或订单明细，支持主题色指示条、自定义图标与操作插槽</text>
+		</view>
+
+		<!-- 示例 1：基础用法 (主题色指示竖条) -->
+		<view class="demo-card">
+			<text class="card-title">1. 基础用法 (主题色指示条)</text>
+			<text class="card-desc">默认展示主题色指示竖条，清晰呈现两端对齐的属性清单</text>
+			<view class="card-content">
+				<ste-goods-list
+					title="调价记录明细"
+					:data="priceAdjustData"
+				/>
+			</view>
+		</view>
+
+		<!-- 示例 2：自定义标题图标 -->
+		<view class="demo-card">
+			<text class="card-title">2. 自定义标题图标</text>
+			<text class="card-desc">通过 titleIcon 传入图标代码，适合参数卡片、特色信息归类</text>
+			<view class="card-content">
+				<ste-goods-list
+					title="商品规格参数"
+					titleIcon="&#xe6a5;"
+					:data="specificationData"
+				/>
+			</view>
+		</view>
+
+		<!-- 示例 3：隐藏标题图标 -->
+		<view class="demo-card">
+			<text class="card-title">3. 隐藏标题图标</text>
+			<text class="card-desc">通过 hideTitleIcon=true 隐藏指示条，呈现紧凑干练的极简清单排版</text>
+			<view class="card-content">
+				<ste-goods-list
+					title="仓储盘点信息"
+					:hideTitleIcon="true"
+					:data="inventoryData"
+				/>
+			</view>
+		</view>
+
+		<!-- 示例 4：标题右侧操作插槽 -->
+		<view class="demo-card">
+			<text class="card-title">4. 标题栏操作插槽 (#method)</text>
+			<text class="card-desc">右侧插槽可灵活扩展“复制单号”、“查看明细”或交互按钮</text>
+			<view class="card-content">
+				<ste-goods-list
+					title="订单发货明细"
+					:data="orderDetailData"
+				>
+					<template #method>
+						<view class="method-action-btn" @click="onCopyOrderNo">
+							<text class="action-text">复制单号</text>
+							<ste-icon code="&#xe674;" :size="20" color="#0275ff"></ste-icon>
+						</view>
+					</template>
+				</ste-goods-list>
+			</view>
+		</view>
+	</scroll-view>
+</template>
+
+<script setup lang="uts">
+/**
+ * @file goods-list.uvue
+ * @description ste-goods-list 商品信息清单 原生演示页面
+ */
+import { GoodsListItem } from '@/uni_modules/stellar-ui-uvue/components/ste-goods-list/constants.uts';
+
+/** 示例 1：调价记录清单 */
+const priceAdjustData = ref<GoodsListItem[]>([
+	{ label: '调价类型', value: '促销调价' } as GoodsListItem,
+	{ label: '原销售价', value: '￥ 20.90' } as GoodsListItem,
+	{ label: '新促销价', value: '￥ 19.90' } as GoodsListItem,
+	{ label: '调价生效日期', value: '2026-09-20' } as GoodsListItem,
+	{ label: '审批人', value: '张总 (已审核)' } as GoodsListItem
+]);
+
+/** 示例 2：规格参数清单 */
+const specificationData = ref<GoodsListItem[]>([
+	{ label: '净含量', value: '500g / 盒' } as GoodsListItem,
+	{ label: '产地归属', value: '云南大理' } as GoodsListItem,
+	{ label: '贮存条件', value: '阴凉避光冷藏 (0~4℃)' } as GoodsListItem,
+	{ label: '保质期限', value: '180 天' } as GoodsListItem
+]);
+
+/** 示例 3：仓储盘点清单 */
+const inventoryData = ref<GoodsListItem[]>([
+	{ label: '库位编号', value: 'A区-03架-02层' } as GoodsListItem,
+	{ label: '当前在库量', value: '1,280 件' } as GoodsListItem,
+	{ label: '锁库占用量', value: '45 件' } as GoodsListItem,
+	{ label: '可用出库量', value: '1,235 件' } as GoodsListItem
+]);
+
+/** 示例 4：订单发货明细 */
+const orderDetailData = ref<GoodsListItem[]>([
+	{ label: '快递单号', value: 'SF14285700921' } as GoodsListItem,
+	{ label: '承运物流', value: '顺丰特快 (冷链直达)' } as GoodsListItem,
+	{ label: '发货时间', value: '2026-09-20 09:30' } as GoodsListItem,
+	{ label: '物流状态', value: '运输中（预计明早送达）' } as GoodsListItem
+]);
+
+/** 复制单号交互 */
+function onCopyOrderNo() {
+	uni.setClipboardData({
+		data: 'SF14285700921',
+		showToast: false,
+		success: () => {
+			uni.showToast({
+				title: '单号复制成功！',
+				icon: 'success'
+			});
+		}
+	});
+}
+</script>
+
+<style scoped>
+.page-root {
+	width: 100%;
+	height: 100%;
+	background-color: #f7f8fa;
+}
+
+.demo-header {
+	padding: 36rpx 32rpx 20rpx;
+}
+
+.demo-title {
+	font-size: 38rpx;
+	font-weight: bold;
+	color: #1f2329;
+}
+
+.demo-subtitle {
+	font-size: 24rpx;
+	color: #8f959e;
+	margin-top: 12rpx;
+	line-height: 36rpx;
+}
+
+.demo-card {
+	margin: 20rpx 24rpx;
+	background-color: #ffffff;
+	border-radius: 16rpx;
+	padding: 24rpx;
+}
+
+.card-title {
+	font-size: 28rpx;
+	font-weight: bold;
+	color: #1f2329;
+}
+
+.card-desc {
+	font-size: 22rpx;
+	color: #8f959e;
+	margin-top: 8rpx;
+	margin-bottom: 20rpx;
+	line-height: 32rpx;
+}
+
+.card-content {
+	background-color: #fcfdfe;
+	border-radius: 12rpx;
+	border: 1rpx solid #edf0f5;
+	overflow: hidden;
+}
+
+/* 标题右侧插槽按钮 */
+.method-action-btn {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+.action-text {
+	font-size: 24rpx;
+	color: #0275ff;
+	margin-right: 4rpx;
+	font-weight: 500;
+}
+</style>

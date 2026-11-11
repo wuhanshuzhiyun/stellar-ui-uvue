@@ -1,0 +1,193 @@
+<template>
+	<scroll-view direction="vertical" class="page">
+		<!-- 顶部标题 -->
+		<view class="header">
+			<text class="title">QRCode 二维码</text>
+			<text class="desc">能够将文本或 URL 转换生成高质量二维码，支持自定义尺寸、配色与中心 Logo 图标。</text>
+		</view>
+
+		<!-- 1. 基础用法 -->
+		<view class="section">
+			<text class="section-title">1. 基础用法</text>
+			<view class="qrcode-card">
+				<ste-qrcode content="https://stellar-ui.intecloud.com.cn/" :size="180" />
+				<text class="qrcode-label">扫描访问 Stellar UI 官网</text>
+			</view>
+		</view>
+
+		<!-- 2. 自定义尺寸 -->
+		<view class="section">
+			<text class="section-title">2. 自定义尺寸 (120px 与 220px)</text>
+			<view class="row-cards">
+				<view class="qrcode-card mini-card">
+					<ste-qrcode content="https://uniapp.dcloud.net.cn/" :size="120" />
+					<text class="qrcode-label">120px 迷你尺寸</text>
+				</view>
+				<view class="qrcode-card mini-card">
+					<ste-qrcode content="https://uniapp.dcloud.net.cn/" :size="200" />
+					<text class="qrcode-label">200px 标准尺寸</text>
+				</view>
+			</view>
+		</view>
+
+		<!-- 3. 自定义配色 -->
+		<view class="section">
+			<text class="section-title">3. 自定义前景色与背景色</text>
+			<view class="row-cards">
+				<view class="qrcode-card mini-card">
+					<ste-qrcode
+						content="https://stellar-ui.intecloud.com.cn/"
+						:size="140"
+						foreground="#1890ff"
+						background="#e6f7ff"
+					/>
+					<text class="qrcode-label">科技蓝主题</text>
+				</view>
+				<view class="qrcode-card mini-card">
+					<ste-qrcode
+						content="https://stellar-ui.intecloud.com.cn/"
+						:size="140"
+						foreground="#00c250"
+						background="#f6ffed"
+					/>
+					<text class="qrcode-label">自然绿主题</text>
+				</view>
+			</view>
+		</view>
+
+		<!-- 4. 中心 Logo 图标 -->
+		<view class="section">
+			<text class="section-title">4. 带有中心 Logo 图标</text>
+			<view class="qrcode-card">
+				<ste-qrcode
+					content="https://stellar-ui.intecloud.com.cn/mp/index/index"
+					:size="200"
+					foregroundImageSrc="https://image.whzb.com/chain/StellarUI/logo.png"
+				/>
+				<text class="qrcode-label">支持中心品牌 Logo 叠加与白底衬托</text>
+			</view>
+		</view>
+
+		<!-- 5. 动态文本实时输入与生成 -->
+		<view class="section">
+			<text class="section-title">5. 动态内容实时生成</text>
+			<view class="input-wrap">
+				<input
+					class="dynamic-input"
+					type="text"
+					v-model="dynamicContent"
+					placeholder="请输入任意文本或网址实时生成"
+				/>
+			</view>
+			<view class="qrcode-card" style="margin-top: 16rpx;">
+				<ste-qrcode
+					:content="dynamicContent != '' ? dynamicContent : 'https://stellar-ui.intecloud.com.cn/'"
+					:size="180"
+					foreground="#2f54eb"
+					background="#f0f5ff"
+				/>
+				<text class="qrcode-label">当前内容：{{ dynamicContent != '' ? dynamicContent : '(默认链接)' }}</text>
+			</view>
+		</view>
+
+		<!-- 底部留白 -->
+		<view class="footer-space"></view>
+	</scroll-view>
+</template>
+
+<script setup lang="uts">
+	/**
+	 * @file qrcode.uvue
+	 * @description QRCode 二维码全场景交互式演示 Demo
+	 */
+	import { ref } from 'vue'
+
+	const dynamicContent = ref('Hello Stellar UI uvue!')
+</script>
+
+<style>
+.page {
+	padding: 24rpx;
+	background-color: #f7f8fa;
+	flex: 1;
+}
+
+.header {
+	margin-bottom: 30rpx;
+}
+
+.title {
+	font-size: 38rpx;
+	font-weight: bold;
+	color: #1f2329;
+}
+
+.desc {
+	font-size: 26rpx;
+	color: #8f959e;
+	margin-top: 10rpx;
+	line-height: 1.5;
+}
+
+.section {
+	margin-bottom: 36rpx;
+}
+
+.section-title {
+	font-size: 30rpx;
+	font-weight: bold;
+	color: #1f2329;
+	margin-bottom: 16rpx;
+}
+
+.qrcode-card {
+	padding: 32rpx;
+	background-color: #ffffff;
+	border-radius: 16rpx;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.03);
+}
+
+.row-cards {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+}
+
+.mini-card {
+	flex: 1;
+	margin-right: 16rpx;
+}
+
+.mini-card:last-child {
+	margin-right: 0;
+}
+
+.qrcode-label {
+	font-size: 24rpx;
+	color: #8f959e;
+	margin-top: 20rpx;
+	text-align: center;
+}
+
+.input-wrap {
+	width: 100%;
+}
+
+.dynamic-input {
+	height: 80rpx;
+	background-color: #ffffff;
+	border: 1px solid #dcdfe6;
+	border-radius: 12rpx;
+	padding: 0 24rpx;
+	font-size: 28rpx;
+	color: #1f2329;
+}
+
+.footer-space {
+	height: 80rpx;
+}
+</style>

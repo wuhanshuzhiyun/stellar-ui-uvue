@@ -1,0 +1,232 @@
+<template>
+	<scroll-view scroll-y="true" class="page-container">
+		<!-- 头部导航与功能简介 -->
+		<view class="page-header">
+			<text class="page-title">SearchBox 复合搜索组件</text>
+			<text class="page-desc">将日期/时间段快速筛选与关键词搜索输入深度融合，支持单日期、日期范围选择、软键盘响应及右侧丰富插槽扩展。</text>
+		</view>
+
+		<view class="demo-content">
+			<!-- 用例 1：单日期搜索模式 -->
+			<view class="demo-card">
+				<text class="card-title">1. 单日期搜索模式 (type="date")</text>
+				<text class="card-desc">左侧单行显示选定月份日期，点击拉起底部单选日历；输入框支持一键清空与回车搜索。</text>
+				<view class="card-inner">
+					<ste-search-box
+						type="date"
+						placeholder="搜索今日行程或订单..."
+						v-model:value="singleSearchText"
+						v-model:headerValue="singleDateValue"
+						@search="onSearchKeyword('单日期搜索')"
+					/>
+				</view>
+			</view>
+
+			<!-- 用例 2：日期范围搜索模式 -->
+			<view class="demo-card">
+				<text class="card-title">2. 日期区间范围模式 (type="dateRange")</text>
+				<text class="card-desc">左侧紧凑双行展示起止日期，点击可选择完整时间段；右侧通过 #right 拓展主搜索按钮。</text>
+				<view class="card-inner">
+					<ste-search-box
+						type="dateRange"
+						placeholder="搜索指定时间段的消费账单..."
+						v-model:value="rangeSearchText"
+						v-model:headerValue="rangeDateValue"
+						@search="onSearchKeyword('区间范围搜索')"
+					>
+						<template #right>
+							<view class="slot-search-btn" @click="onSearchKeyword('右侧按钮触发')">
+								<ste-button mode="200" background="#0275ff" color="#ffffff" :round="true">
+									搜索
+								</ste-button>
+							</view>
+						</template>
+					</ste-search-box>
+				</view>
+			</view>
+
+			<!-- 用例 3：右侧图标扩展插槽 -->
+			<view class="demo-card">
+				<text class="card-title">3. 右侧功能图标插槽 (#right)</text>
+				<text class="card-desc">在搜索框右侧无缝嵌入筛选、语音输入或扫一扫功能图标。</text>
+				<view class="card-inner">
+					<ste-search-box
+						type="date"
+						placeholder="搜索商品或扫描条形码..."
+						v-model:value="slotSearchText"
+						@search="onSearchKeyword('图标插槽搜索')"
+					>
+						<template #right>
+							<view class="slot-icons-wrap">
+								<view class="slot-icon-item" @click="onRightIconClick('扫一扫')">
+									<ste-icon code="&#xe69a;" color="#0275FF" :size="34" />
+								</view>
+								<view class="slot-icon-item ml-12" @click="onRightIconClick('高级筛选')">
+									<ste-icon code="&#xe67b;" color="#4b5563" :size="32" />
+								</view>
+							</view>
+						</template>
+					</ste-search-box>
+				</view>
+			</view>
+
+			<!-- 用例 4：自定义文字颜色与占位符风格 -->
+			<view class="demo-card">
+				<text class="card-title">4. 自定义字体与占位色</text>
+				<text class="card-desc">通过 textColor 与 placeholderColor 自定义搜索文字风格，适配不同品牌主色。</text>
+				<view class="card-inner">
+					<ste-search-box
+						type="date"
+						placeholder="高亮个性化输入样式..."
+						textColor="#dc2626"
+						placeholderColor="#f87171"
+						v-model:value="customStyleText"
+						@search="onSearchKeyword('个性化样式搜索')"
+					/>
+				</view>
+			</view>
+
+			<!-- 操作反馈日志 -->
+			<view class="demo-card">
+				<text class="card-title">操作状态反馈</text>
+				<view class="log-box">
+					<text class="log-text">{{ logText }}</text>
+				</view>
+			</view>
+		</view>
+	</scroll-view>
+</template>
+
+<script setup lang="uts">
+	/**
+	 * @file search-box.uvue
+	 * @description SearchBox 复合搜索组件 - uni-app x / UTS 演示页面
+	 */
+	import { ref } from 'vue'
+
+	// 操作反馈日志
+	const logText = ref('等待交互操作中，请点击左侧日期或输入搜索内容...')
+
+	// ==================== 1. 单日期搜索数据 ====================
+	const singleSearchText = ref('')
+	const singleDateValue = ref('2026-09-29')
+
+	// ==================== 2. 日期区间范围数据 ====================
+	const rangeSearchText = ref('')
+	const rangeDateValue = ref<string[]>(['2026-09-29', '2026-10-08'])
+
+	// ==================== 3. 插槽搜索数据 ====================
+	const slotSearchText = ref('')
+
+	// ==================== 4. 自定义样式数据 ====================
+	const customStyleText = ref('')
+
+	// ==================== 交互事件回调 ====================
+	function onSearchKeyword(source : string) {
+		logText.value = `【${source}】触发搜索，关键词：${singleSearchText.value || rangeSearchText.value || slotSearchText.value || customStyleText.value || '（空文本）'}`
+	}
+
+	function onRightIconClick(action : string) {
+		logText.value = `点击了右侧插槽扩展功能：【${action}】`
+	}
+</script>
+
+<style scoped>
+	/* 页面根容器 */
+	.page-container {
+		flex: 1;
+		background-color: #f7f8fa;
+	}
+
+	/* 顶部头部说明 */
+	.page-header {
+		padding: 40rpx 32rpx 24rpx;
+		background-color: #ffffff;
+		margin-bottom: 24rpx;
+	}
+
+	.page-title {
+		font-size: 40rpx;
+		font-weight: bold;
+		color: #1a1a1a;
+		margin-bottom: 12rpx;
+	}
+
+	.page-desc {
+		font-size: 26rpx;
+		color: #8c8c8c;
+		line-height: 38rpx;
+	}
+
+	/* 演示卡片列表区 */
+	.demo-content {
+		padding: 0 24rpx 48rpx;
+	}
+
+	.demo-card {
+		background-color: #ffffff;
+		border-radius: 16rpx;
+		padding: 32rpx;
+		margin-bottom: 24rpx;
+	}
+
+	.card-title {
+		font-size: 30rpx;
+		font-weight: 600;
+		color: #333333;
+		margin-bottom: 8rpx;
+	}
+
+	.card-desc {
+		font-size: 24rpx;
+		color: #999999;
+		line-height: 34rpx;
+		margin-bottom: 20rpx;
+	}
+
+	/* 卡片底色衬托盒（浅灰色背景衬托白色搜索框） */
+	.card-inner {
+		background-color: #f3f4f6;
+		border-radius: 16rpx;
+		padding: 16rpx;
+	}
+
+	/* 右侧搜索按钮 */
+	.slot-search-btn {
+		margin-left: 16rpx;
+	}
+
+	/* 右侧图标组 */
+	.slot-icons-wrap {
+		flex-direction: row;
+		align-items: center;
+		margin-left: 16rpx;
+	}
+
+	.slot-icon-item {
+		width: 48rpx;
+		height: 48rpx;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.ml-12 {
+		margin-left: 12rpx;
+	}
+
+	/* 操作日志盒子 */
+	.log-box {
+		background-color: #f9f9f9;
+		border-radius: 8rpx;
+		padding: 20rpx;
+		border-left-width: 6rpx;
+		border-left-style: solid;
+		border-left-color: #0090ff;
+	}
+
+	.log-text {
+		font-size: 24rpx;
+		color: #555555;
+		line-height: 36rpx;
+	}
+</style>

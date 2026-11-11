@@ -1,0 +1,86 @@
+/**
+ * @file iconfont.uts
+ * @description 全库唯一的图标字体加载器（模块级单例，所有组件共用一次加载）
+ *
+ * 改动前请先读这几条硬约束（都踩过坑）：
+ * 1. `source` **必须用 `url()` 包裹**。uni-app x 文档明确要求「必须使用 url() 包裹」，
+ *    直接传裸 URL 会加载失败；部分平台不包裹也能生效，但那是巧合，不是标准写法。
+ * 2. 加载状态必须放在模块级，且**全库只能有这一处 `uni.loadFontFace`**。
+ *    两个组件各自用同一 family / 同一 source 并发调用时，底层会判
+ *    `loadFontFace:fail, same source task is loading`（errCode 300001），两边一起失败。
+ *    需要字体的组件一律 import `ensureIconFont()` 调用，不要自己加载。
+ * 3. App-Android **不支持 woff/woff2**，只能用 ttf。
+ * 4. **图标字体统一走远程 CDN，不使用本地字体文件**：npm 包内的静态资源不会被
+ *    uni-app x 打进 App（官方要求本地字体放业务项目 /static 才会被打包），与其让每个
+ *    业务项目手动复制一份 ttf，不如统一走远程。代价是运行时需要网络、小程序需配
+ *    downloadFile 合法域名。FONT_SOURCES 保留数组结构，便于未来按需增加来源。
+ * 5. 远程 URL 以 `.ttf` 结尾、不带 query，避免底层按扩展名判断字体格式时误判。
+ * 6. UTS 无函数声明提升：被调用方必须定义在调用方之前（tryLoad 在 ensureIconFont 之前）。
+ */
+
+/** 图标字体名称，必须与组件内 `font-family` 引用的名称完全一致 */
+export const ICON_FONT_FAMILY = 'ste-iconfont-1709689042473'
+
+/** 远程图标字体（全库唯一来源，App-Android 只支持 ttf） */
+const REMOTE_FONT_URL = 'https://at.alicdn.com/t/c/font_4457057_74vgslmjyas.ttf'
+
+/** 字体来源列表（当前仅远程；保留数组结构便于未来扩展） */
+const FONT_SOURCES : string[] = [
+	REMOTE_FONT_URL,
+]
+
+/** 是否已加载成功 */
+let loaded = false
+/** 是否正在加载（并发调用直接返回，避免重复下发） */
+let loading = false
+/** 当前尝试的来源下标 */
+let sourceIndex = 0
+/** 当前成功命中的字体来源（未成功时为空串），供业务侧排查 */
+let activeSource = ''
+
+/**
+ * 加载远程字体；失败则释放 loading，等待下次组件挂载重试（例如断网恢复后）。
+ */
+function tryLoad() {
+	const path = FONT_SOURCES[sourceIndex]!
+	uni.loadFontFace({
+		family: ICON_FONT_FAMILY,
+		source: `url("${path}")`,
+		global: true,
+		success: () => {
+			loaded = true
+			loading = false
+			activeSource = path
+			console.log('[ste-icon] 图标字体加载成功，来源:', path)
+		},
+		fail: (err) => {
+			// 单来源失败属于网络问题：释放 loading 等下次挂载重试，不打 warn 污染业务日志。
+			if (sourceIndex < FONT_SOURCES.length - 1) {
+				sourceIndex++
+				tryLoad()
+			} else {
+				sourceIndex = 0
+				loading = false
+				console.error('[ste-icon] 远程图标字体加载失败:', path, err)
+			}
+		}
+	})
+}
+
+/**
+ * 确保图标字体已加载（幂等，全库共用一次）
+ * 所有需要图标字体的组件在 onMounted 里调用它即可。
+ */
+export function ensureIconFont() {
+	if (loaded || loading) return
+	loading = true
+	tryLoad()
+}
+
+/**
+ * 返回当前已成功加载的字体来源；为空串表示尚未成功。
+ * 业务页面可据此判断图标不显示是「字体没加载」还是「字符/样式问题」。
+ */
+export function getIconFontSource() : string {
+	return activeSource
+}

@@ -1,0 +1,389 @@
+<template>
+	<scroll-view scroll-y="true" class="page-container">
+		<!-- 头部导航与组件定位描述 -->
+		<view class="page-header">
+			<text class="page-title">SimpleCalendar 简单日历</text>
+			<text class="page-desc">
+				三段式紧凑胶囊日历，聚合呈现日、星期与年月信息；支持点击拉起底部日历选择器进行可视化切换与日期联动。
+			</text>
+		</view>
+
+		<view class="demo-content">
+			<!-- 用例 1：基础胶囊用法 -->
+			<view class="demo-card">
+				<text class="card-title">1. 基础用法 (点击拉起日历弹窗)</text>
+				<text class="card-desc">默认展示今天日期，点击胶囊可直接展开底部日历选择器，并在选中确认后同步更新。</text>
+				<view class="card-inner flex-row-start">
+					<ste-simple-calendar
+						@click="handleCalendarClick"
+						@date-change="handleDateChange"
+					/>
+				</view>
+				<!-- 选定日期状态实时展示 -->
+				<view class="status-panel mt-16" v-if="selectedInfoText != ''">
+					<text class="status-panel-text">{{ selectedInfoText }}</text>
+				</view>
+			</view>
+
+			<!-- 用例 2：自定义格式化模板 -->
+			<view class="demo-card">
+				<text class="card-title">2. 自定义格式化模板 (formatter)</text>
+				<text class="card-desc">通过 formatter 属性灵活定制年月展示格式（如 YYYY-MM、YYYY/M 等）。</text>
+
+				<!-- 2.1 斜杠分隔格式 -->
+				<text class="sub-card-title">2.1 斜杠格式 (YYYY/MM)</text>
+				<view class="card-inner flex-row-start mb-16">
+					<ste-simple-calendar
+						formatter="YYYY/MM"
+						@click="handleCalendarClick"
+					/>
+				</view>
+
+				<!-- 2.2 横杠分隔格式 -->
+				<text class="sub-card-title">2.2 横杠格式 (YYYY-MM)</text>
+				<view class="card-inner flex-row-start">
+					<ste-simple-calendar
+						formatter="YYYY-MM"
+						@click="handleCalendarClick"
+					/>
+				</view>
+			</view>
+
+			<!-- 用例 3：自定义文字颜色 -->
+			<view class="demo-card">
+				<text class="card-title">3. 自定义文字颜色 (color)</text>
+				<text class="card-desc">支持传入特定色值，使日历胶囊与当前页面风格无缝搭配。</text>
+				<view class="color-row">
+					<view class="color-item">
+						<ste-simple-calendar
+							color="#0090FF"
+							@click="handleCalendarClick"
+						/>
+					</view>
+					<view class="color-item ml-16">
+						<ste-simple-calendar
+							color="#E11D48"
+							@click="handleCalendarClick"
+						/>
+					</view>
+				</view>
+			</view>
+
+			<!-- 用例 4：纯展示模式 (禁用弹窗) -->
+			<view class="demo-card">
+				<text class="card-title">4. 纯展示模式 (showCalendar = false)</text>
+				<text class="card-desc">关闭弹窗交互，仅作为列表或卡片顶部的精美日期徽章使用，点击仅触发 click 事件。</text>
+				<view class="card-inner flex-row-start">
+					<ste-simple-calendar
+						:showCalendar="false"
+						@click="handleStaticClick"
+					/>
+				</view>
+			</view>
+
+			<!-- 用例 5：编程式方法调用 (Ref 实例控制) -->
+			<view class="demo-card">
+				<text class="card-title">5. 编程式实例方法调用</text>
+				<text class="card-desc">支持通过 ref 调用 setDate、today 与 getDateInfo 实现外部控制。</text>
+
+				<view class="card-inner flex-row-start mb-24">
+					<ste-simple-calendar
+						ref="calendarRef"
+						@date-change="handleProgrammaticDateChange"
+					/>
+				</view>
+
+				<!-- 操作按钮群 -->
+				<view class="btn-grid">
+					<view class="btn-col">
+						<ste-button mode="100" @click="handleSetCustomDate">
+							<text class="ctrl-btn-text">设置：元旦节</text>
+						</ste-button>
+					</view>
+					<view class="btn-col">
+						<ste-button mode="200" @click="handleBackToday">
+							<text class="ctrl-btn-text">重置：回到今天</text>
+						</ste-button>
+					</view>
+				</view>
+				<view class="btn-grid mt-16">
+					<view class="btn-col">
+						<ste-button mode="300" @click="handleGetInfo">
+							<text class="ctrl-btn-text">获取当前详细信息</text>
+						</ste-button>
+					</view>
+				</view>
+
+				<!-- 专属就地实时状态反馈看板 -->
+				<view v-if="programmaticLogText != ''" class="status-panel mt-16">
+					<text class="status-panel-text">{{ programmaticLogText }}</text>
+				</view>
+			</view>
+		</view>
+	</scroll-view>
+</template>
+
+<script setup lang="uts">
+	/**
+	 * @file simple-calendar.uvue
+	 * @description ste-simple-calendar 简单日历胶囊演示与回归测试页面
+	 */
+	import { ref } from 'vue'
+	import { DateInfo } from '@/uni_modules/stellar-ui-uvue/components/ste-simple-calendar/props.uts'
+
+	// ==================== 选定日期信息展示 ====================
+	const selectedInfoText = ref('')
+
+	/**
+	 * 点击胶囊回调
+	 * @param {DateInfo} info 日期明细
+	 */
+	const handleCalendarClick = (info : DateInfo) => {
+		uni.showToast({
+			title: `点击了胶囊：${info.date} (${info.weekText})`,
+			icon: 'none',
+		})
+	}
+
+	/**
+	 * 日期变更回调
+	 * @param {DateInfo} info 日期明细
+	 */
+	const handleDateChange = (info : DateInfo) => {
+		selectedInfoText.value = `当前选定：${info.date} | ${info.weekText} (时间戳: ${info.timestamp})`
+	}
+
+	/**
+	 * 静态纯展示点击
+	 * @param {DateInfo} info 日期明细
+	 */
+	const handleStaticClick = (info : DateInfo) => {
+		uni.showToast({
+			title: `静态展示：${info.date}`,
+			icon: 'none',
+		})
+	}
+
+	// ==================== 用例 5 独立状态反馈 ====================
+	const programmaticLogText = ref<string>('等待实例控制操作...')
+
+	/**
+	 * 用例 5 日期变更监听
+	 * @param {DateInfo} info 日期明细
+	 */
+	const handleProgrammaticDateChange = (info : DateInfo) => {
+		programmaticLogText.value = `实例状态：${info.date} | ${info.weekText}`
+	}
+
+	// ==================== Ref 编程式控制 ====================
+	const calendarRef = ref<SteSimpleCalendarComponentPublicInstance | null>(null)
+
+	/**
+	 * 编程式跳转到指定日期（如 2026-01-01）
+	 */
+	const handleSetCustomDate = () => {
+		if (calendarRef.value != null) {
+			calendarRef.value?.setDate('2026-01-01')
+			const current = calendarRef.value?.getDateInfo()
+			if (current != null) {
+				programmaticLogText.value = `已设置为：${current.date} (${current.weekText})`
+			} else {
+				programmaticLogText.value = '已通过 setDate 设置为：2026-01-01'
+			}
+			uni.showToast({
+				title: '已设置日期为 2026-01-01',
+				icon: 'none',
+			})
+		} else {
+			uni.showToast({
+				title: '组件实例尚未就绪',
+				icon: 'none',
+			})
+		}
+	}
+
+	/**
+	 * 编程式回到今天
+	 */
+	const handleBackToday = () => {
+		if (calendarRef.value != null) {
+			calendarRef.value?.today()
+			const current = calendarRef.value?.getDateInfo()
+			if (current != null) {
+				programmaticLogText.value = `已重置为今天：${current.date} (${current.weekText})`
+				uni.showToast({
+					title: `已重置为：${current.date}`,
+					icon: 'none',
+				})
+			} else {
+				programmaticLogText.value = '已通过 today() 重置为今天'
+				uni.showToast({
+					title: '已重置为今天',
+					icon: 'none',
+				})
+			}
+		} else {
+			uni.showToast({
+				title: '组件实例尚未就绪',
+				icon: 'none',
+			})
+		}
+	}
+
+	/**
+	 * 编程式读取详情
+	 */
+	const handleGetInfo = () => {
+		if (calendarRef.value != null) {
+			const info = calendarRef.value?.getDateInfo()
+			if (info != null) {
+				programmaticLogText.value = `已读取详情：${info.date} (${info.weekText})`
+				uni.showModal({
+					title: '当前日期信息',
+					content: `日期: ${info.date}\n星期: ${info.weekText}\n年份: ${info.year}\n月份: ${info.month}月\n天数: ${info.day}号`,
+					showCancel: false,
+				})
+			}
+		} else {
+			uni.showToast({
+				title: '组件实例尚未就绪',
+				icon: 'none',
+			})
+		}
+	}
+</script>
+
+<style scoped>
+	.page-container {
+		flex: 1;
+		background-color: #f7f8fa;
+		padding: 24rpx;
+	}
+
+	.page-header {
+		margin-bottom: 24rpx;
+		padding: 16rpx 8rpx;
+	}
+
+	.page-title {
+		font-size: 38rpx;
+		font-weight: bold;
+		color: #1a1a1a;
+	}
+
+	.page-desc {
+		font-size: 26rpx;
+		color: #666666;
+		margin-top: 10rpx;
+		line-height: 38rpx;
+	}
+
+	.demo-content {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.demo-card {
+		background-color: #ffffff;
+		border-radius: 16rpx;
+		padding: 24rpx;
+		margin-bottom: 28rpx;
+	}
+
+	.card-title {
+		font-size: 30rpx;
+		font-weight: bold;
+		color: #333333;
+		margin-bottom: 8rpx;
+	}
+
+	.sub-card-title {
+		font-size: 26rpx;
+		font-weight: 500;
+		color: #555555;
+		margin-top: 12rpx;
+		margin-bottom: 12rpx;
+	}
+
+	.card-desc {
+		font-size: 24rpx;
+		color: #888888;
+		margin-bottom: 20rpx;
+		line-height: 34rpx;
+	}
+
+	.card-inner {
+		background-color: #f5f6f8;
+		border-radius: 12rpx;
+		padding: 20rpx 16rpx;
+		display: flex;
+	}
+
+	.flex-row-start {
+		flex-direction: row;
+		justify-content: flex-start;
+		align-items: center;
+	}
+
+	.mb-16 {
+		margin-bottom: 16rpx;
+	}
+
+	.mb-24 {
+		margin-bottom: 24rpx;
+	}
+
+	.mt-16 {
+		margin-top: 16rpx;
+	}
+
+	.ml-16 {
+		margin-left: 16rpx;
+	}
+
+	/* 实时状态提示框 */
+	.status-panel {
+		background-color: #eff6ff;
+		border-radius: 8rpx;
+		padding: 12rpx 16rpx;
+	}
+
+	.status-panel-text {
+		font-size: 24rpx;
+		color: #1e40af;
+		line-height: 32rpx;
+	}
+
+	/* 颜色展示行 */
+	.color-row {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+	}
+
+	.color-item {
+		background-color: #f5f6f8;
+		border-radius: 12rpx;
+		padding: 20rpx 16rpx;
+	}
+
+	/* 控制按钮网格 */
+	.btn-grid {
+		display: flex;
+		flex-direction: row;
+	}
+
+	.btn-col {
+		flex: 1;
+		margin-right: 12rpx;
+	}
+
+	.btn-col:last-child {
+		margin-right: 0rpx;
+	}
+
+	.ctrl-btn-text {
+		font-size: 26rpx;
+		color: #ffffff;
+	}
+</style>

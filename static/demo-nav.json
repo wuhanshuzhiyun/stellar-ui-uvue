@@ -1,0 +1,463 @@
+[
+  {
+    "group": "基础组件",
+    "key": "basic",
+    "sort": 0,
+    "contents": [
+      {
+        "key": "badge",
+        "title": "Badge 徽标",
+        "component": "ste-badge"
+      },
+      {
+        "key": "button",
+        "title": "Button 按钮",
+        "component": "ste-button"
+      },
+      {
+        "key": "drag",
+        "title": "Drag 拖拽",
+        "component": "ste-drag"
+      },
+      {
+        "key": "drag-sort",
+        "title": "Drag Sort 拖拽排序",
+        "component": "ste-drag-sort"
+      },
+      {
+        "key": "icon",
+        "title": "Icon 图标",
+        "component": "ste-icon"
+      },
+      {
+        "key": "image",
+        "title": "Image 图片",
+        "component": "ste-image"
+      },
+      {
+        "key": "popup",
+        "title": "Popup 弹出层",
+        "component": "ste-popup"
+      },
+      {
+        "key": "skeleton",
+        "title": "Skeleton 骨架屏",
+        "component": "ste-skeleton"
+      },
+      {
+        "key": "sticky",
+        "title": "Sticky 吸顶",
+        "component": "ste-sticky"
+      },
+      {
+        "key": "text",
+        "title": "Text 文本",
+        "component": "ste-text"
+      }
+    ]
+  },
+  {
+    "group": "表单组件",
+    "key": "form",
+    "sort": 1,
+    "contents": [
+      {
+        "key": "calendar",
+        "title": "Calendar 日历",
+        "component": "ste-calendar"
+      },
+      {
+        "key": "checkbox",
+        "title": "Checkbox 复选框",
+        "component": "ste-checkbox"
+      },
+      {
+        "key": "code-input",
+        "title": "CodeInput 验证码输入",
+        "component": "ste-code-input"
+      },
+      {
+        "key": "date-picker",
+        "title": "DatePicker 时间选择器",
+        "component": "ste-date-picker"
+      },
+      {
+        "key": "input",
+        "title": "Input 输入框",
+        "component": "ste-input"
+      },
+      {
+        "key": "radio",
+        "title": "Radio 单选框",
+        "component": "ste-radio"
+      },
+      {
+        "key": "rate",
+        "title": "Rate 评分",
+        "component": "ste-rate"
+      },
+      {
+        "key": "rich-text",
+        "title": "RichText 富文本",
+        "component": "ste-rich-text"
+      },
+      {
+        "key": "search",
+        "title": "Search 搜索",
+        "component": "ste-search"
+      },
+      {
+        "key": "select",
+        "title": "Select 下拉选",
+        "component": "ste-select"
+      },
+      {
+        "key": "signature",
+        "title": "Signature 签名",
+        "component": "ste-signature"
+      },
+      {
+        "key": "slider",
+        "title": "Slider 滑块",
+        "component": "ste-slider"
+      },
+      {
+        "key": "stepper",
+        "title": "Stepper 步进器",
+        "component": "ste-stepper"
+      },
+      {
+        "key": "switch",
+        "title": "Switch 开关",
+        "component": "ste-switch"
+      },
+      {
+        "key": "upload",
+        "title": "Upload 上传",
+        "component": "ste-upload"
+      }
+    ]
+  },
+  {
+    "group": "展示组件",
+    "key": "preview",
+    "sort": 2,
+    "contents": [
+      {
+        "key": "animate",
+        "title": "Animate 动画",
+        "component": "ste-animate"
+      },
+      {
+        "key": "barcode",
+        "title": "Barcode 条形码",
+        "component": "ste-barcode"
+      },
+      {
+        "key": "loading",
+        "title": "Loading 加载动画",
+        "component": "ste-loading"
+      },
+      {
+        "key": "marquee",
+        "title": "Marquee 走马灯",
+        "component": "ste-marquee"
+      },
+      {
+        "key": "media-preview",
+        "title": "MediaPreview 媒体预览",
+        "component": "ste-media-preview"
+      },
+      {
+        "key": "message-box",
+        "title": "MessageBox 弹框",
+        "component": "ste-message-box"
+      },
+      {
+        "key": "notice-bar",
+        "title": "NoticeBar 公告栏",
+        "component": "ste-notice-bar"
+      },
+      {
+        "key": "number-keyboard",
+        "title": "NumberKeyboard 数字键盘",
+        "component": "ste-number-keyboard"
+      },
+      {
+        "key": "qrcode",
+        "title": "QRcode 二维码",
+        "component": "ste-qrcode"
+      },
+      {
+        "key": "read-more",
+        "title": "Readmore 阅读更多",
+        "component": "ste-read-more"
+      },
+      {
+        "key": "steps",
+        "title": "Steps 步骤条",
+        "component": "ste-steps"
+      },
+      {
+        "key": "swipe-action",
+        "title": "SwipeAction 滑动单元格",
+        "component": "ste-swipe-action"
+      },
+      {
+        "key": "table",
+        "title": "Table 表格",
+        "component": "ste-table"
+      },
+      {
+        "key": "toast",
+        "title": "Toast 轻提示",
+        "component": "ste-toast"
+      },
+      {
+        "key": "tooltip",
+        "title": "Tooltip 文字提示",
+        "component": "ste-tooltip"
+      },
+      {
+        "key": "tour",
+        "title": "Tour 指引",
+        "component": "ste-tour"
+      },
+      {
+        "key": "tree",
+        "title": "Tree 树形控件",
+        "component": "ste-tree"
+      },
+      {
+        "key": "video",
+        "title": "Video 视频",
+        "component": "ste-video"
+      },
+      {
+        "key": "watermark",
+        "title": "Watermark 水印",
+        "component": "ste-watermark"
+      }
+    ]
+  },
+  {
+    "group": "导航组件",
+    "key": "navigation",
+    "sort": 3,
+    "contents": [
+      {
+        "key": "dropdown-menu",
+        "title": "DropdownMenu 下拉菜单",
+        "component": "ste-dropdown-menu"
+      },
+      {
+        "key": "index-list",
+        "title": "IndexList 索引列表",
+        "component": "ste-index-list"
+      },
+      {
+        "key": "scroll-to",
+        "title": "ScrollTo 滚动锚点",
+        "component": "ste-scroll-to"
+      },
+      {
+        "key": "swiper",
+        "title": "Swiper 轮播组件",
+        "component": "ste-swiper"
+      },
+      {
+        "key": "tabs",
+        "title": "Tabs 标签页",
+        "component": "ste-tabs"
+      },
+      {
+        "key": "touch-swipe",
+        "title": "TouchSwipe 手势切屏",
+        "component": "ste-touch-swipe"
+      }
+    ]
+  },
+  {
+    "group": "电商组件",
+    "key": "ecommerce",
+    "sort": 4,
+    "contents": [
+      {
+        "key": "price",
+        "title": "Price 价格",
+        "component": "ste-price"
+      }
+    ]
+  },
+  {
+    "group": "数据组件",
+    "key": "data",
+    "sort": 5,
+    "contents": [
+      {
+        "key": "progress",
+        "title": "Progress 进度条",
+        "component": "ste-progress"
+      }
+    ]
+  },
+  {
+    "group": "图表组件",
+    "key": "chart",
+    "sort": 6,
+    "contents": [
+      {
+        "key": "arcbar-chart",
+        "title": "ArcbarChart 圆弧进度图",
+        "component": "ste-arcbar-chart"
+      },
+      {
+        "key": "area-chart",
+        "title": "AreaChart 面积图",
+        "component": "ste-area-chart"
+      },
+      {
+        "key": "bar-chart",
+        "title": "BarChart 条状图",
+        "component": "ste-bar-chart"
+      },
+      {
+        "key": "column-chart",
+        "title": "ColumnChart 柱状图",
+        "component": "ste-column-chart"
+      },
+      {
+        "key": "funnel-chart",
+        "title": "FunnelChart 漏斗图",
+        "component": "ste-funnel-chart"
+      },
+      {
+        "key": "line-chart",
+        "title": "LineChart 折线图",
+        "component": "ste-line-chart"
+      },
+      {
+        "key": "pie-chart",
+        "title": "PieChart 饼图",
+        "component": "ste-pie-chart"
+      },
+      {
+        "key": "ring-chart",
+        "title": "RingChart 环形图",
+        "component": "ste-ring-chart"
+      }
+    ]
+  },
+  {
+    "group": "业务组件",
+    "key": "business",
+    "sort": 7,
+    "contents": [
+      {
+        "key": "app-update",
+        "title": "AppUpdate APP更新",
+        "component": "ste-app-update"
+      },
+      {
+        "key": "category",
+        "title": "Category 分类",
+        "component": "ste-category"
+      },
+      {
+        "key": "comment",
+        "title": "Comment 评价",
+        "component": "ste-comment"
+      },
+      {
+        "key": "coupon-list",
+        "title": "CouponList 券列表",
+        "component": "ste-coupon-list"
+      },
+      {
+        "key": "custom-keyboard",
+        "title": "CustomKeyboard 定制键盘",
+        "component": "ste-custom-keyboard"
+      },
+      {
+        "key": "date-user",
+        "title": "DateUser 人员信息以及日期",
+        "component": "ste-date-user"
+      },
+      {
+        "key": "filter-tool",
+        "title": "FilterTool 筛选选项",
+        "component": "ste-filter-tool"
+      },
+      {
+        "key": "function-list",
+        "title": "FunctionList 功能列表",
+        "component": "ste-function-list"
+      },
+      {
+        "key": "goods-info",
+        "title": "GoodsInfo 商品信息",
+        "component": "ste-goods-info"
+      },
+      {
+        "key": "goods-list",
+        "title": "GoodsList 商品列表",
+        "component": "ste-goods-list"
+      },
+      {
+        "key": "guide-qa",
+        "title": "GuideQA 引导服务区",
+        "component": "ste-guide-qa"
+      },
+      {
+        "key": "login",
+        "title": "Login 登录",
+        "component": "ste-login"
+      },
+      {
+        "key": "login-info",
+        "title": "LoginInfo 登录信息",
+        "component": "ste-login-info"
+      },
+      {
+        "key": "navbar",
+        "title": "Navbar 导航栏",
+        "component": "ste-navbar"
+      },
+      {
+        "key": "order-card",
+        "title": "OrderCard 订单卡片",
+        "component": "ste-order-card"
+      },
+      {
+        "key": "search-box",
+        "title": "SearchBox 搜索组件",
+        "component": "ste-search-box"
+      },
+      {
+        "key": "select-order",
+        "title": "SelectOrder 订单选择",
+        "component": "ste-select-order"
+      },
+      {
+        "key": "select-seat",
+        "title": "SelectSeat 座位选择",
+        "component": "ste-select-seat"
+      },
+      {
+        "key": "simple-calendar",
+        "title": "SimpleCalendar 简单日历",
+        "component": "ste-simple-calendar"
+      },
+      {
+        "key": "slide-verify",
+        "title": "Slide Verify 滑动验证",
+        "component": "ste-slide-verify"
+      },
+      {
+        "key": "user-info",
+        "title": "UserInfo 用户信息",
+        "component": "ste-user-info"
+      }
+    ]
+  }
+]

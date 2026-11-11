@@ -1,0 +1,257 @@
+<template>
+	<scroll-view scroll-y="true" class="page-container">
+		<!-- 头部导航与组件定位描述 -->
+		<view class="page-header">
+			<text class="page-title">SlideVerify 滑动验证</text>
+			<text class="page-desc">
+				常用于登录、注册、短信发送或高危操作前的防刷人机验证，支持普通滑块解锁与旋转图片角度校准两种模式。
+			</text>
+		</view>
+
+		<view class="demo-content">
+			<!-- 用例 1：基础滑块模式 -->
+			<view class="demo-card">
+				<text class="card-title">1. 基础滑动验证 (mode="slide")</text>
+				<text class="card-desc">按住左侧滑块向右拖拽至尽头，验证通过后展示成功状态并触发 success 事件。</text>
+				<view class="card-inner">
+					<ste-slide-verify
+						v-model="basicPassed"
+						@success="handleVerifySuccess('基础滑块')"
+						@fail="handleVerifyFail('基础滑块')"
+						@change="handleVerifyChange"
+					/>
+				</view>
+				<!-- 实时进度与状态反馈面板 -->
+				<view class="status-panel mt-16">
+					<text class="status-panel-text">
+						状态: {{ basicPassed ? '已通过验证 ✔' : '待验证 ⏳' }} | 实时进度: {{ currentProgressPercent }}%
+					</text>
+				</view>
+			</view>
+
+			<!-- 用例 2：旋转图片校准模式 -->
+			<view class="demo-card">
+				<text class="card-title">2. 旋转图片校验模式 (mode="image")</text>
+				<text class="card-desc">拖动滑块使上方倾斜的图片旋转至水平正位，松手在容差阈值（±15°）内即判定通过。</text>
+				<view class="card-inner">
+					<ste-slide-verify
+						mode="image"
+						imageUrl="https://image.whzb.com/chain/StellarUI/图片.jpg"
+						:imageSize="180"
+						:angleThreshold="15"
+						@success="handleVerifySuccess('旋转图片')"
+						@fail="handleVerifyFail('旋转图片')"
+					/>
+				</view>
+			</view>
+
+			<!-- 用例 3：自定义主题色彩与提示文案 -->
+			<view class="demo-card">
+				<text class="card-title">3. 自定义视觉色彩与文案</text>
+				<text class="card-desc">支持自定义拖动激活高亮色（activeColor）、成功文案及背景底色。</text>
+				<view class="card-inner">
+					<ste-slide-verify
+						activeColor="#8B5CF6"
+						text="按住滑块右滑解锁"
+						successText="安全检查通过"
+						@success="handleVerifySuccess('自定义配色')"
+					/>
+				</view>
+			</view>
+
+			<!-- 用例 4：禁用状态 -->
+			<view class="demo-card">
+				<text class="card-title">4. 禁用状态 (disabled = true)</text>
+				<text class="card-desc">禁用滑块拖动手势响应，半透明呈现不可交互状态。</text>
+				<view class="card-inner">
+					<ste-slide-verify
+						:disabled="true"
+						text="功能暂不可用（已禁用）"
+					/>
+				</view>
+			</view>
+
+			<!-- 用例 5：Ref 实例控制与手动重置 -->
+			<view class="demo-card">
+				<text class="card-title">5. 编程式实例重置 (Ref)</text>
+				<text class="card-desc">支持通过 ref 获得组件实例，在业务需要时手动调用 reset() 重置验证码。</text>
+				<view class="card-inner mb-24">
+					<ste-slide-verify
+						ref="verifyRef"
+						@success="handleVerifySuccess('实例控制')"
+						@fail="handleVerifyFail('实例控制')"
+					/>
+				</view>
+				<!-- 重置操作按钮 -->
+				<view class="btn-group">
+					<view class="btn-item">
+						<ste-button mode="200" @click="handleManualReset">
+							<text class="ctrl-btn-text">手动重置滑块状态</text>
+						</ste-button>
+					</view>
+				</view>
+			</view>
+		</view>
+	</scroll-view>
+</template>
+
+<script setup lang="uts">
+	/**
+	 * @file slide-verify.uvue
+	 * @description ste-slide-verify 滑动验证演示与回归测试页面
+	 */
+	import { ref } from 'vue'
+	import { SlideVerifyDetail } from '@/uni_modules/stellar-ui-uvue/components/ste-slide-verify/props.uts'
+
+	// ==================== 基础滑块状态 ====================
+	const basicPassed = ref(false)
+	const currentProgressPercent = ref(0)
+
+	/**
+	 * 滑动过程实时回调
+	 */
+	const handleVerifyChange = (detail : SlideVerifyDetail) => {
+		currentProgressPercent.value = Math.round(detail.progress * 100)
+	}
+
+	/**
+	 * 验证成功回调
+	 * @param {string} tag 来源标签
+	 */
+	const handleVerifySuccess = (tag : string) => {
+		uni.showToast({
+			title: `[${tag}] 验证通过！`,
+			icon: 'success',
+		})
+	}
+
+	/**
+	 * 验证失败回调
+	 * @param {string} tag 来源标签
+	 */
+	const handleVerifyFail = (tag : string) => {
+		uni.showToast({
+			title: `[${tag}] 验证失败，请重试`,
+			icon: 'error',
+		})
+	}
+
+	// ==================== Ref 实例控制 ====================
+	const verifyRef = ref<SteSlideVerifyComponentPublicInstance | null>(null)
+
+	/**
+	 * 手动重置滑块
+	 */
+	const handleManualReset = () => {
+		if (verifyRef.value != null) {
+			verifyRef.value?.reset()
+			uni.showToast({
+				title: '已重置滑块状态',
+				icon: 'none',
+			})
+		}
+	}
+</script>
+
+<style scoped>
+	.page-container {
+		flex: 1;
+		background-color: #f7f8fa;
+		padding: 24rpx;
+	}
+
+	.page-header {
+		margin-bottom: 24rpx;
+		padding: 16rpx 8rpx;
+	}
+
+	.page-title {
+		font-size: 38rpx;
+		font-weight: bold;
+		color: #1a1a1a;
+	}
+
+	.page-desc {
+		font-size: 26rpx;
+		color: #666666;
+		margin-top: 10rpx;
+		line-height: 38rpx;
+	}
+
+	.demo-content {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.demo-card {
+		background-color: #ffffff;
+		border-radius: 16rpx;
+		padding: 24rpx;
+		margin-bottom: 28rpx;
+	}
+
+	.card-title {
+		font-size: 30rpx;
+		font-weight: bold;
+		color: #333333;
+		margin-bottom: 8rpx;
+	}
+
+	.card-desc {
+		font-size: 24rpx;
+		color: #888888;
+		margin-bottom: 20rpx;
+		line-height: 34rpx;
+	}
+
+	.card-inner {
+		background-color: #f5f6f8;
+		border-radius: 12rpx;
+		padding: 24rpx 16rpx;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.mb-16 {
+		margin-bottom: 16rpx;
+	}
+
+	.mb-24 {
+		margin-bottom: 24rpx;
+	}
+
+	.mt-16 {
+		margin-top: 16rpx;
+	}
+
+	/* 实时状态提示框 */
+	.status-panel {
+		background-color: #eff6ff;
+		border-radius: 8rpx;
+		padding: 12rpx 16rpx;
+	}
+
+	.status-panel-text {
+		font-size: 24rpx;
+		color: #1e40af;
+		line-height: 32rpx;
+	}
+
+	/* 操作按钮栏 */
+	.btn-group {
+		margin-top: 16rpx;
+		display: flex;
+		flex-direction: row;
+	}
+
+	.btn-item {
+		flex: 1;
+	}
+
+	.ctrl-btn-text {
+		font-size: 28rpx;
+		color: #ffffff;
+	}
+</style>

@@ -1,0 +1,352 @@
+<template>
+	<scroll-view scroll-y="true" class="page-container">
+		<!-- 头部导航说明 -->
+		<view class="page-header">
+			<text class="page-title">Tree 树形控件</text>
+			<text class="page-desc">层级化数据折叠展示，支持手风琴模式、异步懒加载、默认展开、关键词搜索过滤与插槽定制。</text>
+		</view>
+
+		<view class="demo-content">
+			<!-- 用例 1：基础用法 -->
+			<view class="demo-card">
+				<text class="card-title">1. 基础用法</text>
+				<text class="card-desc">多层级节点展开与收起，手风琴模式默认开启。</text>
+				<ste-tree
+					:options="basicOptions"
+					@click="handleNodeClick"
+					@open="handleNodeOpen"
+					@close="handleNodeClose"
+				/>
+				<!-- 事件日志反馈 -->
+				<view class="log-box">
+					<text class="log-title">事件反馈：</text>
+					<text class="log-content">{{ eventLogText }}</text>
+				</view>
+			</view>
+
+			<!-- 用例 2：默认展开与 Ref 控制 -->
+			<view class="demo-card">
+				<text class="card-title">2. 默认展开与命令式控制</text>
+				<text class="card-desc">初始化默认展开节点 '1-2-2'，支持通过 ref.open() / close() 手动控制。</text>
+				<view class="btn-group" style="margin-bottom: 16rpx">
+					<view class="btn-item">
+						<ste-button @click="handleOpenNode2" :width="220" :mode="100">打开节点 2</ste-button>
+					</view>
+					<view class="btn-item">
+						<ste-button @click="handleCloseNode2" :width="220" :mode="100" mode="error">关闭节点 2</ste-button>
+					</view>
+				</view>
+				<ste-tree
+					ref="treeRef2"
+					:options="basicOptions"
+					:openNodes="['1-2-2']"
+				/>
+			</view>
+
+			<!-- 用例 3：节点搜索过滤 -->
+			<view class="demo-card">
+				<text class="card-title">3. 节点搜索过滤</text>
+				<text class="card-desc">实时搜索标题关键词，自动保留并展开匹配节点的父级路径。</text>
+				<view style="margin-bottom: 16rpx">
+					<ste-input
+						v-model="searchKeyword"
+						placeholder="输入关键词（如 1-1 或 2）"
+						border
+						borderColor="#d9d9d9"
+					/>
+				</view>
+				<ste-tree
+					:options="basicOptions"
+					:searchTitle="searchKeyword"
+				/>
+			</view>
+
+			<!-- 用例 4：非手风琴模式 -->
+			<view class="demo-card">
+				<text class="card-title">4. 非手风琴模式 (accordion: false)</text>
+				<text class="card-desc">允许同时并行展开多个同级兄弟节点。</text>
+				<ste-tree
+					:options="basicOptions"
+					:accordion="false"
+				/>
+			</view>
+
+			<!-- 用例 5：异步懒加载 -->
+			<view class="demo-card">
+				<text class="card-title">5. 异步懒加载 (beforeOpen)</text>
+				<text class="card-desc">点击展开按钮时触发 beforeOpen，模拟 1.2 秒异步请求后注入子数据。</text>
+				<ste-tree
+					:options="lazyLoadOptions"
+					@beforeOpen="handleBeforeOpen"
+				/>
+			</view>
+
+			<!-- 用例 6：自定义插槽内容 -->
+			<view class="demo-card">
+				<text class="card-title">6. 自定义插槽内容与图标</text>
+				<text class="card-desc">通过默认插槽与 open 插槽定制节点前缀图标与指示符号。</text>
+				<ste-tree :options="customSlotOptions">
+					<!-- 节点内容自定义插槽 -->
+					<template #default="{ node, depth }">
+						<view class="custom-node-content">
+							<ste-icon code="&#xe67a;" :size="24" color="#0090FF" style="margin-right: 8rpx" />
+							<text class="custom-node-text">{{ getNodeTitle(node) }}</text>
+							<text class="custom-node-tag">层级: {{ depth }}</text>
+						</view>
+					</template>
+				</ste-tree>
+			</view>
+		</view>
+	</scroll-view>
+</template>
+
+<script setup lang="uts">
+	/**
+	 * @file tree.uvue
+	 * @description Tree 树形控件 - uni-app x / UTS 全功能演示页面
+	 */
+	import { ref } from 'vue'
+	import {
+		SteTreeNode,
+		BeforeOpenSuspend,
+		BeforeOpenNext,
+		BeforeOpenStop,
+	} from '@/uni_modules/stellar-ui-uvue/components/ste-tree/constants.uts'
+
+	// 日志反馈
+	const eventLogText = ref<string>('暂无操作日志')
+
+	// Ref 引用
+	const treeRef2 = ref<SteTreeComponentPublicInstance | null>(null)
+
+	// 搜索词
+	const searchKeyword = ref<string>('')
+
+	// ==================== 数据源定义 ====================
+	const basicOptions = ref<SteTreeNode[]>([
+		{
+			title: '标题 1 (主菜单)',
+			value: '1',
+			children: [
+				{
+					title: '标题 1-1 (子项)',
+					value: '1-1',
+					children: [
+						{ title: '叶子节点 1-1-1', value: '1-1-1' } as SteTreeNode,
+						{ title: '叶子节点 1-1-2', value: '1-1-2' } as SteTreeNode,
+					] as SteTreeNode[],
+				} as SteTreeNode,
+				{
+					title: '标题 1-2 (复合项)',
+					value: '1-2',
+					children: [
+						{ title: '叶子节点 1-2-1', value: '1-2-1' } as SteTreeNode,
+						{
+							title: '标题 1-2-2 (深度项)',
+							value: '1-2-2',
+							children: [
+								{ title: '叶子节点 1-2-2-1', value: '1-2-2-1' } as SteTreeNode,
+							] as SteTreeNode[],
+						} as SteTreeNode,
+					] as SteTreeNode[],
+				} as SteTreeNode,
+			] as SteTreeNode[],
+		} as SteTreeNode,
+		{
+			title: '标题 2 (分组二)',
+			value: '2',
+			children: [
+				{ title: '叶子节点 2-1', value: '2-1' } as SteTreeNode,
+				{ title: '叶子节点 2-2', value: '2-2' } as SteTreeNode,
+			] as SteTreeNode[],
+		} as SteTreeNode,
+		{
+			title: '标题 3 (单节点)',
+			value: '3',
+		} as SteTreeNode,
+	])
+
+	// 懒加载数据源
+	const lazyLoadOptions = ref<SteTreeNode[]>([
+		{ title: '动态加载模块 A', value: 'lazy-1', hasChildren: true } as SteTreeNode,
+		{ title: '动态加载模块 B', value: 'lazy-2', hasChildren: true } as SteTreeNode,
+		{ title: '普通静态模块 C', value: 'lazy-3' } as SteTreeNode,
+	])
+
+	// 插槽自定义数据源
+	const customSlotOptions = ref<SteTreeNode[]>([
+		{
+			title: '核心研发部',
+			value: 'dept-1',
+			children: [
+				{ title: '前端架构组', value: 'dept-1-1' } as SteTreeNode,
+				{ title: '后端云原生组', value: 'dept-1-2' } as SteTreeNode,
+			] as SteTreeNode[],
+		} as SteTreeNode,
+		{
+			title: '产品设计部',
+			value: 'dept-2',
+			children: [
+				{ title: 'UI / UX 体验组', value: 'dept-2-1' } as SteTreeNode,
+			] as SteTreeNode[],
+		} as SteTreeNode,
+	])
+
+	// ==================== 事件处理 ====================
+	function handleNodeClick(node : SteTreeNode) {
+		eventLogText.value = `【点击】节点: ${node.title ?? ''} (value: ${node.value ?? ''})`
+	}
+
+	function handleNodeOpen(node : SteTreeNode) {
+		eventLogText.value = `【展开】节点: ${node.title ?? ''}`
+	}
+
+	function handleNodeClose(node : SteTreeNode) {
+		eventLogText.value = `【收起】节点: ${node.title ?? ''}`
+	}
+
+	function handleOpenNode2() {
+		treeRef2.value?.open('2')
+	}
+
+	function handleCloseNode2() {
+		treeRef2.value?.close('2')
+	}
+
+	function handleBeforeOpen(
+		node : SteTreeNode,
+		suspend : BeforeOpenSuspend,
+		next : BeforeOpenNext,
+		_stop : BeforeOpenStop
+	) {
+		// 开启挂起与菊花加载
+		suspend()
+		// 模拟 1.2 秒异步网络请求
+		setTimeout(() => {
+			const subNodes : SteTreeNode[] = [
+				{ title: `${node.title ?? ''} - 子项 1`, value: `${node.value ?? ''}-sub1` } as SteTreeNode,
+				{
+					title: `${node.title ?? ''} - 子项 2 (深度懒加载)`,
+					value: `${node.value ?? ''}-sub2`,
+					hasChildren: true,
+				} as SteTreeNode,
+			]
+			next(subNodes)
+			eventLogText.value = `【异步加载完成】已注入节点 ${node.title ?? ''} 的子数据`
+		}, 1200)
+	}
+
+	/** 安全获取插槽节点标题 */
+	function getNodeTitle(node : any | null) : string {
+		if (node != null) {
+			const n = node as SteTreeNode
+			return n.title ?? ''
+		}
+		return ''
+	}
+</script>
+
+<style scoped>
+.page-container {
+	flex: 1;
+	background-color: #f7f8fa;
+	padding: 24rpx;
+}
+
+.page-header {
+	margin-bottom: 24rpx;
+}
+
+.page-title {
+	font-size: 40rpx;
+	font-weight: bold;
+	color: #333333;
+	margin-bottom: 8rpx;
+}
+
+.page-desc {
+	font-size: 26rpx;
+	color: #666666;
+	line-height: 38rpx;
+}
+
+.demo-content {
+	display: flex;
+	flex-direction: column;
+	padding-bottom: 80rpx;
+}
+
+.demo-card {
+	background-color: #ffffff;
+	border-radius: 16rpx;
+	padding: 24rpx;
+	margin-bottom: 24rpx;
+	box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.03);
+}
+
+.card-title {
+	font-size: 30rpx;
+	font-weight: bold;
+	color: #1a1a1a;
+	margin-bottom: 8rpx;
+}
+
+.card-desc {
+	font-size: 24rpx;
+	color: #888888;
+	line-height: 34rpx;
+	margin-bottom: 20rpx;
+}
+
+.btn-group {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+}
+
+.btn-item {
+	margin-right: 16rpx;
+	margin-bottom: 16rpx;
+}
+
+.log-box {
+	margin-top: 20rpx;
+	background-color: #f0f2f5;
+	border-radius: 10rpx;
+	padding: 16rpx 20rpx;
+}
+
+.log-title {
+	font-size: 24rpx;
+	font-weight: bold;
+	color: #555555;
+	margin-bottom: 6rpx;
+}
+
+.log-content {
+	font-size: 24rpx;
+	color: #007aff;
+	line-height: 34rpx;
+}
+
+.custom-node-content {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+.custom-node-text {
+	font-size: 28rpx;
+	color: #333333;
+	font-weight: 500;
+}
+
+.custom-node-tag {
+	margin-left: 16rpx;
+	font-size: 20rpx;
+	color: #007aff;
+	background-color: #e8f4ff;
+	padding: 2rpx 10rpx;
+	border-radius: 6rpx;
+}
+</style>

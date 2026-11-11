@@ -1,0 +1,258 @@
+<template>
+	<scroll-view scroll-y="true" class="page">
+		<view class="header">
+			<text class="title">Image 图片</text>
+			<text class="desc">图片组件，对原生 image 组件进行了扩展</text>
+		</view>
+
+		<!-- 基础用法 -->
+		<view class="demo-item">
+			<text class="demo-title">基础用法</text>
+			<view class="demo-content">
+				<ste-image :src="imgUrl1" width="200" height="200" />
+			</view>
+		</view>
+
+		<!-- 缩放模式 -->
+		<view class="demo-item">
+			<text class="demo-title">缩放模式</text>
+			<view class="demo-content row">
+				<ste-image :src="imgUrl1" width="150" height="150" mode="scaleToFill" />
+				<ste-image :src="imgUrl1" width="150" height="150" mode="aspectFit" />
+				<ste-image :src="imgUrl1" width="150" height="150" mode="aspectFill" />
+			</view>
+			<view class="demo-result">
+				<text class="demo-result-text">从左到右：scaleToFill / aspectFit / aspectFill</text>
+			</view>
+		</view>
+
+		<!-- 自适应宽高 -->
+		<view class="demo-item">
+			<text class="demo-title">自适应宽高</text>
+			<view class="demo-content column">
+				<ste-image :src="imgUrl1" width="300" mode="widthFix" />
+				<ste-image :src="imgUrl1" height="150" mode="heightFix" />
+			</view>
+			<view class="demo-result">
+				<text class="demo-result-text">widthFix：宽度固定，高度自适应</text>
+				<text class="demo-result-text">heightFix：高度固定，宽度自适应</text>
+			</view>
+		</view>
+
+		<!-- 圆角 -->
+		<view class="demo-item">
+			<text class="demo-title">圆角</text>
+			<view class="demo-content row">
+				<ste-image :src="imgUrl1" width="150" height="150" :radius="20" />
+				<ste-image :src="imgUrl1" width="150" height="150" :radius="50" />
+			</view>
+			<view class="demo-result">
+				<text class="demo-result-text">radius 20rpx / 50rpx</text>
+			</view>
+		</view>
+
+		<!-- 圆形 -->
+		<view class="demo-item">
+			<text class="demo-title">圆形</text>
+			<view class="demo-content row">
+				<ste-image :src="imgUrl1" width="150" height="150" radius="50%" />
+			</view>
+		</view>
+
+		<!-- 加载效果 -->
+		<view class="demo-item">
+			<text class="demo-title">加载效果</text>
+			<view class="demo-content column">
+				<view class="row">
+					<view class="image-box">
+						<ste-image :src="loadingUrl" width="200" height="200" />
+						<text class="msg">默认显示加载</text>
+					</view>
+					<view class="image-box">
+						<ste-image :src="loadingUrl" hiddenLoading width="200" height="200" />
+						<text class="msg">隐藏加载中</text>
+					</view>
+				</view>
+			</view>
+		</view>
+
+		<!-- 加载失败 -->
+		<view class="demo-item">
+			<text class="demo-title">加载失败</text>
+			<view class="demo-content column">
+				<view class="row">
+					<view class="image-box">
+						<ste-image :src="errorUrl" width="200" height="200" />
+						<text class="msg">默认显示失败</text>
+					</view>
+					<view class="image-box">
+						<ste-image :src="errorUrl" hiddenError width="200" height="200" />
+						<text class="msg">隐藏失败</text>
+					</view>
+				</view>
+			</view>
+		</view>
+
+		<!-- 具名插槽 -->
+		<view class="demo-item">
+			<text class="demo-title">具名插槽</text>
+			<view class="demo-content column">
+				<view class="row">
+					<view class="image-box">
+						<ste-image :src="errorUrl" width="200" height="200">
+							<template #loading>
+								<text class="custom-slot">自定义Loading</text>
+							</template>
+							<template #error>
+								<text class="custom-slot">自定义Error</text>
+							</template>
+						</ste-image>
+						<text class="msg">自定义插槽</text>
+					</view>
+				</view>
+			</view>
+		</view>
+
+		<!-- 事件 -->
+		<view class="demo-item">
+			<text class="demo-title">事件回调</text>
+			<view class="demo-content column">
+				<ste-image :src="imgUrl1" width="200" height="200" @click="onClick" @load="onLoad" @error="onError" />
+			</view>
+			<view class="demo-result">
+				<text class="demo-result-text">点击次数：{{ clickCount }}</text>
+				<text class="demo-result-text">加载成功次数：{{ loadCount }}</text>
+				<text class="demo-result-text">加载失败次数：{{ errorCount }}</text>
+			</view>
+		</view>
+
+		<!-- 懒加载 -->
+		<view class="demo-item">
+			<text class="demo-title">懒加载</text>
+			<view class="demo-content column">
+				<ste-image v-for="(item, idx) in lazyList" :key="idx" :src="item" width="300" height="180" lazyLoad />
+			</view>
+			<view class="demo-result">
+				<text class="demo-result-text">滚动到可视区域才会加载</text>
+			</view>
+		</view>
+	</scroll-view>
+</template>
+
+<script setup lang="uts">
+	import { ref } from 'vue'
+
+	// 使用 picsum.photos 稳定图床（mp-weixin 端 urlCheck: false 已跳过域名校验）
+	const imgUrl1 = 'https://picsum.photos/300/200?random=1'
+	const errorUrl = 'https://picsum.photos/200/200?random=2'
+	const loadingUrl = 'https://picsum.photos/200/200?random=3'
+
+	const lazyList = ref<string[]>([
+		'https://picsum.photos/300/180?random=11',
+		'https://picsum.photos/300/180?random=12',
+		'https://picsum.photos/300/180?random=13',
+		'https://picsum.photos/300/180?random=14',
+		'https://picsum.photos/300/180?random=15',
+	])
+
+	const clickCount = ref(0)
+	const loadCount = ref(0)
+	const errorCount = ref(0)
+
+	const onClick = (_e : any) => {
+		clickCount.value++
+	}
+	const onLoad = (_e : any) => {
+		loadCount.value++
+	}
+	const onError = (_e : any) => {
+		errorCount.value++
+	}
+</script>
+
+<style>
+	.page {
+		padding: 20rpx;
+		flex: 1;
+	}
+
+	.header {
+		padding: 20rpx 0;
+		margin-bottom: 20rpx;
+	}
+
+	.title {
+		font-size: 40rpx;
+		font-weight: bold;
+		color: #333;
+	}
+
+	.desc {
+		font-size: 28rpx;
+		color: #666;
+		margin-top: 10rpx;
+	}
+
+	.demo-item {
+		background: #fff;
+		border-radius: 16rpx;
+		margin-bottom: 24rpx;
+		overflow: hidden;
+		box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+	}
+
+	.demo-title {
+		padding: 24rpx 30rpx;
+		font-size: 30rpx;
+		font-weight: 500;
+		color: #333;
+		border-bottom: 1rpx solid #f0f0f0;
+	}
+
+	.demo-content {
+		padding: 40rpx 30rpx;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.row {
+		flex-direction: row;
+		flex-wrap: wrap;
+		justify-content: space-around;
+	}
+
+	.column {
+		flex-direction: column;
+		align-items: center;
+	}
+
+	.image-box {
+		flex-direction: column;
+		align-items: center;
+		margin: 10rpx;
+	}
+
+	.msg {
+		font-size: 24rpx;
+		color: #999;
+		margin-top: 10rpx;
+	}
+
+	.custom-slot {
+		font-size: 26rpx;
+		color: #999;
+	}
+
+	.demo-result {
+		padding: 20rpx 30rpx;
+		background: #f9f9f9;
+		border-top: 1rpx solid #f0f0f0;
+	}
+
+	.demo-result-text {
+		font-size: 26rpx;
+		color: #666;
+		line-height: 40rpx;
+	}
+</style>

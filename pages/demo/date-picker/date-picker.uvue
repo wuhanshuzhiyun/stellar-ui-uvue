@@ -1,0 +1,183 @@
+<template>
+	<scroll-view scroll-y="true" class="page-root">
+		<view class="demo-item">
+			<text class="demo-title">基础用法</text>
+			<ste-date-picker :value="value1" @confirm="onConfirm1" @update:value="onUpdate1"></ste-date-picker>
+			<text class="demo-result">选中值: {{ result1 }}</text>
+		</view>
+
+		<view class="demo-item">
+			<text class="demo-title">日期模式 (date)</text>
+			<ste-date-picker mode="date" :value="value2" @confirm="onConfirm2" @update:value="onUpdate2"></ste-date-picker>
+			<text class="demo-result">选中值: {{ result2 }}</text>
+		</view>
+
+		<view class="demo-item">
+			<text class="demo-title">年月模式 (year-month)</text>
+			<ste-date-picker mode="year-month" :value="value3" @confirm="onConfirm3" @update:value="onUpdate3"></ste-date-picker>
+			<text class="demo-result">选中值: {{ result3 }}</text>
+		</view>
+
+		<view class="demo-item">
+			<text class="demo-title">月日模式 (month-day)</text>
+			<ste-date-picker mode="month-day" :value="value4" @confirm="onConfirm4" @update:value="onUpdate4"></ste-date-picker>
+			<text class="demo-result">选中值: {{ result4 }}</text>
+		</view>
+
+		<view class="demo-item">
+			<text class="demo-title">时间模式 (time)</text>
+			<ste-date-picker mode="time" :value="value5" @confirm="onConfirm5" @update:value="onUpdate5"></ste-date-picker>
+			<text class="demo-result">选中值: {{ result5 }}</text>
+		</view>
+
+		<view class="demo-item">
+			<text class="demo-title">时分模式 (hour-minute)</text>
+			<ste-date-picker mode="hour-minute" :value="value6" @confirm="onConfirm6" @update:value="onUpdate6"></ste-date-picker>
+			<text class="demo-result">选中值: {{ result6 }}</text>
+		</view>
+
+		<view class="demo-item">
+			<text class="demo-title">分秒模式 (minute-second)</text>
+			<ste-date-picker mode="minute-second" :value="value7" @confirm="onConfirm7" @update:value="onUpdate7"></ste-date-picker>
+			<text class="demo-result">选中值: {{ result7 }}</text>
+		</view>
+
+		<view class="demo-item">
+			<text class="demo-title">日期时间模式 (datetime)</text>
+			<ste-date-picker mode="datetime" :value="value8" @confirm="onConfirm8" @update:value="onUpdate8"></ste-date-picker>
+			<text class="demo-result">选中值: {{ result8 }}</text>
+		</view>
+
+		<view class="demo-item">
+			<text class="demo-title">自定义颜色</text>
+			<ste-date-picker :value="value9" confirmColor="#ff4d4f" cancelColor="#52c41a" @confirm="onConfirm9" @update:value="onUpdate9"></ste-date-picker>
+			<text class="demo-result">选中值: {{ result9 }}</text>
+		</view>
+
+		<view class="demo-item">
+			<text class="demo-title">隐藏工具栏</text>
+			<ste-date-picker :showToolbar="false" :value="value10" @confirm="onConfirm10" @update:value="onUpdate10"></ste-date-picker>
+			<text class="demo-result">选中值: {{ result10 }}</text>
+		</view>
+
+		<view class="demo-item">
+			<text class="demo-title">自定义标题</text>
+			<ste-date-picker title="请选择日期" :value="value11" @confirm="onConfirm11" @update:value="onUpdate11"></ste-date-picker>
+			<text class="demo-result">选中值: {{ result11 }}</text>
+		</view>
+
+		<view class="demo-item">
+			<text class="demo-title">限制日期范围</text>
+			<ste-date-picker :minDate="minDate" :maxDate="maxDate" :value="value12" @confirm="onConfirm12" @update:value="onUpdate12"></ste-date-picker>
+			<text class="demo-result">选中值: {{ result12 }}</text>
+		</view>
+	</scroll-view>
+</template>
+
+<script setup lang="uts">
+import { ref } from 'vue'
+
+const now = new Date().getTime()
+const value1 = ref<string | number>(now)
+const value2 = ref<string | number>(now)
+const value3 = ref<string | number>(now)
+const value4 = ref<string | number>(now)
+const value5 = ref<string | number>(now)
+const value6 = ref<string | number>(now)
+const value7 = ref<string | number>(now)
+const value8 = ref<string | number>(now)
+const value9 = ref<string | number>(now)
+const value10 = ref<string | number>(now)
+const value11 = ref<string | number>(now)
+const value12 = ref<string | number>(now)
+
+const result1 = ref<string>('')
+const result2 = ref<string>('')
+const result3 = ref<string>('')
+const result4 = ref<string>('')
+const result5 = ref<string>('')
+const result6 = ref<string>('')
+const result7 = ref<string>('')
+const result8 = ref<string>('')
+const result9 = ref<string>('')
+const result10 = ref<string>('')
+const result11 = ref<string>('')
+const result12 = ref<string>('')
+
+const formatTimestamp = (timestamp: number) : string => {
+	const date = new Date(timestamp)
+	const year = date.getFullYear()
+	const month = date.getMonth() + 1
+	const day = date.getDate()
+	const hour = date.getHours()
+	const minute = date.getMinutes()
+	const second = date.getSeconds()
+	return `${year}-${month < 10 ? '0' + month : month}-${day < 10 ? '0' + day : day} ${hour < 10 ? '0' + hour : hour}:${minute < 10 ? '0' + minute : minute}:${second < 10 ? '0' + second : second}`
+}
+
+const onConfirm1 = (value: string | number) => { result1.value = formatTimestamp(value as number) }
+const onUpdate1 = (value: string | number) => { value1.value = value }
+
+const onConfirm2 = (value: string | number) => { result2.value = formatTimestamp(value as number) }
+const onUpdate2 = (value: string | number) => { value2.value = value }
+
+const onConfirm3 = (value: string | number) => { result3.value = formatTimestamp(value as number) }
+const onUpdate3 = (value: string | number) => { value3.value = value }
+
+const onConfirm4 = (value: string | number) => { result4.value = formatTimestamp(value as number) }
+const onUpdate4 = (value: string | number) => { value4.value = value }
+
+const onConfirm5 = (value: string | number) => { result5.value = formatTimestamp(value as number) }
+const onUpdate5 = (value: string | number) => { value5.value = value }
+
+const onConfirm6 = (value: string | number) => { result6.value = formatTimestamp(value as number) }
+const onUpdate6 = (value: string | number) => { value6.value = value }
+
+const onConfirm7 = (value: string | number) => { result7.value = formatTimestamp(value as number) }
+const onUpdate7 = (value: string | number) => { value7.value = value }
+
+const onConfirm8 = (value: string | number) => { result8.value = formatTimestamp(value as number) }
+const onUpdate8 = (value: string | number) => { value8.value = value }
+
+const onConfirm9 = (value: string | number) => { result9.value = formatTimestamp(value as number) }
+const onUpdate9 = (value: string | number) => { value9.value = value }
+
+const onConfirm10 = (value: string | number) => { result10.value = formatTimestamp(value as number) }
+const onUpdate10 = (value: string | number) => { value10.value = value }
+
+const onConfirm11 = (value: string | number) => { result11.value = formatTimestamp(value as number) }
+const onUpdate11 = (value: string | number) => { value11.value = value }
+
+const onConfirm12 = (value: string | number) => { result12.value = formatTimestamp(value as number) }
+const onUpdate12 = (value: string | number) => { value12.value = value }
+
+const minDate = new Date(2020, 0, 1).getTime()
+const maxDate = new Date(2030, 11, 31, 23, 59, 59).getTime()
+</script>
+
+<style scoped>
+.page-root {
+	height: 100%;
+	background-color: #f5f5f5;
+}
+
+.demo-item {
+	margin: 20rpx;
+	padding: 30rpx;
+	background-color: #ffffff;
+	border-radius: 12rpx;
+}
+
+.demo-title {
+	font-size: 30rpx;
+	font-weight: bold;
+	color: #333333;
+	margin-bottom: 20rpx;
+}
+
+.demo-result {
+	font-size: 26rpx;
+	color: #666666;
+	margin-top: 20rpx;
+}
+</style>

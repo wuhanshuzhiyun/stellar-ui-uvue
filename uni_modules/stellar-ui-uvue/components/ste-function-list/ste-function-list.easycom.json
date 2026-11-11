@@ -1,0 +1,122 @@
+{
+    "name": "ste-function-list",
+    "description": "功能列表组件，用于横向横滑展示业务卡片、配图、副标题胶囊与操作按钮，支持空数据展示。",
+    "example": "<ste-function-list :data=\"data\" title=\"今日功能\"></ste-function-list>",
+    "tutorial": "https://stellar-ui.intecloud.com.cn/?projectName=stellar-ui-uvue&menu=%E7%BB%84%E4%BB%B6&active=ste-function-list",
+    "attributes": [
+        {
+            "name": "background",
+            "description": "组件外层根卡片背景色",
+            "type": "string",
+            "default": "#fff"
+        },
+        {
+            "name": "contentBg",
+            "description": "内容数据项背景色",
+            "type": "string",
+            "default": "#f9f9f9"
+        },
+        {
+            "name": "title",
+            "description": "组件头部主标题",
+            "type": "string"
+        },
+        {
+            "name": "subhead",
+            "description": "组件头部副标题文本",
+            "type": "string"
+        },
+        {
+            "name": "data",
+            "description": "核心功能数据列表。采用原生横向横滑容器，单项自动撑满 100%，多项时卡片以 580rpx 规范宽度露出，滑动体验极其顺畅",
+            "type": "FunctionListItem[]",
+            "default": "[]"
+        },
+        {
+            "name": "buttonBg",
+            "description": "列表操作按钮背景色（若单项未指定时采用此默认值）",
+            "type": "string",
+            "default": "#EC3E1A"
+        },
+        {
+            "name": "buttonColor",
+            "description": "列表操作按钮文字颜色（若单项未指定时采用此默认值）",
+            "type": "string",
+            "default": "#fff"
+        },
+        {
+            "name": "buttonText",
+            "description": "列表操作按钮文字（若单项未指定时采用此默认值）",
+            "type": "string"
+        },
+        {
+            "name": "buttonIcon",
+            "description": "列表操作按钮图标代码（若单项未指定时采用此默认值）",
+            "type": "string",
+            "default": ""
+        },
+        {
+            "name": "emptyImage",
+            "description": "列表为空时显示的图片地址",
+            "type": "string"
+        },
+        {
+            "name": "emptyText",
+            "description": "列表为空时显示的说明文案",
+            "type": "string"
+        },
+        {
+            "name": "emptyButtonText",
+            "description": "列表为空时显示的引导操作按钮文案",
+            "type": "string"
+        },
+        {
+            "name": "fontFamily",
+            "description": "图标字体族名称",
+            "type": "string",
+            "default": "ste-iconfont-1709689042473"
+        },
+        {
+            "name": "[event]click-header",
+            "description": "点击列表头部时触发",
+            "params": [
+                {
+                    "name": "type",
+                    "description": "点击的区域类型（可选值：`empty`, `title`, `subhead`, `more`）"
+                }
+            ]
+        },
+        {
+            "name": "[event]click-item",
+            "description": "点击列表项各部位时触发",
+            "params": [
+                {
+                    "name": "type",
+                    "description": "点击的区域类型（可选值：`empty`, `image`, `title`, `subhead`, `status`, `button`）"
+                },
+                {
+                    "name": "item",
+                    "description": "当前点击的数据项 (FunctionListItem)"
+                }
+            ]
+        },
+        {
+            "name": "[event]click-empty",
+            "description": "数据为空时点击占位内容触发",
+            "params": [
+                {
+                    "name": "type",
+                    "description": "点击的区域类型（可选值：`image`, `text`, `button`）"
+                }
+            ]
+        },
+        {
+            "name": "[slot]subhead",
+            "description": "组件头部副标题插槽（若副标题需要丰富图文或自定义样式，可使用此插槽）"
+        },
+        {
+            "name": "[slot]header-right",
+            "description": "组件头部右侧操作区插槽（默认展示`更多 >`）"
+        }
+    ]
+}

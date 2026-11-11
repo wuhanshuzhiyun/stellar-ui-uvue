@@ -1,0 +1,152 @@
+{
+    "name": "ste-price",
+    "description": "价格展示组件，支持分转元、精度截断、经典电商排版风格与基线对齐",
+    "example": "<ste-price :value=\"9527\"/>",
+    "tutorial": "https://stellar-ui.intecloud.com.cn/?projectName=stellar-ui-uvue&menu=%E7%BB%84%E4%BB%B6&active=ste-price",
+    "attributes": [
+        {
+            "name": "value",
+            "description": "金额数值，支持数字或数字字符串（默认分单位，自动除以100转元）",
+            "type": "string | number",
+            "default": 0
+        },
+        {
+            "name": "valueUnit",
+            "description": "输入金额的单位",
+            "type": "string",
+            "values": [
+                {
+                    "name": "fen",
+                    "description": "分（默认，自动除以100转元展示）"
+                },
+                {
+                    "name": "yuan",
+                    "description": "元（按元直接展示）"
+                }
+            ],
+            "default": "fen"
+        },
+        {
+            "name": "showUnit",
+            "description": "是否展示货币符号",
+            "type": "boolean",
+            "default": true
+        },
+        {
+            "name": "unitSymbol",
+            "description": "自定义货币符号",
+            "type": "string",
+            "default": "¥"
+        },
+        {
+            "name": "digits",
+            "description": "保留小数精度规则",
+            "type": "number",
+            "values": [
+                {
+                    "name": -1,
+                    "description": "自动去除末尾无意义的0"
+                },
+                {
+                    "name": 0,
+                    "description": "纯整数（四舍五入）"
+                },
+                {
+                    "name": 1,
+                    "description": "保留1位小数（四舍五入）"
+                },
+                {
+                    "name": 2,
+                    "description": "保留2位小数（四舍五入）"
+                }
+            ],
+            "default": -1
+        },
+        {
+            "name": "fontSize",
+            "description": "整数部分基准字体尺寸（支持 rpx/px 或纯数字，默认 30）",
+            "type": "string | number",
+            "default": 30
+        },
+        {
+            "name": "color",
+            "description": "文字颜色",
+            "type": "string",
+            "default": "#FF1E19"
+        },
+        {
+            "name": "linePriceColor",
+            "description": "划线价原价文字颜色",
+            "type": "string",
+            "default": "#999999"
+        },
+        {
+            "name": "lineHeight",
+            "description": "文字行高（-1 代表由文字自适应，其它数值将被格式化为具体行高）",
+            "type": "string | number",
+            "default": -1
+        },
+        {
+            "name": "isSuggestPrice",
+            "description": "是否开启划线价模式（添加中划线并应用划线价颜色）",
+            "type": "boolean",
+            "default": false
+        },
+        {
+            "name": "marginLeft",
+            "description": "左外边距",
+            "type": "string | number",
+            "default": 0
+        },
+        {
+            "name": "marginRight",
+            "description": "右外边距",
+            "type": "string | number",
+            "default": 0
+        },
+        {
+            "name": "marginTop",
+            "description": "上外边距",
+            "type": "string | number",
+            "default": 0
+        },
+        {
+            "name": "marginBottom",
+            "description": "下外边距",
+            "type": "string | number",
+            "default": 0
+        },
+        {
+            "name": "styleType",
+            "description": "排版字号风格",
+            "type": "number",
+            "values": [
+                {
+                    "name": 1,
+                    "description": "风格 1：整数和小数等大，仅货币符号缩小"
+                },
+                {
+                    "name": 2,
+                    "description": "风格 2：经典电商前大后小，符号与角分均缩小"
+                },
+                {
+                    "name": 3,
+                    "description": "风格 3：货币符号、整数与角分全部统一字号"
+                }
+            ],
+            "default": 2
+        },
+        {
+            "name": "bold",
+            "description": "是否加粗展示",
+            "type": "boolean",
+            "default": false
+        },
+        {
+            "name": "formatter",
+            "description": "自定义价格格式化函数 (val: any) => string",
+            "type": "function",
+            "default": null
+        }
+    ]
+}

@@ -1,0 +1,145 @@
+<template>
+	<scroll-view direction="vertical" class="page">
+		<!-- 页面头部说明 -->
+		<view class="header">
+			<text class="title">BarChart 条形图</text>
+			<text class="desc">横向排列的柱状图，极佳适配移动端长标签排行榜与阶段指标对比。</text>
+		</view>
+
+		<!-- 1. 基础单系列条形图 -->
+		<view class="section">
+			<text class="section-title">1. 基础横向条形排行榜</text>
+			<text class="section-desc">适合分类文案较长的场景，条柱自左向右生长</text>
+			<view class="chart-card">
+				<ste-bar-chart :categories="categories1" :series="series1" height="420" />
+			</view>
+		</view>
+
+		<!-- 2. 多系列条形图 -->
+		<view class="section">
+			<text class="section-title">2. 多维度对比条形图</text>
+			<text class="section-desc">同一分类下两组条柱对比，支持图例点击交互</text>
+			<view class="chart-card">
+				<ste-bar-chart :categories="categories2" :series="series2" height="460" />
+			</view>
+		</view>
+
+		<!-- 3. 动态更新 -->
+		<view class="section">
+			<text class="section-title">3. 动态更新与伸展动效</text>
+			<text class="section-desc">点击按钮更新数据，条柱向右平滑展开</text>
+			<view class="chart-card">
+				<ste-bar-chart :categories="categories1" :series="dynamicSeries" height="420" />
+			</view>
+			<view class="btn-box">
+				<button class="action-btn" size="mini" @click="randomizeData">随机更新数值</button>
+			</view>
+		</view>
+	</scroll-view>
+</template>
+
+<script setup lang="uts">
+/**
+ * @file bar-chart.uvue
+ * @description BarChart 条形图全功能交互式 Demo
+ */
+
+const categories1 = ['开发部', '设计部', '市场部', '运营部', '客服部'];
+
+const series1: UTSJSONObject[] = [
+	{
+		name: '绩效得分',
+		data: [92, 85, 88, 78, 90],
+		color: '#165DFF'
+	}
+];
+
+const categories2 = ['华东大区', '华北大区', '华南大区', '西南大区'];
+const series2: UTSJSONObject[] = [
+	{
+		name: '计划完成',
+		data: [80, 65, 75, 55],
+		color: '#14C9C9'
+	},
+	{
+		name: '实际完成',
+		data: [95, 70, 85, 60],
+		color: '#165DFF'
+	}
+];
+
+const dynamicSeries = ref<UTSJSONObject[]>([
+	{
+		name: '完成度',
+		data: [60, 75, 90, 80, 85],
+		color: '#F7BA1E'
+	}
+]);
+
+function randomizeData() {
+	const newNums: number[] = [];
+	for (let i = 0; i < 5; i++) {
+		newNums.push(Math.floor(Math.random() * 50) + 50);
+	}
+	dynamicSeries.value = [
+		{
+			name: '完成度',
+			data: newNums,
+			color: '#F7BA1E'
+		}
+	];
+}
+</script>
+
+<style>
+.page {
+	padding: 24rpx;
+	background-color: #f7f8fa;
+	flex: 1;
+}
+.header {
+	margin-bottom: 28rpx;
+}
+.title {
+	font-size: 38rpx;
+	font-weight: bold;
+	color: #1f2329;
+}
+.desc {
+	font-size: 26rpx;
+	color: #646a73;
+	margin-top: 10rpx;
+	line-height: 38rpx;
+}
+.section {
+	margin-bottom: 32rpx;
+}
+.section-title {
+	font-size: 30rpx;
+	font-weight: bold;
+	color: #1f2329;
+}
+.section-desc {
+	font-size: 24rpx;
+	color: #8f959e;
+	margin-top: 6rpx;
+	margin-bottom: 14rpx;
+}
+.chart-card {
+	background-color: #ffffff;
+	border-radius: 16rpx;
+	padding: 16rpx;
+	box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
+}
+.btn-box {
+	margin-top: 16rpx;
+	flex-direction: row;
+	justify-content: center;
+}
+.action-btn {
+	background-color: #165dff;
+	color: #ffffff;
+	border-radius: 8rpx;
+	font-size: 26rpx;
+}
+</style>

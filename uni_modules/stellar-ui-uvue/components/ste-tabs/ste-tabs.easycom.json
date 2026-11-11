@@ -1,0 +1,178 @@
+{
+    "name": "ste-tabs",
+    "description": "标签页组件，用于在不同的内容区域之间进行切换。",
+    "tutorial": "https://stellar-ui.intecloud.com.cn/?projectName=stellar-ui-uvue&menu=%E7%BB%84%E4%BB%B6&active=ste-tabs",
+    "attributes": [
+        {
+            "name": "active",
+            "description": "当前激活的选项（支持 v-model:active 双向绑定，类型为 number 或 string）",
+            "type": "number | string",
+            "default": 0
+        },
+        {
+            "name": "barType",
+            "description": "样式风格形态：line（下划线型）、card（卡片型）、segment（分段控制器）",
+            "type": "string",
+            "default": "line",
+            "values": [
+                {
+                    "name": "line",
+                    "description": "下划线线型"
+                },
+                {
+                    "name": "card",
+                    "description": "卡片型"
+                },
+                {
+                    "name": "segment",
+                    "description": "分段控制器型"
+                }
+            ]
+        },
+        {
+            "name": "tabList",
+            "description": "标签项数据源数组（支持配置式直接渲染标签）",
+            "type": "array"
+        },
+        {
+            "name": "color",
+            "description": "主题颜色（下划线颜色、激活文字颜色等）",
+            "type": "string",
+            "default": "#0090FF"
+        },
+        {
+            "name": "titleInactiveColor",
+            "description": "未选中标签文字颜色",
+            "type": "string",
+            "default": "#666666"
+        },
+        {
+            "name": "titleActiveColor",
+            "description": "选中激活标签文字颜色",
+            "type": "string"
+        },
+        {
+            "name": "background",
+            "description": "标签栏背景色",
+            "type": "string",
+            "default": "#ffffff"
+        },
+        {
+            "name": "duration",
+            "description": "动画过渡时长（毫秒）",
+            "type": "number",
+            "default": 300
+        },
+        {
+            "name": "lineWidth",
+            "description": "底部下划线指示条宽度（px/rpx）",
+            "type": "number | string",
+            "default": 40
+        },
+        {
+            "name": "lineHeight",
+            "description": "底部下划线指示条高度（px/rpx）",
+            "type": "number | string",
+            "default": 3
+        },
+        {
+            "name": "lineScale",
+            "description": "底部指示条形变缩放比",
+            "type": "number",
+            "default": 1
+        },
+        {
+            "name": "showLine",
+            "description": "是否展示底部指示条",
+            "type": "boolean",
+            "default": true
+        },
+        {
+            "name": "shrink",
+            "description": "是否开启收缩布局（自适应内容宽度）",
+            "type": "boolean",
+            "default": false
+        },
+        {
+            "name": "scrollable",
+            "description": "是否允许横向滚动",
+            "type": "boolean",
+            "default": true
+        },
+        {
+            "name": "swipeable",
+            "description": "是否支持在内容区域手势滑动切换",
+            "type": "boolean",
+            "default": false
+        },
+        {
+            "name": "swipeHeight",
+            "description": "开启 swipeable 手势滑动时内容区的高度，支持 rpx/px/% 或数字（数字按 px 处理）",
+            "type": "number | string",
+            "default": "100%"
+        },
+        {
+            "name": "pullDown",
+            "description": "是否开启下拉展开全览面板",
+            "type": "boolean",
+            "default": false
+        },
+        {
+            "name": "disabled",
+            "description": "是否全局禁用所有标签切换",
+            "type": "boolean",
+            "default": false
+        },
+        {
+            "name": "rootStyle",
+            "description": "根节点自定义样式",
+            "type": "object"
+        },
+        {
+            "name": "[event]update:active",
+            "description": "当前激活标签值变更时触发（用于 v-model:active 双向绑定）",
+            "params": [
+                {
+                    "name": "active",
+                    "description": "激活的标签标识"
+                }
+            ]
+        },
+        {
+            "name": "[event]change",
+            "description": "标签切换完成且值发生变更时触发",
+            "params": [
+                {
+                    "name": "tab",
+                    "description": "当前激活的标签对象"
+                },
+                {
+                    "name": "index",
+                    "description": "当前激活的标签索引"
+                }
+            ]
+        },
+        {
+            "name": "[event]click-tab",
+            "description": "点击标签时触发",
+            "params": [
+                {
+                    "name": "tab",
+                    "description": "被点击的标签对象"
+                },
+                {
+                    "name": "index",
+                    "description": "被点击的标签索引"
+                }
+            ]
+        },
+        {
+            "name": "[slot]default",
+            "description": "默认插槽，用于承载 ste-tab 子标签列表或标签页内容"
+        },
+        {
+            "name": "[slot]header-suffix",
+            "description": "头部右侧扩展插槽，可在标签栏右侧插入自定义操作按钮"
+        }
+    ]
+}

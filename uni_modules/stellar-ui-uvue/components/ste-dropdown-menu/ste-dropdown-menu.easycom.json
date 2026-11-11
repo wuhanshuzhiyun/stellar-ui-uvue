@@ -1,0 +1,159 @@
+{
+    "name": "ste-dropdown-menu",
+    "description": "下拉菜单组件，用于向下或向上展开筛选选项卡，支持单选/多选联动、列表与胶囊按钮形态、定向遮罩裁剪及精准定位动画",
+    "tutorial": "https://stellar-ui.intecloud.com.cn/?projectName=stellar-ui-uvue&menu=%E7%BB%84%E4%BB%B6&active=ste-dropdown-menu",
+    "attributes": [
+        {
+            "name": "title",
+            "description": "菜单标题，未设置时会自动跟随选中项的标题变化",
+            "type": "string"
+        },
+        {
+            "name": "value",
+            "description": "下拉菜单选中的值 (支持 v-model)",
+            "type": "string | number | array"
+        },
+        {
+            "name": "inactiveColor",
+            "description": "未选中状态下的文本颜色",
+            "type": "string",
+            "default": "#000000"
+        },
+        {
+            "name": "activeColor",
+            "description": "选中高亮激活颜色，默认读取主题色",
+            "type": "string",
+            "default": "#0090FF"
+        },
+        {
+            "name": "direction",
+            "description": "下拉菜单展开方向",
+            "type": "string",
+            "default": "down",
+            "values": [
+                {
+                    "name": "down",
+                    "description": "向下展开 (默认)"
+                },
+                {
+                    "name": "up",
+                    "description": "向上展开"
+                }
+            ]
+        },
+        {
+            "name": "duration",
+            "description": "展开/收起过渡动画执行时间（秒）",
+            "type": "number",
+            "default": 0.2
+        },
+        {
+            "name": "showMask",
+            "description": "是否展示半透明背景遮罩",
+            "type": "boolean",
+            "default": true
+        },
+        {
+            "name": "isMaskClick",
+            "description": "是否允许点击遮罩时自动关闭菜单",
+            "type": "boolean",
+            "default": true
+        },
+        {
+            "name": "zIndex",
+            "description": "弹窗浮层层级 z-index",
+            "type": "number",
+            "default": 1000
+        },
+        {
+            "name": "type",
+            "description": "菜单排版布局形式",
+            "type": "string",
+            "default": "block",
+            "values": [
+                {
+                    "name": "block",
+                    "description": "列表模式 (默认)"
+                },
+                {
+                    "name": "round",
+                    "description": "胶囊按钮模式"
+                }
+            ]
+        },
+        {
+            "name": "max",
+            "description": "允许选中的最大项数，1 为单选（选定自动收起），大于 1 为多选",
+            "type": "number",
+            "default": 1
+        },
+        {
+            "name": "dropDownIconColor",
+            "description": "标题栏右侧小箭头图标颜色",
+            "type": "string",
+            "default": "#bbbbbb"
+        },
+        {
+            "name": "offsetTop",
+            "description": "下拉内容相对触发栏的悬空偏移量；数值按 rpx 处理，也支持 px、rpx 单位字符串（如 '80rpx'、'20px'）",
+            "type": "number | string",
+            "default": 0
+        },
+        {
+            "name": "showPopup",
+            "description": "是否显示菜单弹窗（支持 v-model:showPopup 双向受控）",
+            "type": "boolean",
+            "default": false
+        },
+        {
+            "name": "[event]change",
+            "description": "选项值改变时触发",
+            "params": [
+                {
+                    "name": "value",
+                    "description": "当前选中的值数组"
+                }
+            ]
+        },
+        {
+            "name": "[event]item-choose",
+            "description": "点击选中某一项时触发",
+            "params": [
+                {
+                    "name": "item",
+                    "description": "当前选中的选项数据对象 { title, value }"
+                }
+            ]
+        },
+        {
+            "name": "[event]open",
+            "description": "菜单弹窗展开时触发"
+        },
+        {
+            "name": "[event]close",
+            "description": "菜单弹窗收起时触发"
+        },
+        {
+            "name": "[event]maskClick",
+            "description": "点击背景遮罩时触发"
+        },
+        {
+            "name": "[method]open",
+            "description": "命令式展开下拉菜单",
+            "returnValue": "void"
+        },
+        {
+            "name": "[method]close",
+            "description": "命令式收起下拉菜单",
+            "returnValue": "void"
+        },
+        {
+            "name": "[slot]title",
+            "description": "自定义菜单栏标题插槽"
+        },
+        {
+            "name": "[slot]default",
+            "description": "默认插槽，用于承载 ste-dropdown-menu-item 选项或自定义布局"
+        }
+    ]
+}

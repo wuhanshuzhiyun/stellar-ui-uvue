@@ -1,0 +1,307 @@
+<template>
+	<view class="page-root">
+		<scroll-view scroll-y="true" class="page-scroll">
+			<view class="header">
+				<text class="title">Calendar 日历</text>
+				<text class="desc">按照日历形式展示数据或日期的容器</text>
+			</view>
+
+			<!-- 基础用法 -->
+			<view class="demo-item">
+				<text class="demo-item-title">基础用法 (文档流单月紧凑卡片)</text>
+				<view class="calendar-card">
+					<ste-calendar :height="540" :monthCount="1" :showTitle="false" @confirm="handleConfirm"></ste-calendar>
+				</view>
+			</view>
+
+			<!-- 组件类型 -->
+			<view class="demo-item">
+				<text class="demo-item-title">01 组件类型</text>
+				<view class="btn-row">
+					<ste-button @click="show1 = true" width="100%" :round="false" background="#ffffff"
+						borderColor="#0090FF" color="#0090FF">默认(单个日期)</ste-button>
+				</view>
+				<view class="btn-row">
+					<ste-button @click="show2 = true" width="100%" :round="false" background="#ffffff"
+						borderColor="#0090FF" color="#0090FF">多个日期</ste-button>
+				</view>
+				<view class="btn-row">
+					<ste-button @click="show3 = true" width="100%" :round="false" background="#ffffff"
+						borderColor="#0090FF" color="#0090FF">日期范围</ste-button>
+				</view>
+			</view>
+
+			<!-- 组件样式 -->
+			<view class="demo-item">
+				<text class="demo-item-title">02 组件样式</text>
+				<view class="btn-row">
+					<ste-button @click="show4 = true" width="100%" :round="false" background="#ffffff"
+						borderColor="#0090FF" color="#0090FF">自定义主题色</ste-button>
+				</view>
+				<view class="btn-row">
+					<ste-button @click="show5 = true" width="100%" :round="false" background="#ffffff"
+						borderColor="#0090FF" color="#0090FF">自定义文案</ste-button>
+				</view>
+				<view class="btn-row">
+					<ste-button @click="show14 = true" width="100%" :round="false" background="#ffffff"
+						borderColor="#0090FF" color="#0090FF">自定义范围背景色 (rangeColor)</ste-button>
+				</view>
+				<view class="btn-row">
+					<ste-button @click="show15 = true" width="100%" :round="false" background="#ffffff"
+						borderColor="#0090FF" color="#0090FF">隐藏范围起止文案 (showRangeText=false)</ste-button>
+				</view>
+			</view>
+
+			<!-- 组件状态 -->
+			<view class="demo-item">
+				<text class="demo-item-title">03 组件状态</text>
+				<view class="btn-row">
+					<ste-button @click="show6 = true" width="100%" :round="false" background="#ffffff"
+						borderColor="#0090FF" color="#0090FF">日期最大范围</ste-button>
+				</view>
+				<view class="btn-row">
+					<ste-button @click="show7 = true" width="100%" :round="false" background="#ffffff"
+						borderColor="#0090FF" color="#0090FF">多选数量限制</ste-button>
+				</view>
+				<view class="btn-row">
+					<ste-button @click="show8 = true" width="100%" :round="false" background="#ffffff"
+						borderColor="#0090FF" color="#0090FF">范围数量限制</ste-button>
+				</view>
+				<view class="btn-row">
+					<ste-button @click="show9 = true" width="100%" :round="false" background="#ffffff"
+						borderColor="#0090FF" color="#0090FF">默认选择日期</ste-button>
+				</view>
+				<view class="btn-row">
+					<ste-button @click="show10 = true" width="100%" :round="false" background="#ffffff"
+						borderColor="#0090FF" color="#0090FF">默认展示月份</ste-button>
+				</view>
+				<view class="btn-row">
+					<ste-button @click="show11 = true" width="100%" :round="false" background="#ffffff"
+						borderColor="#0090FF" color="#0090FF">隐藏确定按钮</ste-button>
+				</view>
+				<view class="btn-row">
+					<ste-button @click="show12 = true" width="100%" :round="false" background="#ffffff"
+						borderColor="#0090FF" color="#0090FF">只读</ste-button>
+				</view>
+				<view class="btn-row">
+					<ste-button @click="show13 = true" width="100%" :round="false" background="#ffffff"
+						borderColor="#0090FF" color="#0090FF">隐藏背景月份</ste-button>
+				</view>
+				<view class="btn-row">
+					<ste-button @click="show16 = true" width="100%" :round="false" background="#ffffff"
+						borderColor="#0090FF" color="#0090FF">自定义月份标题格式 (monthFormatter)</ste-button>
+				</view>
+			</view>
+
+			<!-- 组件自定义 -->
+			<view class="demo-item">
+				<text class="demo-item-title">04 组件自定义</text>
+				<ste-calendar @select="handleSelect" weekendColor="#999999" color="#0099FF"
+					:signs="signsData" :defaultDate="defaultMonth" :monthCount="1" :showConfirm="false"
+					:showTitle="false" :height="500"></ste-calendar>
+			</view>
+		</scroll-view>
+
+		<!-- 弹窗 -->
+		<ste-popup :show="show1" @update:show="onS1" position="bottom" :height="1000" :round="true">
+			<ste-calendar @confirm="handleConfirm"></ste-calendar>
+		</ste-popup>
+		<ste-popup :show="show2" @update:show="onS2" position="bottom" :height="1000" :round="true">
+			<ste-calendar mode="multiple" @confirm="handleConfirm"></ste-calendar>
+		</ste-popup>
+		<ste-popup :show="show3" @update:show="onS3" position="bottom" :height="1000" :round="true">
+			<ste-calendar mode="range" @confirm="handleConfirm"></ste-calendar>
+		</ste-popup>
+		<ste-popup :show="show4" @update:show="onS4" position="bottom" :height="1000" :round="true">
+			<ste-calendar color="#ff0000" @confirm="handleConfirm"></ste-calendar>
+		</ste-popup>
+		<ste-popup :show="show5" @update:show="onS5" position="bottom" :height="1000" :round="true">
+			<ste-calendar mode="range" title="酒店预约" startText="住店" endText="离店"
+				@confirm="handleConfirm"></ste-calendar>
+		</ste-popup>
+		<ste-popup :show="show6" @update:show="onS6" position="bottom" :height="1000" :round="true">
+			<ste-calendar mode="range" minDate="2026-05-10" maxDate="2026-05-20" viewStart="2026-01"
+				viewEnd="2026-12" @confirm="handleConfirm"></ste-calendar>
+		</ste-popup>
+		<ste-popup :show="show7" @update:show="onS7" position="bottom" :height="1000" :round="true">
+			<ste-calendar mode="multiple" :maxCount="5" @confirm="handleConfirm"></ste-calendar>
+		</ste-popup>
+		<ste-popup :show="show8" @update:show="onS8" position="bottom" :height="1000" :round="true">
+			<ste-calendar mode="range" :maxRange="5" @confirm="handleConfirm"></ste-calendar>
+		</ste-popup>
+		<ste-popup :show="show9" @update:show="onS9" position="bottom" :height="1000" :round="true">
+			<ste-calendar :list="defaultList" @confirm="handleConfirm"></ste-calendar>
+		</ste-popup>
+		<ste-popup :show="show10" @update:show="onS10" position="bottom" :height="1000" :round="true">
+			<ste-calendar minDate="2024-05-20" maxDate="2024-08-01" defaultDate="2024-07"
+				@confirm="handleConfirm"></ste-calendar>
+		</ste-popup>
+		<ste-popup :show="show11" @update:show="onS11" position="bottom" :height="1000" :round="true">
+			<ste-calendar minDate="2024-05-20" maxDate="2024-08-01" @select="handleSelect"
+				:showConfirm="false"></ste-calendar>
+		</ste-popup>
+		<ste-popup :show="show12" @update:show="onS12" position="bottom" :height="1000" :round="true">
+			<ste-calendar minDate="2024-05-20" maxDate="2024-06-10" readonly
+				:list="readonlyList"></ste-calendar>
+		</ste-popup>
+		<ste-popup :show="show13" @update:show="onS13" position="bottom" :height="1000" :round="true">
+			<ste-calendar :showMark="false" @select="handleSelect"></ste-calendar>
+		</ste-popup>
+		<ste-popup :show="show14" @update:show="onS14" position="bottom" :height="1000" :round="true">
+			<ste-calendar mode="range" rangeColor="#ffebee" color="#e53935" @confirm="handleConfirm"></ste-calendar>
+		</ste-popup>
+		<ste-popup :show="show15" @update:show="onS15" position="bottom" :height="1000" :round="true">
+			<ste-calendar mode="range" :showRangeText="false" @confirm="handleConfirm"></ste-calendar>
+		</ste-popup>
+		<ste-popup :show="show16" @update:show="onS16" position="bottom" :height="1000" :round="true">
+			<ste-calendar monthFormatter="YYYY年M月" @confirm="handleConfirm"></ste-calendar>
+		</ste-popup>
+	</view>
+</template>
+
+<script setup lang="uts">
+	import { ref } from 'vue'
+
+	defineOptions({ name: 'demo-calendar' })
+
+	// 弹窗状态
+	const show1 = ref(false)
+	const show2 = ref(false)
+	const show3 = ref(false)
+	const show4 = ref(false)
+	const show5 = ref(false)
+	const show6 = ref(false)
+	const show7 = ref(false)
+	const show8 = ref(false)
+	const show9 = ref(false)
+	const show10 = ref(false)
+	const show11 = ref(false)
+	const show12 = ref(false)
+	const show13 = ref(false)
+	const show14 = ref(false)
+	const show15 = ref(false)
+	const show16 = ref(false)
+
+	function onS1(v : boolean) { show1.value = v }
+	function onS2(v : boolean) { show2.value = v }
+	function onS3(v : boolean) { show3.value = v }
+	function onS4(v : boolean) { show4.value = v }
+	function onS5(v : boolean) { show5.value = v }
+	function onS6(v : boolean) { show6.value = v }
+	function onS7(v : boolean) { show7.value = v }
+	function onS8(v : boolean) { show8.value = v }
+	function onS9(v : boolean) { show9.value = v }
+	function onS10(v : boolean) { show10.value = v }
+	function onS11(v : boolean) { show11.value = v }
+	function onS12(v : boolean) { show12.value = v }
+	function onS13(v : boolean) { show13.value = v }
+	function onS14(v : boolean) { show14.value = v }
+	function onS15(v : boolean) { show15.value = v }
+	function onS16(v : boolean) { show16.value = v }
+
+	// 日期工具
+	function pad2(n : number) : string {
+		return n < 10 ? '0' + n : '' + n
+	}
+	function dateToStr(d : Date) : string {
+		return '' + d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate())
+	}
+	function monthToStr(d : Date) : string {
+		return '' + d.getFullYear() + '-' + pad2(d.getMonth() + 1)
+	}
+
+	// 默认选择日期（时间戳）
+	const now = new Date()
+	const defaultList : number[] = [now.getTime()]
+
+	// 只读演示的预设日期
+	const readonlyList : string[] = ['2024-05-21']
+
+	// 默认展示月份（当前月）
+	const defaultMonth = monthToStr(new Date())
+
+	// 构建 signs 数据
+	function buildSigns() : UTSJSONObject {
+		const today = dateToStr(new Date())
+		const tomorrowMs = new Date().getTime() + 86400000
+		const tomorrow = dateToStr(new Date(tomorrowMs))
+
+		const sign1 = '{"content":"XXXXX","style":{"color":"#ffffff","backgroundColor":"#000000"}}'
+		const sign2 = '{"content":"XXXXX","style":{"color":"#666666","backgroundColor":"#f5f5f5"}}'
+		const json = '{"' + today + '":[' + sign1 + ',' + sign1 + ',' + sign1 + '],"'
+			+ tomorrow + '":[' + sign2 + ',' + sign2 + ']}'
+
+		return JSON.parse(json) as UTSJSONObject
+	}
+
+	const signsData = buildSigns()
+
+	// 事件处理
+	const handleConfirm = (days : string[]) => {
+		let title = '确定选择：'
+		for (let i = 0; i < days.length; i++) {
+			if (i > 0) title += ' '
+			title += days[i]
+		}
+		uni.showToast({ title: title, icon: 'none', duration: 1500 })
+	}
+
+	const handleSelect = (days : string[]) => {
+		let title = '选择：'
+		for (let i = 0; i < days.length; i++) {
+			if (i > 0) title += ' '
+			title += days[i]
+		}
+		uni.showToast({ title: title, icon: 'none', duration: 1500 })
+	}
+</script>
+
+<style>
+.page-root {
+	flex: 1;
+	background-color: #f5f5f5;
+}
+
+.page-scroll {
+	flex: 1;
+	padding: 20rpx;
+}
+
+.header {
+	margin-bottom: 30rpx;
+}
+
+.title {
+	font-size: 36rpx;
+	font-weight: bold;
+}
+
+.desc {
+	font-size: 24rpx;
+	color: #969799;
+	margin-top: 8rpx;
+}
+
+.demo-item {
+	margin-bottom: 30rpx;
+}
+
+.demo-item-title {
+	font-size: 28rpx;
+	font-weight: bold;
+	margin-bottom: 16rpx;
+	color: #333333;
+}
+
+.btn-row {
+	margin-bottom: 12rpx;
+}
+
+.calendar-card {
+	background-color: #ffffff;
+	border-radius: 16rpx;
+	overflow: hidden;
+	padding: 12rpx;
+	border: 1rpx solid #e8e8e8;
+}
+</style>

@@ -1,0 +1,244 @@
+<template>
+	<scroll-view direction="vertical" class="page">
+		<!-- 页面顶部导航说明 -->
+		<view class="header">
+			<text class="title">Progress 进度条</text>
+			<text class="desc">用于展示任务当前执行状态、上传加载进度与多阶段里程碑达成情况。</text>
+		</view>
+
+		<!-- 1. 基础用法与动态步进控制 -->
+		<view class="section">
+			<text class="section-title">1. 基础用法 & 动态步进</text>
+			<text class="section-desc">支持受控进度与原生平滑过渡动画，点击下方按钮调整进度</text>
+			<view class="demo-box">
+				<ste-progress :percentage="dynamicPercent" :duration="0.4" />
+			</view>
+			<view class="btn-group">
+				<button class="action-btn" size="mini" @click="decreasePercent">- 15%</button>
+				<button class="action-btn primary" size="mini" @click="increasePercent">+ 15%</button>
+				<button class="action-btn" size="mini" @click="resetPercent">重置</button>
+			</view>
+		</view>
+
+		<!-- 2. 炫彩渐变与自定义色彩 -->
+		<view class="section">
+			<text class="section-title">2. 渐变色彩 & 主题定制 (activeBg)</text>
+			<text class="section-desc">完美支持 CSS 线性渐变 (linear-gradient) 与纯色十六进制配置</text>
+			<view class="demo-item">
+				<text class="item-label">科技蓝绿渐变</text>
+				<ste-progress
+					:percentage="70"
+					activeBg="linear-gradient(to right, #1890ff, #52c41a)"
+				/>
+			</view>
+			<view class="demo-item">
+				<text class="item-label">日落暖橙渐变</text>
+				<ste-progress
+					:percentage="85"
+					activeBg="linear-gradient(to right, #fa8c16, #ff4d4f)"
+				/>
+			</view>
+			<view class="demo-item">
+				<text class="item-label">高雅紫韵纯色</text>
+				<ste-progress
+					:percentage="60"
+					activeBg="#722ed1"
+					inactiveBg="#f9f0ff"
+				/>
+			</view>
+		</view>
+
+		<!-- 3. 线条高度与粗细控制 -->
+		<view class="section">
+			<text class="section-title">3. 线条粗细控制 (strokeWidth)</text>
+			<text class="section-desc">支持任意高度定制，内置全圆角胶囊形态</text>
+			<view class="demo-item">
+				<text class="item-label">迷你极细进度条 (strokeWidth="10")</text>
+				<ste-progress :percentage="45" :strokeWidth="10" :showPivot="false" />
+			</view>
+			<view class="demo-item">
+				<text class="item-label">标准常规高度 (strokeWidth="24")</text>
+				<ste-progress :percentage="60" :strokeWidth="24" />
+			</view>
+			<view class="demo-item">
+				<text class="item-label">醒目粗线条 (strokeWidth="36", textSize="20")</text>
+				<ste-progress :percentage="80" :strokeWidth="36" :textSize="20" />
+			</view>
+		</view>
+
+		<!-- 4. 文字展示与对齐模式 -->
+		<view class="section">
+			<text class="section-title">4. 文字对齐 & 阈值隐藏</text>
+			<text class="section-desc">支持文字靠左/居中/靠右排列；当进度过小时自动隐藏防溢出</text>
+			<view class="demo-item">
+				<text class="item-label">自定义文字内容 (pivotText="已就绪 90%")</text>
+				<ste-progress :percentage="90" pivotText="已就绪 90%" :strokeWidth="28" />
+			</view>
+			<view class="demo-item">
+				<text class="item-label">文字居中排列 (textAlign="center")</text>
+				<ste-progress :percentage="50" textAlign="center" :strokeWidth="28" />
+			</view>
+			<view class="demo-item">
+				<text class="item-label">文字居左排列 (textAlign="left")</text>
+				<ste-progress :percentage="65" textAlign="left" :strokeWidth="28" />
+			</view>
+			<view class="demo-item">
+				<text class="item-label">阈值隐藏 (进度 10% 小于阈值 15% 时自动隐藏文字)</text>
+				<ste-progress :percentage="10" :displayTextThreshold="15" :strokeWidth="28" />
+			</view>
+		</view>
+
+		<!-- 5. 分段里程碑进度 -->
+		<view class="section">
+			<text class="section-title">5. 分段多阶段展示 (stageData)</text>
+			<text class="section-desc">支持复杂订单物流、流程审批等多阶段进度可视化</text>
+			<view class="demo-box">
+				<ste-progress
+					:strokeWidth="32"
+					:textSize="18"
+					:stageData="logisticsStage"
+				/>
+			</view>
+		</view>
+
+		<!-- 6. 禁用状态展示 -->
+		<view class="section">
+			<text class="section-title">6. 禁用状态 (disabled)</text>
+			<text class="section-desc">禁用状态下组件整条置灰，提示不可用或已中断</text>
+			<view class="demo-box">
+				<ste-progress :percentage="55" :disabled="true" :strokeWidth="24" />
+			</view>
+		</view>
+	</scroll-view>
+</template>
+
+<script setup lang="uts">
+/**
+ * Progress 进度条演示页面
+ */
+import { ref } from 'vue'
+
+/** 动态进度受控数值 */
+const dynamicPercent = ref<number>(45)
+
+/** 增加进度 */
+function increasePercent() {
+	if (dynamicPercent.value >= 100) {
+		dynamicPercent.value = 100
+	} else {
+		dynamicPercent.value = Math.min(100, dynamicPercent.value + 15)
+	}
+}
+
+/** 减少进度 */
+function decreasePercent() {
+	if (dynamicPercent.value <= 0) {
+		dynamicPercent.value = 0
+	} else {
+		dynamicPercent.value = Math.max(0, dynamicPercent.value - 15)
+	}
+}
+
+/** 重置进度 */
+function resetPercent() {
+	dynamicPercent.value = 45
+}
+
+/** 物流分段里程碑数据配置 */
+const logisticsStage = ref<UTSJSONObject>({
+	'25': {
+		label: '已支付',
+		style: {
+			background: '#1890ff'
+		}
+	},
+	'60': {
+		label: '运输中',
+		style: {
+			background: '#fa8c16'
+		}
+	},
+	'100': {
+		label: '已签收',
+		style: {
+			background: '#52c41a'
+		}
+	}
+})
+</script>
+
+<style>
+.page {
+	padding: 24rpx;
+	background-color: #f7f8fa;
+	flex: 1;
+}
+
+.header {
+	margin-bottom: 24rpx;
+}
+
+.title {
+	font-size: 38rpx;
+	font-weight: bold;
+	color: #1a1a1a;
+}
+
+.desc {
+	font-size: 26rpx;
+	color: #888888;
+	margin-top: 8rpx;
+	line-height: 38rpx;
+}
+
+.section {
+	margin-bottom: 30rpx;
+	background-color: #ffffff;
+	border-radius: 16rpx;
+	padding: 24rpx;
+}
+
+.section-title {
+	font-size: 28rpx;
+	font-weight: 600;
+	color: #333333;
+	margin-bottom: 6rpx;
+}
+
+.section-desc {
+	font-size: 24rpx;
+	color: #999999;
+	margin-bottom: 20rpx;
+	line-height: 34rpx;
+}
+
+.demo-box {
+	margin-bottom: 16rpx;
+}
+
+.demo-item {
+	margin-bottom: 24rpx;
+}
+
+.item-label {
+	font-size: 24rpx;
+	color: #666666;
+	margin-bottom: 12rpx;
+}
+
+.btn-group {
+	flex-direction: row;
+	align-items: center;
+	margin-top: 20rpx;
+}
+
+.action-btn {
+	margin-right: 16rpx;
+	font-size: 24rpx;
+}
+
+.primary {
+	background-color: #1890ff;
+	color: #ffffff;
+}
+</style>

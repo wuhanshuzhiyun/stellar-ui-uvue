@@ -1,0 +1,12 @@
+# 文档模板（不随 npm 包发布）
+template/
+
+# 组件库内的独立 git 仓库与本地编辑器/工具目录
+# 注意：package.json 的 files 白名单是第一道防线，这里是双保险
+.git*/
+.vscode/
+.hbuilderx/
+.lingma/
+.workbuddy/
+node_modules/
+*.tgz

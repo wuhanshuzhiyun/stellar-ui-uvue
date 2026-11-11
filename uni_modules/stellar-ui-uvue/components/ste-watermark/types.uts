@@ -1,0 +1,17 @@
+/**
+ * 水印字体配置类型定义
+ */
+export type WatermarkFont = {
+	/** 字体颜色，例如 'rgba(0, 0, 0, 0.15)' 或 '#999999' */
+	color ?: string
+	/** 字体大小，单位为 px */
+	fontSize ?: number
+	/** 字重，例如 'normal', 'bold', '500' */
+	fontWeight ?: string
+	/** 字体样式，例如 'normal', 'italic' */
+	fontStyle ?: string
+	/** 字体族 */
+	fontFamily ?: string
+	/** 文本水平对齐方式，可选 'center', 'left', 'right', 'start', 'end' */
+	textAlign ?: string
+}

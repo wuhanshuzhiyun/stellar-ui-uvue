@@ -1,0 +1,11 @@
+{
+    "name": "ste-swiper-item",
+    "description": "轮播滑块子项组件，配合 ste-swiper 容器使用，承载单个轮播项的具体内容。",
+    "tutorial": "https://stellar-ui.intecloud.com.cn/?projectName=stellar-ui-uvue&menu=%E7%BB%84%E4%BB%B6&active=ste-swiper",
+    "attributes": [
+        {
+            "name": "[slot]default",
+            "description": "默认插槽，承载轮播滑块展示内容"
+        }
+    ]
+}

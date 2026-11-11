@@ -1,0 +1,332 @@
+<template>
+	<scroll-view scroll-y="true" class="page">
+		<view class="header">
+			<text class="title">Animate 动画</text>
+			<text class="desc">给子元素添加各种动画效果</text>
+		</view>
+
+		<!-- 基础用法：抖动动画 -->
+		<view class="section">
+			<text class="section-title">抖动动画</text>
+			<view class="demo-row">
+				<ste-animate type="shakeX" :show="shakeXShow" action="initial">
+					<view class="animate-box">
+						<text class="animate-text">横向抖动</text>
+					</view>
+				</ste-animate>
+				<ste-animate type="shakeY" :show="shakeYShow" action="initial">
+					<view class="animate-box">
+						<text class="animate-text">竖向抖动</text>
+					</view>
+				</ste-animate>
+			</view>
+			<view class="btn-row">
+				<ste-button size="small" @click="triggerShakeX">触发抖动</ste-button>
+			</view>
+		</view>
+
+		<!-- 循环动画 -->
+		<view class="section">
+			<text class="section-title">循环动画</text>
+			<view class="demo-row-loop">
+				<ste-animate type="ripple" :loop="true">
+					<view class="animate-box animate-box-primary">
+						<text class="animate-text">心跳/涟漪</text>
+					</view>
+				</ste-animate>
+				<ste-animate type="breath" :loop="true" :duration="2700">
+					<view class="animate-box animate-box-success">
+						<text class="animate-text">呼吸灯</text>
+					</view>
+				</ste-animate>
+			</view>
+		</view>
+
+		<!-- 漂浮动画 -->
+		<view class="section">
+			<text class="section-title">漂浮动画</text>
+			<view class="demo-row-loop">
+				<ste-animate type="float" :loop="true" :duration="2000">
+					<view class="animate-box animate-box-warning">
+						<text class="animate-text">漂浮</text>
+					</view>
+				</ste-animate>
+			</view>
+		</view>
+
+		<!-- 滑动动画 -->
+		<view class="section">
+			<text class="section-title">滑动动画</text>
+			<view class="demo-row">
+				<ste-animate type="slide-right" :show="slideRightShow">
+					<view class="animate-box animate-box-info">
+						<text class="animate-text">从右滑入</text>
+					</view>
+				</ste-animate>
+				<ste-animate type="slide-left" :show="slideLeftShow">
+					<view class="animate-box animate-box-info">
+						<text class="animate-text">从左滑入</text>
+					</view>
+				</ste-animate>
+			</view>
+			<view class="demo-row" style="margin-top: 20rpx;">
+				<ste-animate type="slide-top" :show="slideTopShow">
+					<view class="animate-box animate-box-info">
+						<text class="animate-text">从上滑入</text>
+					</view>
+				</ste-animate>
+				<ste-animate type="slide-bottom" :show="slideBottomShow">
+					<view class="animate-box animate-box-info">
+						<text class="animate-text">从下滑入</text>
+					</view>
+				</ste-animate>
+			</view>
+			<view class="btn-row">
+				<ste-button size="small" @click="triggerSlide">触发滑动</ste-button>
+			</view>
+		</view>
+
+		<!-- 跳跃动画 -->
+		<view class="section">
+			<text class="section-title">跳跃动画</text>
+			<view class="demo-row">
+				<ste-animate type="jump" :show="jumpShow" action="initial">
+					<view class="animate-box animate-box-danger">
+						<text class="animate-text">跳跃</text>
+					</view>
+				</ste-animate>
+			</view>
+			<view class="btn-row">
+				<ste-button size="small" @click="triggerJump">触发跳跃</ste-button>
+			</view>
+		</view>
+
+		<!-- 闪烁动画（降级效果） -->
+		<view class="section">
+			<text class="section-title">闪烁动画</text>
+			<view class="demo-row-loop">
+				<ste-animate type="twinkle" :loop="true">
+					<view class="animate-box animate-box-primary">
+						<text class="animate-text">水波(APP降级)</text>
+					</view>
+				</ste-animate>
+				<ste-animate type="flicker" :loop="true">
+					<view class="animate-box animate-box-success">
+						<text class="animate-text">擦亮(APP降级)</text>
+					</view>
+				</ste-animate>
+			</view>
+		</view>
+
+		<!-- 点击触发 -->
+		<view class="section">
+			<text class="section-title">点击触发</text>
+			<view class="demo-row">
+				<ste-animate type="shakeX" action="click">
+					<view class="animate-box">
+						<text class="animate-text">点击我抖动</text>
+					</view>
+				</ste-animate>
+				<ste-animate type="ripple" action="click">
+					<view class="animate-box animate-box-primary">
+						<text class="animate-text">点击我心跳</text>
+					</view>
+				</ste-animate>
+			</view>
+		</view>
+
+		<!-- 自定义时长 -->
+		<view class="section">
+			<text class="section-title">自定义时长</text>
+			<view class="demo-row">
+				<ste-animate type="shakeX" :duration="100" :show="customDurShow" action="initial">
+					<view class="animate-box">
+						<text class="animate-text">100ms</text>
+					</view>
+				</ste-animate>
+				<ste-animate type="shakeX" :duration="500" :show="customDurShow" action="initial">
+					<view class="animate-box">
+						<text class="animate-text">500ms</text>
+					</view>
+				</ste-animate>
+				<ste-animate type="shakeX" :duration="1000" :show="customDurShow" action="initial">
+					<view class="animate-box">
+						<text class="animate-text">1000ms</text>
+					</view>
+				</ste-animate>
+			</view>
+			<view class="btn-row">
+				<ste-button size="small" @click="triggerCustomDur">触发不同时长</ste-button>
+			</view>
+		</view>
+
+		<!-- 平台差异说明 -->
+		<view class="section">
+			<text class="section-title">平台差异说明</text>
+			<view class="note-box">
+				<text class="note-text">• APP端使用 UniElement.animate() API 实现关键帧动画</text>
+				<text class="note-text">• H5/小程序端使用 CSS @keyframes 实现</text>
+				<text class="note-text">• twinkle/flicker 在APP端降级为透明度闪烁</text>
+				<text class="note-text">• slide-* 在APP端使用元素实际像素计算</text>
+			</view>
+		</view>
+	</scroll-view>
+</template>
+
+<script setup lang="uts">
+	import { ref } from 'vue'
+
+	// 各动画的触发状态
+	const shakeXShow = ref(true)
+	const shakeYShow = ref(true)
+	const slideRightShow = ref(false)
+	const slideLeftShow = ref(false)
+	const slideTopShow = ref(false)
+	const slideBottomShow = ref(false)
+	const jumpShow = ref(true)
+	const customDurShow = ref(true)
+
+	// 触发抖动动画
+	function triggerShakeX() {
+		shakeXShow.value = false
+		shakeYShow.value = false
+		setTimeout(() => {
+			shakeXShow.value = true
+			shakeYShow.value = true
+		}, 50)
+	}
+
+	// 触发滑动动画
+	function triggerSlide() {
+		slideRightShow.value = false
+		slideLeftShow.value = false
+		slideTopShow.value = false
+		slideBottomShow.value = false
+		setTimeout(() => {
+			slideRightShow.value = true
+			slideLeftShow.value = true
+			slideTopShow.value = true
+			slideBottomShow.value = true
+		}, 50)
+	}
+
+	// 触发跳跃动画
+	function triggerJump() {
+		jumpShow.value = false
+		setTimeout(() => {
+			jumpShow.value = true
+		}, 50)
+	}
+
+	// 触发自定义时长动画
+	function triggerCustomDur() {
+		customDurShow.value = false
+		setTimeout(() => {
+			customDurShow.value = true
+		}, 50)
+	}
+</script>
+
+<style>
+	.page {
+		padding: 20rpx;
+		flex: 1
+	}
+
+	.header {
+		margin-bottom: 30rpx;
+	}
+
+	.title {
+		font-size: 36rpx;
+		font-weight: bold;
+		color: #333333;
+	}
+
+	.desc {
+		font-size: 24rpx;
+		color: #999999;
+		margin-top: 8rpx;
+	}
+
+	.section {
+		margin-bottom: 40rpx;
+	}
+
+	.section-title {
+		font-size: 28rpx;
+		font-weight: bold;
+		margin-bottom: 16rpx;
+		color: #333333;
+	}
+
+	.demo-row {
+		flex-direction: row;
+		align-items: center;
+		flex-wrap: wrap;
+	}
+
+	/* 循环动画容器：需要为放大效果预留空间，避免被裁剪 */
+	.demo-row-loop {
+		flex-direction: row;
+		align-items: center;
+		flex-wrap: wrap;
+		padding: 30rpx;
+		margin: -10rpx;
+	}
+
+	.btn-row {
+		margin-top: 20rpx;
+	}
+
+	/* 动画演示盒子 */
+	.animate-box {
+		width: 180rpx;
+		height: 120rpx;
+		background-color: #f2f3f5;
+		border-radius: 8rpx;
+		justify-content: center;
+		align-items: center;
+		margin-right: 20rpx;
+		margin-bottom: 20rpx;
+	}
+
+	.animate-box-primary {
+		background-color: #e8f0fe;
+	}
+
+	.animate-box-success {
+		background-color: #e8f8f0;
+	}
+
+	.animate-box-warning {
+		background-color: #fff8e8;
+	}
+
+	.animate-box-info {
+		background-color: #e8f4ff;
+	}
+
+	.animate-box-danger {
+		background-color: #fee8e8;
+	}
+
+	.animate-text {
+		font-size: 24rpx;
+		color: #333333;
+		text-align: center;
+	}
+
+	/* 说明框 */
+	.note-box {
+		background-color: #f8f9fa;
+		border-radius: 8rpx;
+		padding: 20rpx;
+	}
+
+	.note-text {
+		font-size: 24rpx;
+		color: #666666;
+		line-height: 40rpx;
+	}
+</style>

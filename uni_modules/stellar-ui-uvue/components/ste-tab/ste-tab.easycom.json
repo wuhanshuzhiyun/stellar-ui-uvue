@@ -1,0 +1,87 @@
+{
+    "name": "ste-tab",
+    "description": "标签页子项面板组件，必须与 ste-tabs 配合使用，用于承载展示单标签页的标题与内容。",
+    "tutorial": "https://stellar-ui.intecloud.com.cn/?projectName=stellar-ui-uvue&menu=%E7%BB%84%E4%BB%B6&active=ste-tabs",
+    "attributes": [
+        {
+            "name": "title",
+            "description": "标签主标题文字",
+            "type": "string",
+            "default": ""
+        },
+        {
+            "name": "subTitle",
+            "description": "标签副标题文字（展示于标题下方）",
+            "type": "string",
+            "default": ""
+        },
+        {
+            "name": "name",
+            "description": "标签唯一标识符（匹配 tabs 的 active 值；缺省时按索引匹配）",
+            "type": "string | number"
+        },
+        {
+            "name": "disabled",
+            "description": "是否禁用当前标签（禁用项无法点击且手势滑动自动跳过）",
+            "type": "boolean",
+            "default": false
+        },
+        {
+            "name": "badge",
+            "description": "徽标内容（支持数字或文字内容）",
+            "type": "number | string",
+            "default": 0
+        },
+        {
+            "name": "showDot",
+            "description": "是否仅以红点形式展示徽标",
+            "type": "boolean",
+            "default": false
+        },
+        {
+            "name": "showZeroBadge",
+            "description": "徽标数值为 0 时是否依然展示",
+            "type": "boolean",
+            "default": false
+        },
+        {
+            "name": "image",
+            "description": "未激活状态的自定义图标或图片路径",
+            "type": "string",
+            "default": ""
+        },
+        {
+            "name": "activeImage",
+            "description": "激活状态的自定义图标或图片路径（优先展示）",
+            "type": "string",
+            "default": ""
+        },
+        {
+            "name": "icon",
+            "description": "内置图标名称（优先使用图标组件渲染）",
+            "type": "string",
+            "default": ""
+        },
+        {
+            "name": "rootStyle",
+            "description": "单个 Tab 面板根节点自定义样式",
+            "type": "object"
+        },
+        {
+            "name": "[slot]default",
+            "description": "默认插槽，当前标签页被激活时渲染展示的内容"
+        },
+        {
+            "name": "[slot]title",
+            "description": "自定义标签标题插槽"
+        },
+        {
+            "name": "[slot]subTitle",
+            "description": "自定义标签副标题插槽"
+        },
+        {
+            "name": "[slot]icon",
+            "description": "自定义标签图标插槽"
+        }
+    ]
+}

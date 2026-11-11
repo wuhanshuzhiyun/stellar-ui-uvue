@@ -1,0 +1,90 @@
+{
+	"name": "ste-coupon-list",
+	"description": "CouponList 优惠券卡片组件，用于电商抢购、满减折扣券及活动卡片列表展示。已全面支持原生渲染。",
+	"example": "<ste-coupon-list :data=\"couponData\" :progress=\"60\" progressText=\"已抢60%\" @buttonClick=\"onBuy\"></ste-coupon-list>",
+	"tutorial": "https://stellar-ui.intecloud.com.cn/?projectName=stellar-ui-uvue&menu=%E7%BB%84%E4%BB%B6&active=ste-coupon-list",
+	"attributes": [
+		{
+			"name": "data",
+			"description": "优惠券核心数据对象，类型为强类型 CouponData，可从 stellar-ui-uvue/components/ste-coupon-list/constants.uts 导入",
+			"type": "CouponData",
+			"default": "{}"
+		},
+		{
+			"name": "endTime",
+			"description": "限时抢购倒计时结束时间（支持 Date、时间戳 number 或时间字符串格式），配置后将自动驱动倒计时展示",
+			"type": "string | number | Date",
+			"default": "null"
+		},
+		{
+			"name": "residue",
+			"description": "剩余可用或库存数量",
+			"type": "number",
+			"default": -1
+		},
+		{
+			"name": "progress",
+			"description": "半圆环形抢购进度条百分比 (0-100，小于 0 时不呈现进度条)。采用官方标准的 uni.createCanvasContextAsync 异步管线渲染半圆弧线，保证各端渲染一致",
+			"type": "number",
+			"default": -1
+		},
+		{
+			"name": "progressText",
+			"description": "半圆进度条正下方描述说明文本（如 '已抢70%'、'仅剩30%'）",
+			"type": "string",
+			"default": "''"
+		},
+		{
+			"name": "buttonText",
+			"description": "右下角购买或领取行动按钮文案",
+			"type": "string",
+			"default": "购买"
+		},
+		{
+			"name": "buttonDisabled",
+			"description": "是否禁用操作按钮（置灰并禁止点击）",
+			"type": "boolean",
+			"default": false
+		},
+		{
+			"name": "backgroundColor",
+			"description": "优惠券卡片背景颜色。使用动态内联样式直接绑定",
+			"type": "string",
+			"default": "#ffffff"
+		},
+		{
+			"name": "[event]buttonClick",
+			"description": "点击购买/领取行动按钮时触发",
+			"params": [
+				{
+					"name": "data",
+					"description": "() => void"
+				}
+			]
+		},
+		{
+			"name": "[event]footerClick",
+			"description": "点击底部使用须知/规则列表项时触发",
+			"params": [
+				{
+					"name": "index",
+					"description": "被点击规则项的索引 (number)"
+				}
+			]
+		},
+		{
+			"name": "[event]countDown",
+			"description": "倒计时秒级变动时触发",
+			"params": [
+				{
+					"name": "remainSeconds",
+					"description": "当前剩余秒数 (number)"
+				}
+			]
+		},
+		{
+			"name": "[slot]position",
+			"description": "右上角绝对定位自定义扩展插槽（可放置角标、促销标签等）"
+		}
+	]
+}

@@ -1,0 +1,99 @@
+{
+    "name": "ste-toast",
+    "description": "在页面中间弹出黑色半透明提示，用于消息通知、加载提示、操作结果提示等场景。(UTS/UVUE)。",
+    "example": "<ste-toast ref=\"toastRef\"></ste-toast>",
+    "tutorial": "https://stellar-ui.intecloud.com.cn/?projectName=stellar-ui-uvue&menu=%E7%BB%84%E4%BB%B6&active=ste-toast",
+    "attributes": [
+        {
+            "name": "title",
+            "description": "提示文本内容，支持换行符 \\n",
+            "type": "string",
+            "default": ""
+        },
+        {
+            "name": "icon",
+            "description": "图标类型",
+            "type": "string",
+            "default": "success",
+            "values": [
+                {
+                    "name": "success",
+                    "description": "显示成功图标"
+                },
+                {
+                    "name": "error",
+                    "description": "显示失败图标"
+                },
+                {
+                    "name": "loading",
+                    "description": "显示加载中旋转图标（duration 默认为 0，需手动关闭）"
+                },
+                {
+                    "name": "none",
+                    "description": "无图标（仅展示纯文本）"
+                }
+            ]
+        },
+        {
+            "name": "image",
+            "description": "自定义图标图片 URL 地址，优先级高于 icon",
+            "type": "string",
+            "default": ""
+        },
+        {
+            "name": "duration",
+            "description": "提示停留持续时间（毫秒），为 0 时不自动关闭（loading 模式默认为 0）",
+            "type": "number",
+            "default": 1500
+        },
+        {
+            "name": "mask",
+            "description": "是否显示全屏透明遮罩层，防止提示期间触摸穿透",
+            "type": "boolean",
+            "default": false
+        },
+        {
+            "name": "order",
+            "description": "是否开启排队队列模式（连续触发时按序播放）。采用高性能内存队列调度器",
+            "type": "boolean",
+            "default": false
+        },
+        {
+            "name": "success",
+            "description": "提示成功显示时的回调函数",
+            "type": "() => void"
+        },
+        {
+            "name": "fail",
+            "description": "提示失败时的回调函数",
+            "type": "() => void"
+        },
+        {
+            "name": "complete",
+            "description": "提示完成（成功或失败均触发）的回调函数",
+            "type": "() => void"
+        },
+        {
+            "name": "close",
+            "description": "提示完全关闭/隐藏后的回调函数",
+            "type": "() => void"
+        },
+        {
+            "name": "[method]showToast",
+            "description": "显示轻提示方法。支持通过 useToast() 组合式函数或 ref 实例调用，参数强类型契约为 ToastOptions",
+            "params": [
+                {
+                    "name": "options",
+                    "type": "ToastOptions",
+                    "description": "Toast 配置对象（包含 title、icon、image、duration、mask、order 及回调函数）"
+                }
+            ],
+            "returnValue": "void"
+        },
+        {
+            "name": "[method]hideToast",
+            "description": "关闭/隐藏当前轻提示方法",
+            "returnValue": "void"
+        }
+    ]
+}

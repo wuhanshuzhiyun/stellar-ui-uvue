@@ -1,0 +1,139 @@
+<template>
+	<scroll-view scroll-y="true" class="page-root">
+		<view class="header">
+			<text class="title">Rate 评分</text>
+		</view>
+
+		<!-- 临时测试：直接用 ste-icon -->
+		<view class="demo-item">
+			<text class="demo-title">图标测试</text>
+			<view class="icon-test">
+				<ste-icon code="&#xe681;" color="#dddddd" :size="44"></ste-icon>
+				<ste-icon code="&#xe684;" color="#0090FF" :size="44"></ste-icon>
+			</view>
+		</view>
+
+		<!-- 基础用法 -->
+		<view class="demo-item">
+			<text class="demo-title">基础用法</text>
+			<ste-rate v-model="value1"></ste-rate>
+			<text class="demo-result-text">当前分值: {{ value1 }}</text>
+		</view>
+
+		<!-- 自定义星星数量 -->
+		<view class="demo-item">
+			<text class="demo-title">自定义星星数量（10颗）</text>
+			<ste-rate v-model="value2" :count="10"></ste-rate>
+			<text class="demo-result-text">当前分值: {{ value2 }}</text>
+		</view>
+
+		<!-- 禁用 -->
+		<view class="demo-item">
+			<text class="demo-title">禁用（初始3分）</text>
+			<ste-rate v-model="value5" disabled></ste-rate>
+			<text class="demo-result-text">当前分值: {{ value5 }}</text>
+		</view>
+
+		<!-- 只读 -->
+		<view class="demo-item">
+			<text class="demo-title">只读（初始3分）</text>
+			<ste-rate v-model="value6" readonly></ste-rate>
+			<text class="demo-result-text">当前分值: {{ value6 }}</text>
+		</view>
+
+		<!-- 自定义图标大小 -->
+		<view class="demo-item">
+			<text class="demo-title">自定义图标大小（64rpx）</text>
+			<ste-rate v-model="value7" :size="64"></ste-rate>
+			<text class="demo-result-text">当前分值: {{ value7 }}</text>
+		</view>
+
+		<!-- 自定义颜色 -->
+		<view class="demo-item">
+			<text class="demo-title">自定义选中颜色</text>
+			<ste-rate v-model="value8" activeColor="#ee0a24"></ste-rate>
+			<text class="demo-result-text">当前分值: {{ value8 }}</text>
+		</view>
+
+		<!-- 自定义间距 -->
+		<view class="demo-item">
+			<text class="demo-title">自定义间距（20rpx）</text>
+			<ste-rate v-model="value9" :gutter="20"></ste-rate>
+			<text class="demo-result-text">当前分值: {{ value9 }}</text>
+		</view>
+
+		<!-- 回调事件 -->
+		<view class="demo-item">
+			<text class="demo-title">回调事件</text>
+			<ste-rate v-model="value10" @change="onChange"></ste-rate>
+			<text class="demo-result-text">change 次数: {{ changeCount }} | 当前分值: {{ value10 }}</text>
+		</view>
+
+		<!-- 初始值 -->
+		<view class="demo-item">
+			<text class="demo-title">初始值（3分）</text>
+			<ste-rate v-model="value11"></ste-rate>
+			<text class="demo-result-text">当前分值: {{ value11 }}</text>
+		</view>
+	</scroll-view>
+</template>
+
+<script setup lang="uts">
+	const value1 = ref(0)
+	const value2 = ref(0)
+	const value5 = ref(3)
+	const value6 = ref(3)
+	const value7 = ref(0)
+	const value8 = ref(0)
+	const value9 = ref(0)
+	const value10 = ref(0)
+	const value11 = ref(3)
+
+	const changeCount = ref(0)
+
+	const onChange = (value : number) => {
+		changeCount.value = changeCount.value + 1
+	}
+</script>
+
+<style>
+	.page-root {
+		padding: 20rpx;
+		flex: 1;
+	}
+
+	.header {
+		margin-bottom: 20rpx;
+	}
+
+	.title {
+		font-size: 36rpx;
+		font-weight: bold;
+	}
+
+	.demo-item {
+		background-color: #ffffff;
+		border-radius: 12rpx;
+		padding: 24rpx;
+		margin-bottom: 20rpx;
+		flex-direction: column;
+	}
+
+	.demo-title {
+		font-size: 28rpx;
+		font-weight: bold;
+		margin-bottom: 16rpx;
+		color: #333333;
+	}
+
+	.demo-result-text {
+		font-size: 26rpx;
+		color: #666666;
+		margin-top: 12rpx;
+	}
+
+	.icon-test {
+		flex-direction: row;
+		align-items: center;
+	}
+</style>

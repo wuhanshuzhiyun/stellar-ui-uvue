@@ -1,0 +1,223 @@
+<template>
+	<scroll-view scroll-y="true" class="page-root">
+		<!-- 顶部导航标题区 -->
+		<view class="demo-header">
+			<text class="demo-title">GuideQA 引导服务区</text>
+			<text class="demo-subtitle">用于展示常见问答、新手指南与客服帮助，支持简单摘要模式与完整列表卡片模式</text>
+		</view>
+
+		<!-- 示例 1：简单模式 (默认模式一) -->
+		<view class="demo-card">
+			<text class="card-title">1. 简单摘要模式 (mode='1')</text>
+			<text class="card-desc">展示标题栏、问答条目总数与首条问答摘要，支持点击“全部”查看更多</text>
+			<view class="card-content">
+				<ste-guide-qa
+					mode="1"
+					:data="basicQaData"
+					@click-all="onClickAll"
+				/>
+			</view>
+		</view>
+
+		<!-- 示例 2：完整列表卡片模式 (模式二) -->
+		<view class="demo-card">
+			<text class="card-title">2. 完整卡片列表模式 (mode='2')</text>
+			<text class="card-desc">以独立卡片流展示全部问答，点击问题与答案可分别捕获回调事件</text>
+			<view class="card-content-transparent">
+				<ste-guide-qa
+					mode="2"
+					:data="multipleQaData"
+					@click-item="onClickItem"
+				/>
+			</view>
+		</view>
+
+		<!-- 示例 3：自定义标题与隐藏数量 -->
+		<view class="demo-card">
+			<text class="card-title">3. 自定义标题与隐藏数量</text>
+			<text class="card-desc">自定义标题为“帮助与客服”，操作按钮为“更多指南”，隐藏数量统计</text>
+			<view class="card-content">
+				<ste-guide-qa
+					mode="1"
+					title="帮助与客服"
+					actionTitle="更多指南"
+					:showNum="false"
+					:data="basicQaData"
+					@click-all="onClickAll"
+				/>
+			</view>
+		</view>
+
+		<!-- 示例 4：自定义前缀插槽 -->
+		<view class="demo-card">
+			<text class="card-title">4. 自定义问答前缀插槽</text>
+			<text class="card-desc">通过 #prefix-q 与 #prefix-a 插槽自定义彩色胶囊徽标</text>
+			<view class="card-content-transparent">
+				<ste-guide-qa
+					mode="2"
+					:data="customSlotQaData"
+					@click-item="onClickItem"
+				>
+					<!-- 自定义问题前缀 -->
+					<template #prefix-q>
+						<view class="custom-badge q-badge">
+							<text class="badge-text q-text">问</text>
+						</view>
+					</template>
+					<!-- 自定义答案前缀 -->
+					<template #prefix-a>
+						<view class="custom-badge a-badge">
+							<text class="badge-text a-text">答</text>
+						</view>
+					</template>
+				</ste-guide-qa>
+			</view>
+		</view>
+	</scroll-view>
+</template>
+
+<script setup lang="uts">
+/**
+ * @file guide-qa.uvue
+ * @description ste-guide-qa 引导服务区/常见问答 原生演示页面
+ */
+import { GuideQaItem } from '@/uni_modules/stellar-ui-uvue/components/ste-guide-qa/constants.uts';
+
+/** 示例 1 & 3：基础问答数据 */
+const basicQaData = ref<GuideQaItem[]>([
+	{
+		question: '如何快速在 uni-app x 原生工程中集成 StellarUI？',
+		answer: '只需将 stellar-ui-uvue 导入 uni_modules 目录，即可通过 easycom 规范零配置直接使用所有原生组件。'
+	} as GuideQaItem,
+	{
+		question: '组件库支持哪些操作系统与端？',
+		answer: '全面支持 Android、iOS 原生平台（UTS 原生编译）以及 Web、微信小程序等多端环境。'
+	} as GuideQaItem,
+	{
+		question: '遇到编译报错或样式疑问如何获得支持？',
+		answer: '请查阅组件库官方文档，或在项目工程提报 Issue 寻求开发者协助。'
+	} as GuideQaItem
+]);
+
+/** 示例 2：完整卡片列表数据 */
+const multipleQaData = ref<GuideQaItem[]>([
+	{
+		question: '如何设置组件全局主题色？',
+		answer: '通过 useColorStore().setColor({ steThemeColor: "#0275ff" }) 即可实现全局主题色一键动态切换。'
+	} as GuideQaItem,
+	{
+		question: '原生端的动画与交互性能如何？',
+		answer: '基于 uni-app x 纯原生架构，无 WebView 桥接损耗，滑动横滑、下拉菜单与弹窗动画帧率高达 60~120fps。'
+	} as GuideQaItem
+]);
+
+/** 示例 4：插槽定制数据 */
+const customSlotQaData = ref<GuideQaItem[]>([
+	{
+		question: '订单支付成功后多久发货？',
+		answer: '日常订单将在支付完成后的 24 小时内由顺丰冷链发出，节假日或大促活动根据公告时效顺延。'
+	} as GuideQaItem,
+	{
+		question: '收到生鲜商品有坏果破损怎么处理？',
+		answer: '签收后 24 小时内拍摄外包装与坏果照片联系客服，我们提供“坏单包赔、秒级极速退款”售后保障。'
+	} as GuideQaItem
+]);
+
+/** 点击全部事件处理 */
+function onClickAll() {
+	uni.showToast({
+		title: '点击了[查看全部]常见问题',
+		icon: 'none'
+	});
+}
+
+/** 点击具体问题或答案事件处理 */
+function onClickItem(type : string, item : GuideQaItem) {
+	const areaName = type == 'q' ? '问题' : '答案';
+	uni.showToast({
+		title: `点击了[${areaName}]: ${item.question}`,
+		icon: 'none'
+	});
+}
+</script>
+
+<style scoped>
+.page-root {
+	width: 100%;
+	height: 100%;
+	background-color: #f7f8fa;
+}
+
+.demo-header {
+	padding: 36rpx 32rpx 20rpx;
+}
+
+.demo-title {
+	font-size: 38rpx;
+	font-weight: bold;
+	color: #1f2329;
+}
+
+.demo-subtitle {
+	font-size: 24rpx;
+	color: #8f959e;
+	margin-top: 12rpx;
+	line-height: 36rpx;
+}
+
+.demo-card {
+	margin: 20rpx 24rpx;
+	background-color: #ffffff;
+	border-radius: 16rpx;
+	padding: 24rpx;
+}
+
+.card-title {
+	font-size: 28rpx;
+	font-weight: bold;
+	color: #1f2329;
+}
+
+.card-desc {
+	font-size: 22rpx;
+	color: #8f959e;
+	margin-top: 8rpx;
+	margin-bottom: 20rpx;
+	line-height: 32rpx;
+}
+
+.card-content {
+	border-radius: 12rpx;
+	overflow: hidden;
+}
+
+.card-content-transparent {
+	background-color: transparent;
+}
+
+/* 自定义前缀徽章样式 */
+.custom-badge {
+	width: 34rpx;
+	height: 34rpx;
+	border-radius: 6rpx;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+}
+
+.q-badge {
+	background-color: #0275ff;
+}
+
+.a-badge {
+	background-color: #00b578;
+}
+
+.badge-text {
+	font-size: 20rpx;
+	font-weight: bold;
+	color: #ffffff;
+	line-height: 34rpx;
+}
+</style>

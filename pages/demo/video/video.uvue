@@ -1,0 +1,247 @@
+<template>
+	<scroll-view scroll-y="true" class="page-container">
+		<!-- 头部说明 -->
+		<view class="page-header">
+			<text class="page-title">Video 视频</text>
+			<text class="page-desc">基于原生 Video 进行增强封装，提供自定义控制栏、清晰度无缝切换、多倍速播放及事件联动。</text>
+		</view>
+
+		<view class="demo-content">
+			<!-- 用例 1：基础视频播放 -->
+			<view class="demo-card">
+				<text class="card-title">1. 基础视频播放</text>
+				<text class="card-desc">默认展示精美封面与预设时长（2分01秒），点击中央大播放按钮或底部控制栏即可流畅播放。</text>
+				<view class="video-box">
+					<ste-video
+						title="精选产品演示视频"
+						:src="sampleVideoUrl"
+						:duration="121"
+						:muted="false"
+					/>
+				</view>
+			</view>
+
+			<!-- 用例 2：多清晰度无缝切换 -->
+			<view class="demo-card">
+				<text class="card-title">2. 多清晰度无缝切换</text>
+				<text class="card-desc">全屏模式下点击底部清晰度可弹出侧边栏选择，自动保持当前播放进度。</text>
+				<view class="video-box">
+					<ste-video
+						title="多码率视频演示"
+						:resolution="resolutionList"
+						:duration="121"
+						:muted="true"
+					/>
+				</view>
+			</view>
+
+			<!-- 用例 3：自动播放与循环重播 -->
+			<view class="demo-card">
+				<text class="card-title">3. 自动与循环播放</text>
+				<text class="card-desc">设置 autoplay 与 loop，静音自动起播并在结束时无缝循环。</text>
+				<view class="video-box">
+					<ste-video
+						:src="sampleVideoUrl"
+						:duration="121"
+						:autoplay="true"
+						:loop="true"
+						:muted="true"
+					/>
+				</view>
+			</view>
+
+			<!-- 用例 4：Ref 命令式控制与事件日志 -->
+			<view class="demo-card">
+				<text class="card-title">4. Ref 命令式控制与事件监听</text>
+				<text class="card-desc">通过组件实例方法主动控制播放、暂停、跳转进度与变速。</text>
+				<view class="video-box">
+					<ste-video
+						ref="controlVideoRef"
+						title="Ref 控制与事件监听"
+						:src="sampleVideoUrl"
+						:duration="121"
+						@play="handlePlay"
+						@pause="handlePause"
+						@ended="handleEnded"
+						@timeupdate="handleTimeUpdate"
+					/>
+				</view>
+
+				<!-- 控制按钮组 -->
+				<view class="btn-group" style="margin-top: 20rpx">
+					<view class="btn-item">
+						<ste-button @click="handleBtnPlay" :width="150" :mode="100">播放</ste-button>
+					</view>
+					<view class="btn-item">
+						<ste-button @click="handleBtnPause" :width="150" :mode="100" mode="error">暂停</ste-button>
+					</view>
+					<view class="btn-item">
+						<ste-button @click="handleBtnSeek15" :width="200" :mode="100">跳至 15s</ste-button>
+					</view>
+					<view class="btn-item">
+						<ste-button @click="handleBtnSpeed15" :width="180" :mode="100">1.5X 倍速</ste-button>
+					</view>
+				</view>
+
+				<!-- 实时事件日志反馈 -->
+				<view class="log-box">
+					<text class="log-title">事件反馈：</text>
+					<text class="log-content">{{ eventLogText }}</text>
+				</view>
+			</view>
+		</view>
+	</scroll-view>
+</template>
+
+<script setup lang="uts">
+	/**
+	 * @file video.uvue
+	 * @description Video 视频组件 - uni-app x / UTS 全功能演示页面
+	 */
+	import { ref } from 'vue'
+	import type { VideoResolution } from '@/uni_modules/stellar-ui-uvue/components/ste-video/constants.uts'
+
+	// 演示视频源地址
+	const sampleVideoUrl = 'https://qiniu-web-assets.dcloud.net.cn/unidoc/zh/2minute-demo.mp4'
+
+	// 多清晰度源列表
+	const resolutionList = ref<VideoResolution[]>([
+		{ text: '标清 480P', url: sampleVideoUrl } as VideoResolution,
+		{ text: '高清 720P', url: sampleVideoUrl } as VideoResolution,
+		{ text: '超清 1080P', url: sampleVideoUrl } as VideoResolution,
+	])
+
+	// Ref 控制实例
+	const controlVideoRef = ref<SteVideoComponentPublicInstance | null>(null)
+
+	// 事件日志
+	const eventLogText = ref<string>('等待视频交互...')
+
+	// ==================== Ref 控制方法 ====================
+	function handleBtnPlay() {
+		controlVideoRef.value?.play()
+	}
+
+	function handleBtnPause() {
+		controlVideoRef.value?.pause()
+	}
+
+	function handleBtnSeek15() {
+		controlVideoRef.value?.seek(15)
+		eventLogText.value = '【命令】已跳转至 15 秒'
+	}
+
+	function handleBtnSpeed15() {
+		controlVideoRef.value?.playbackRate(1.5)
+		eventLogText.value = '【命令】已设置 1.5 倍速播放'
+	}
+
+	// ==================== 事件监听 ====================
+	function handlePlay() {
+		eventLogText.value = '【事件】视频开始/继续播放 (play)'
+	}
+
+	function handlePause() {
+		eventLogText.value = '【事件】视频已暂停 (pause)'
+	}
+
+	function handleEnded() {
+		eventLogText.value = '【事件】视频播放结束 (ended)'
+	}
+
+	function handleTimeUpdate(e : UniVideoTimeUpdateEvent) {
+		const cur = Math.floor(e.detail.currentTime)
+		const dur = Math.floor(e.detail.duration)
+		eventLogText.value = `【进度更新】当前: ${cur}s / 总长: ${dur}s`
+	}
+</script>
+
+<style scoped>
+.page-container {
+	flex: 1;
+	background-color: #f7f8fa;
+	padding: 24rpx;
+}
+
+.page-header {
+	margin-bottom: 24rpx;
+}
+
+.page-title {
+	font-size: 40rpx;
+	font-weight: bold;
+	color: #333333;
+	margin-bottom: 8rpx;
+}
+
+.page-desc {
+	font-size: 26rpx;
+	color: #666666;
+	line-height: 38rpx;
+}
+
+.demo-content {
+	display: flex;
+	flex-direction: column;
+	padding-bottom: 80rpx;
+}
+
+.demo-card {
+	background-color: #ffffff;
+	border-radius: 16rpx;
+	padding: 24rpx;
+	margin-bottom: 24rpx;
+	box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.03);
+}
+
+.card-title {
+	font-size: 30rpx;
+	font-weight: bold;
+	color: #1a1a1a;
+	margin-bottom: 8rpx;
+}
+
+.card-desc {
+	font-size: 24rpx;
+	color: #888888;
+	line-height: 34rpx;
+	margin-bottom: 20rpx;
+}
+
+.video-box {
+	width: 100%;
+	border-radius: 12rpx;
+	overflow: hidden;
+}
+
+.btn-group {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+}
+
+.btn-item {
+	margin-right: 16rpx;
+	margin-bottom: 16rpx;
+}
+
+.log-box {
+	margin-top: 16rpx;
+	background-color: #f0f2f5;
+	border-radius: 10rpx;
+	padding: 16rpx 20rpx;
+}
+
+.log-title {
+	font-size: 24rpx;
+	font-weight: bold;
+	color: #555555;
+	margin-bottom: 6rpx;
+}
+
+.log-content {
+	font-size: 24rpx;
+	color: #007aff;
+	line-height: 34rpx;
+}
+</style>

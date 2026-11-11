@@ -1,0 +1,94 @@
+{
+    "name": "ste-filter-tool",
+    "description": "多维筛选选项工具，支持按钮网格、单选勾选项与日历模式，提供分类联动与展开折叠能力。",
+    "example": "<ste-filter-tool :data=\"filters\"></ste-filter-tool>",
+    "tutorial": "https://stellar-ui.intecloud.com.cn/?projectName=stellar-ui-uvue&menu=%E7%BB%84%E4%BB%B6&active=ste-filter-tool",
+    "attributes": [
+        {
+            "name": "value",
+            "description": "当前选中的筛选值数组，支持 v-model:value 双向绑定",
+            "type": "FilterValue[]",
+            "default": "[]"
+        },
+        {
+            "name": "activeColor",
+            "description": "激活高亮主题颜色，不传时优先采用主题配置 steThemeColor",
+            "type": "string",
+            "default": ""
+        },
+        {
+            "name": "inactiveColor",
+            "description": "未激活项文字颜色",
+            "type": "string",
+            "default": "#555A61"
+        },
+        {
+            "name": "filterType",
+            "description": "筛选展现模式。完整支持 button（胶囊网格）、checkbox（单选勾选）与 calendar（日历选择）三种形态",
+            "type": "string",
+            "default": "button",
+            "values": [
+                {
+                    "name": "button",
+                    "description": "按钮胶囊网格模式"
+                },
+                {
+                    "name": "checkbox",
+                    "description": "单选勾选列表模式"
+                },
+                {
+                    "name": "calendar",
+                    "description": "日历选择模式"
+                }
+            ]
+        },
+        {
+            "name": "data",
+            "description": "筛选主数据源数组，包含分类标题、key、children 及 rowCount、expandCount 等配置",
+            "type": "FilterItem[]",
+            "default": "[]"
+        },
+        {
+            "name": "showCategory",
+            "description": "是否展示左侧分类栏",
+            "type": "boolean",
+            "default": "true"
+        },
+        {
+            "name": "confirmDisabled",
+            "description": "是否禁用底部确认按钮",
+            "type": "boolean",
+            "default": "false"
+        },
+        {
+            "name": "[event]confirm",
+            "description": "点击底部确认按钮时触发",
+            "params": [
+                {
+                    "name": "values",
+                    "description": "当前所有选中的值集合 (FilterValue[])"
+                }
+            ]
+        },
+        {
+            "name": "[event]reset",
+            "description": "点击底部重置按钮时触发",
+            "params": []
+        },
+        {
+            "name": "[event]itemClick",
+            "description": "点击任意筛选项时触发（实时）",
+            "params": [
+                {
+                    "name": "item",
+                    "description": "当前触发变更的筛选项 (FilterValue)"
+                }
+            ]
+        },
+        {
+            "name": "[event]maskClose",
+            "description": "点击蒙层关闭了弹窗后触发",
+            "params": []
+        }
+    ]
+}

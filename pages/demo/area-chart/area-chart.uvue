@@ -1,0 +1,174 @@
+<template>
+	<scroll-view direction="vertical" class="page">
+		<!-- 页面头部说明 -->
+		<view class="header">
+			<text class="title">AreaChart 面积图</text>
+			<text class="desc">在折线图基础上向下延伸填充半透明渐变区域，强化量级累计与趋势流转。</text>
+		</view>
+
+		<!-- 1. 基础单序列面积图 -->
+		<view class="section">
+			<text class="section-title">1. 基础渐变面积图</text>
+			<text class="section-desc">单序列折线下沉渐变填充，线条与区间层次分明</text>
+			<view class="chart-card">
+				<ste-area-chart :categories="categories1" :series="series1" height="420" />
+			</view>
+		</view>
+
+		<!-- 2. 多系列对比面积图 -->
+		<view class="section">
+			<text class="section-title">2. 多系列对比</text>
+			<text class="section-desc">双序列半透明交叠，直观对比不同渠道的流量贡献</text>
+			<view class="chart-card">
+				<ste-area-chart :categories="categories1" :series="series2" height="420" />
+			</view>
+		</view>
+
+		<!-- 3. 平滑贝塞尔曲线面积图 -->
+		<view class="section">
+			<text class="section-title">3. 平滑曲线填充 (type="curve")</text>
+			<text class="section-desc">柔和曲线过渡，适合展现平缓的统计数据</text>
+			<view class="chart-card">
+				<ste-area-chart
+					:categories="categories1"
+					:series="series3"
+					:extra="curveAreaExtra"
+					height="420"
+				/>
+			</view>
+		</view>
+
+		<!-- 4. 动态数据刷新 -->
+		<view class="section">
+			<text class="section-title">4. 动态数据更新与动画</text>
+			<text class="section-desc">点击按钮更新数据并触发面积区间入场动画</text>
+			<view class="chart-card">
+				<ste-area-chart :categories="categories1" :series="dynamicSeries" height="420" />
+			</view>
+			<view class="btn-box">
+				<button class="action-btn" size="mini" @click="randomizeData">生成随机数据</button>
+			</view>
+		</view>
+	</scroll-view>
+</template>
+
+<script setup lang="uts">
+/**
+ * @file area-chart.uvue
+ * @description AreaChart 面积图全功能交互式 Demo
+ */
+
+const categories1 = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
+
+const series1: UTSJSONObject[] = [
+	{
+		name: '浏览量 (PV)',
+		data: [120, 180, 150, 260, 210, 310, 280],
+		color: '#165DFF'
+	}
+];
+
+const series2: UTSJSONObject[] = [
+	{
+		name: '线上成交',
+		data: [80, 110, 130, 170, 160, 230, 210],
+		color: '#165DFF'
+	},
+	{
+		name: '门店成交',
+		data: [60, 75, 90, 120, 110, 150, 140],
+		color: '#14C9C9'
+	}
+];
+
+const series3: UTSJSONObject[] = [
+	{
+		name: '内存占用率',
+		data: [42, 55, 48, 62, 58, 70, 65],
+		color: '#722ED1'
+	}
+];
+
+const curveAreaExtra: UTSJSONObject = {
+	area: {
+		type: 'curve',
+		width: 2,
+		opacity: 0.4
+	}
+};
+
+const dynamicSeries = ref<UTSJSONObject[]>([
+	{
+		name: '下载量',
+		data: [50, 90, 80, 140, 120, 180, 160],
+		color: '#F7BA1E'
+	}
+]);
+
+function randomizeData() {
+	const newNums: number[] = [];
+	for (let i = 0; i < 7; i++) {
+		newNums.push(Math.floor(Math.random() * 200) + 50);
+	}
+	dynamicSeries.value = [
+		{
+			name: '下载量',
+			data: newNums,
+			color: '#F7BA1E'
+		}
+	];
+}
+</script>
+
+<style>
+.page {
+	padding: 24rpx;
+	background-color: #f7f8fa;
+	flex: 1;
+}
+.header {
+	margin-bottom: 28rpx;
+}
+.title {
+	font-size: 38rpx;
+	font-weight: bold;
+	color: #1f2329;
+}
+.desc {
+	font-size: 26rpx;
+	color: #646a73;
+	margin-top: 10rpx;
+	line-height: 38rpx;
+}
+.section {
+	margin-bottom: 32rpx;
+}
+.section-title {
+	font-size: 30rpx;
+	font-weight: bold;
+	color: #1f2329;
+}
+.section-desc {
+	font-size: 24rpx;
+	color: #8f959e;
+	margin-top: 6rpx;
+	margin-bottom: 14rpx;
+}
+.chart-card {
+	background-color: #ffffff;
+	border-radius: 16rpx;
+	padding: 16rpx;
+	box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
+}
+.btn-box {
+	margin-top: 16rpx;
+	flex-direction: row;
+	justify-content: center;
+}
+.action-btn {
+	background-color: #165dff;
+	color: #ffffff;
+	border-radius: 8rpx;
+	font-size: 26rpx;
+}
+</style>

@@ -1,0 +1,234 @@
+<template>
+	<scroll-view scroll-y="true" class="page">
+		<view class="header">
+			<text class="title">Stepper 步进器</text>
+			<text class="desc">在一定范围内输入、调整数字</text>
+		</view>
+
+		<!-- 基础用法 -->
+		<view class="demo-item">
+			<text class="demo-item-title">基础用法</text>
+			<view class="demo-row">
+				<ste-stepper v-model="val1"></ste-stepper>
+			</view>
+			<text class="result">当前值: {{ val1 }}</text>
+		</view>
+
+		<!-- 限制输入范围 -->
+		<view class="demo-item">
+			<text class="demo-item-title">限制输入范围</text>
+			<text class="demo-desc">min=5, max=15</text>
+			<view class="demo-row">
+				<ste-stepper v-model="val2" :min="5" :max="15"></ste-stepper>
+			</view>
+			<text class="result">当前值: {{ val2 }}</text>
+		</view>
+
+		<!-- 步长设置 -->
+		<view class="demo-item">
+			<text class="demo-item-title">步长设置</text>
+			<text class="demo-desc">step=2</text>
+			<view class="demo-row">
+				<ste-stepper v-model="val3" :step="2"></ste-stepper>
+			</view>
+			<text class="result">当前值: {{ val3 }}</text>
+		</view>
+
+		<!-- 数值精度 -->
+		<view class="demo-item">
+			<text class="demo-item-title">数值精度</text>
+			<text class="demo-desc">precision=1</text>
+			<view class="demo-row">
+				<ste-stepper v-model="val4" :precision="1" :step="0.1"></ste-stepper>
+			</view>
+			<text class="result">当前值: {{ val4 }}</text>
+		</view>
+
+		<!-- 自定义大小 -->
+		<view class="demo-item">
+			<text class="demo-item-title">自定义大小</text>
+			<text class="demo-desc">inputWidth=100, btnSize=70</text>
+			<view class="demo-row">
+				<ste-stepper v-model="val5" :inputWidth="100" :btnSize="70"></ste-stepper>
+			</view>
+			<text class="result">当前值: {{ val5 }}</text>
+		</view>
+
+		<!-- 主色 -->
+		<view class="demo-item">
+			<text class="demo-item-title">主色</text>
+			<text class="demo-desc">mainColor=#ff5722</text>
+			<view class="demo-row">
+				<ste-stepper v-model="val6" mainColor="#ff5722"></ste-stepper>
+			</view>
+			<text class="result">当前值: {{ val6 }}</text>
+		</view>
+
+		<!-- 禁用 -->
+		<view class="demo-item">
+			<text class="demo-item-title">禁用</text>
+			<text class="demo-desc">disabled</text>
+			<view class="demo-row">
+				<ste-stepper v-model="val7" disabled></ste-stepper>
+			</view>
+			<text class="demo-desc">disablePlus</text>
+			<view class="demo-row">
+				<ste-stepper v-model="val7" disablePlus></ste-stepper>
+			</view>
+			<text class="demo-desc">disableInput</text>
+			<view class="demo-row">
+				<ste-stepper v-model="val7" disableInput></ste-stepper>
+			</view>
+			<text class="demo-desc">disableMinus</text>
+			<view class="demo-row">
+				<ste-stepper v-model="val7" disableMinus></ste-stepper>
+			</view>
+			<text class="result">当前值: {{ val7 }}</text>
+		</view>
+
+		<!-- 线性风格 -->
+		<view class="demo-item">
+			<text class="demo-item-title">线性风格 (line)</text>
+			<view class="demo-row">
+				<ste-stepper v-model="val8" theme="line"></ste-stepper>
+			</view>
+			<text class="demo-desc">disabled</text>
+			<view class="demo-row">
+				<ste-stepper v-model="val8" theme="line" disabled></ste-stepper>
+			</view>
+			<text class="result">当前值: {{ val8 }}</text>
+		</view>
+
+		<!-- Simple 主题 -->
+		<view class="demo-item">
+			<text class="demo-item-title">Simple 主题</text>
+			<view class="demo-row">
+				<ste-stepper v-model="val9" theme="simple"></ste-stepper>
+			</view>
+			<text class="result">当前值: {{ val9 }}</text>
+		</view>
+
+		<!-- Circle 主题 -->
+		<view class="demo-item">
+			<text class="demo-item-title">Circle 主题</text>
+			<view class="demo-row">
+				<ste-stepper v-model="val10" theme="circle"></ste-stepper>
+			</view>
+			<text class="result">当前值: {{ val10 }}</text>
+		</view>
+
+		<!-- Add 主题（加购按钮） -->
+		<view class="demo-item">
+			<text class="demo-item-title">Add 主题（加购按钮）</text>
+			<view class="demo-row add-row">
+				<ste-stepper v-model="val11" theme="add" offsetY="-10"></ste-stepper>
+			</view>
+			<text class="demo-desc">带徽标 (max=9)</text>
+			<view class="demo-row add-row">
+				<ste-stepper v-model="val12" theme="add" :badgeMax="9" offsetY="-10"></ste-stepper>
+			</view>
+			<text class="result">数量: {{ val11 }} | 带徽标: {{ val12 }}</text>
+		</view>
+	</scroll-view>
+</template>
+
+<script setup lang="uts">
+	import { ref } from 'vue'
+
+	defineOptions({ name: 'demo-stepper' })
+
+	// 基础用法
+	const val1 = ref<number>(10)
+
+	// 限制范围
+	const val2 = ref<number>(7)
+
+	// 步长
+	const val3 = ref<number>(2)
+
+	// 精度
+	const val4 = ref<number>(5.8)
+
+	// 自定义大小
+	const val5 = ref<number>(5)
+
+	// 主色
+	const val6 = ref<number>(5)
+
+	// 禁用
+	const val7 = ref<number>(7)
+
+	// 线性风格
+	const val8 = ref<number>(11)
+
+	// Simple
+	const val9 = ref<number>(3)
+
+	// Circle
+	const val10 = ref<number>(3)
+
+	// Add
+	const val11 = ref<number>(0)
+	const val12 = ref<number>(3)
+</script>
+
+<style>
+	.page {
+		padding: 20rpx;
+		flex: 1
+	}
+
+	.header {
+		margin-bottom: 30rpx;
+	}
+
+	.title {
+		font-size: 36rpx;
+		font-weight: bold;
+	}
+
+	.desc {
+		font-size: 24rpx;
+		color: #969799;
+		margin-top: 8rpx;
+	}
+
+	.demo-item {
+		margin-bottom: 30rpx;
+		padding: 20rpx;
+		background-color: #ffffff;
+		border-radius: 12rpx;
+		flex-direction: column;
+	}
+
+	.demo-item-title {
+		font-size: 28rpx;
+		font-weight: bold;
+		margin-bottom: 16rpx;
+		color: #333333;
+	}
+
+	.demo-desc {
+		font-size: 24rpx;
+		color: #969799;
+		margin-bottom: 8rpx;
+		margin-top: 12rpx;
+	}
+
+	.demo-row {
+		flex-direction: row;
+		align-items: center;
+		margin-bottom: 8rpx;
+	}
+
+	.add-row {
+		padding-top: 16rpx;
+		overflow: visible;
+	}
+
+	.result {
+		font-size: 24rpx;
+		color: #999999;
+		margin-top: 12rpx;
+	}
+</style>

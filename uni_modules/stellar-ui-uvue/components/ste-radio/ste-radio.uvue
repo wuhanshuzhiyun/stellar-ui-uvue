@@ -1,0 +1,331 @@
+<template>
+	<view class="ste-radio-root" :style="cmpRootStyle" @click="click">
+		<view class="icon" :style="cmpIconStyle">
+			<view class="input-icon" :style="cmpInputStyle">
+				<ste-icon v-if="cmpChecked" :size="iconSizeComputed * 0.8" code="&#xe67a;" :color="cmpDisabled ? '#bbbbbb' : '#fff'" bold></ste-icon>
+			</view>
+		</view>
+		<view class="text">
+			<text :style="cmpTextStyle"><slot></slot></text>
+		</view>
+	</view>
+</template>
+
+<script setup lang="uts">
+	import { computed, inject } from 'vue'
+	import { useColorStore } from '../../store/color.uts'
+	import { formatPx } from '../../utils/utils.uts'
+	import { normalizeFontSize } from '../../config/index.uts'
+	import type { RadioGroupContext } from './radio-types.uts'
+
+	defineOptions({ name: 'ste-radio', options: { virtualHost: true } })
+
+	type RadioProps = {
+		modelValue ?: string,
+		name ?: string | number,
+		disabled ?: boolean,
+		/* 以下「可继承组配置」的属性一律不给本地默认值：
+		 * 未传时不给默认值（web 端为 undefined、App 端为 null），否则 withDefaults 填的默认值会永远盖住组上的配置，
+		 * 让「子组件 > 组 > 库默认值」这条优先级链失效 */
+		shape ?: string,
+		iconSize ?: string | number,
+		checkedColor ?: string,
+		textPosition ?: string,
+		textSize ?: string | number,
+		textInactiveColor ?: string,
+		textActiveColor ?: string,
+		textDisabled ?: boolean,
+		marginLeft ?: string | number,
+		marginRight ?: string | number,
+		columnGap ?: string | number,
+	}
+
+	const props = withDefaults(defineProps<RadioProps>(), {
+		modelValue: '',
+		name: '',
+		disabled: false,
+	})
+	const emits = defineEmits(['click', 'change', 'input', 'update:modelValue'])
+
+	// 颜色 store
+	const colorStore = useColorStore()
+	const colorData = colorStore.getColor()
+
+	// 父组件上下文通过 inject 注入
+	const injected = inject<RadioGroupContext | null>('ste-radio', null)
+	const parentData = injected
+
+	// 是否在 group 中
+	const inGroup = computed(() : boolean => parentData != null)
+
+	// ============== 属性获取（优先本地 > 父组件 > 默认值） ==============
+
+	function getDisabled() : boolean {
+		if (props.disabled) return true
+		if (inGroup.value && parentData!.getDisabled()) return true
+		return false
+	}
+
+	// 只读是「组」级别的概念：单选的值属于整组，锁的是整组而不是某一项
+	function getReadonly() : boolean {
+		if (inGroup.value && parentData!.getReadonly()) return true
+		return false
+	}
+
+	function getShape() : string {
+		const local = props.shape
+		if (local != null && local != '') return local!
+		if (inGroup.value) {
+			const v = parentData!.getShape()
+			if (v != '') return v
+		}
+		return 'circle'
+	}
+
+	function getTextPosition() : string {
+		const local = props.textPosition
+		if (local != null && local != '') return local!
+		if (inGroup.value) {
+			const v = parentData!.getTextPosition()
+			if (v != '') return v
+		}
+		return 'right'
+	}
+
+	function getTextSize() : string | number {
+		const local = props.textSize
+		if (local != null) return local!
+		if (inGroup.value) {
+			const v = parentData!.getTextSize()
+			if (v != '') return v
+		}
+		return 28
+	}
+
+	function getCheckedColor() : string {
+		const local = props.checkedColor
+		if (local != null && local != '') return local!
+		if (inGroup.value) {
+			const v = parentData!.getCheckedColor()
+			if (v != '') return v
+		}
+		return colorData.steThemeColor
+	}
+
+	function getTextActiveColor() : string {
+		const local = props.textActiveColor
+		if (local != null && local != '') return local!
+		if (inGroup.value) {
+			const v = parentData!.getTextActiveColor()
+			if (v != '') return v
+		}
+		return '#000000'
+	}
+
+	function getTextInactiveColor() : string {
+		const local = props.textInactiveColor
+		if (local != null && local != '') return local!
+		if (inGroup.value) {
+			const v = parentData!.getTextInactiveColor()
+			if (v != '') return v
+		}
+		return '#000000'
+	}
+
+	function getTextDisabled() : boolean {
+		if (props.textDisabled == true) return true
+		if (inGroup.value && parentData!.getTextDisabled()) return true
+		return false
+	}
+
+	function getColumnGap() : string | number {
+		const local = props.columnGap
+		if (local != null && local != '') return local!
+		if (inGroup.value) {
+			const v = parentData!.getColumnGap()
+			if (v != '') return v
+		}
+		return '16'
+	}
+
+	// ============== 核心状态 ==============
+
+	const cmpChecked = computed(() : boolean => {
+		if (inGroup.value) {
+			return parentData!.getModelValue() == '' + props.name
+		}
+		return props.modelValue == '' + props.name
+	})
+
+	const cmpDisabled = computed(() : boolean => {
+		return getDisabled()
+	})
+
+	const iconSizeComputed = computed(() : number => {
+		let size : string | number = 36
+		const local = props.iconSize
+		if (local != null && local != '') {
+			size = local!
+		} else if (inGroup.value) {
+			const v = parentData!.getIconSize()
+			if (v != '') size = v
+		}
+		if (typeof size === 'number') return size as number
+		return parseFloat(size as string)
+	})
+
+	// ============== 样式 computed ==============
+
+	const cmpRootStyle = computed(() : UTSJSONObject => {
+		const textPosition = getTextPosition()
+
+		let marginLeft : string | number = '0'
+		const localLeft = props.marginLeft
+		if (localLeft != null && localLeft != '') {
+			marginLeft = localLeft!
+		} else if (inGroup.value) {
+			const v = parentData!.getMarginLeft()
+			if (v != '') marginLeft = v
+		}
+
+		let marginRight : string | number = '0'
+		const localRight = props.marginRight
+		if (localRight != null && localRight != '') {
+			marginRight = localRight!
+		} else if (inGroup.value) {
+			const v = parentData!.getMarginRight()
+			if (v != '') marginRight = v
+		}
+
+		const style : UTSJSONObject = {
+			flexDirection: textPosition == 'right' ? 'row' : 'row-reverse',
+			marginLeft: formatPx(marginLeft),
+			marginRight: formatPx(marginRight),
+			display: 'flex',
+			alignItems: 'center',
+		}
+
+		return style
+	})
+
+	// 图标与文本的间距：与 ste-checkbox 一致，用图标的 margin 实现
+	// （textPosition=left 时文本在左、图标在右，间距要加在图标左侧）
+	const cmpIconStyle = computed(() : UTSJSONObject => {
+		const style : UTSJSONObject = {}
+		const gap = formatPx(getColumnGap())
+		if (getTextPosition() == 'right') {
+			style['marginRight'] = gap
+		} else {
+			style['marginLeft'] = gap
+		}
+		return style
+	})
+
+	// 文本样式（fontSize/color 只能用于 <text> 元素）
+	const cmpTextStyle = computed(() : UTSJSONObject => {
+		const textSize = getTextSize()
+		return {
+			fontSize: typeof textSize === 'number' ? normalizeFontSize(textSize as number) : formatPx(textSize as string),
+			color: cmpChecked.value ? getTextActiveColor() : getTextInactiveColor(),
+		} as UTSJSONObject
+	})
+
+	const cmpInputStyle = computed(() : UTSJSONObject => {
+		const shape = getShape()
+		const size = iconSizeComputed.value
+		const checkedColor = getCheckedColor()
+		const checked = cmpChecked.value
+
+		const style : UTSJSONObject = {
+			borderRadius: shape == 'circle' ? '50%' : '0px',
+			// uni-app x 内联样式不支持 border / background 简写，必须拆开写
+			borderWidth: '1px',
+			borderStyle: 'solid',
+			borderColor: checked ? checkedColor : '#BBBBBB',
+			backgroundColor: checked ? checkedColor : '#FFFFFF',
+			width: uni.rpx2px(size) + 'px',
+			height: uni.rpx2px(size) + 'px',
+			display: 'flex',
+			justifyContent: 'center',
+			alignItems: 'center',
+		}
+
+		if (cmpDisabled.value) {
+			style['backgroundColor'] = '#eeeeee'
+			style['borderColor'] = '#bbbbbb'
+		}
+
+		return style
+	})
+
+	// ============== 点击处理（suspend/next/stop 机制） ==============
+
+	type ClickEventContext = {
+		suspend : () => void,
+		next : () => void,
+		stop : () => void,
+	}
+
+	const click = () => {
+		if (cmpDisabled.value) return
+		if (getReadonly()) return
+
+		let suspended = false
+
+		// 执行变更的函数
+		const executeChange = () => {
+			// radio：只有未选中时才触发变更
+			if (!cmpChecked.value) {
+				const value = '' + props.name
+				if (inGroup.value) {
+					parentData!.updateValue(value)
+				} else {
+					emits('update:modelValue', value)
+				}
+				emits('change', value)
+			}
+		}
+
+		// 创建事件上下文
+		const context : ClickEventContext = {
+			suspend: () => {
+				suspended = true
+			},
+			next: () => {
+				if (suspended) {
+					executeChange()
+				}
+			},
+			stop: () => {
+				// 用户调用 stop()，不执行后续逻辑
+			},
+		}
+
+		// 触发 click 事件，传递当前值和 context 对象
+		emits('click', props.modelValue, context)
+
+		// 如果用户没有调用 suspend()，则直接执行
+		if (!suspended) {
+			executeChange()
+		}
+	}
+</script>
+
+<style>
+.ste-radio-root {
+	width: auto;
+	display: flex;
+	align-items: center;
+}
+
+.input-icon {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.text {
+	display: flex;
+	align-items: center;
+}
+</style>

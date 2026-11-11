@@ -1,0 +1,340 @@
+<template>
+	<scroll-view scroll-y="true" class="page-root">
+		<!-- 顶部导航标题区 -->
+		<view class="demo-header">
+			<text class="demo-title">Login 登录组件</text>
+			<text class="demo-subtitle">涵盖微信免密一键登录、多 Tab 表单登录、短信验证码倒计时与多账号下拉选择</text>
+		</view>
+
+		<!-- 示例 1：基础简单登录模式 (微信/手机免密一键登录) -->
+		<view class="demo-card">
+			<text class="card-title">1. 基础一键登录模式 (mode='base')</text>
+			<text class="card-desc">居中 Logo 展示，包含协议勾选与主要/次要按钮交互</text>
+			<view class="card-content base-container">
+				<ste-login
+					mode="base"
+					:protocolCheck="baseProtocolCheck"
+					baseProtocol="我已阅读并同意"
+					:protocolData="protocolList"
+					:primaryBtn="basePrimaryBtns"
+					:secondaryBtn="baseSecondaryBtns"
+					bottomTip="版本信息 v2.0.0"
+					@update:protocolCheck="onBaseProtocolChange"
+					@protocolClick="onProtocolClick"
+					@primaryBtnClick="onPrimaryBtnClick"
+					@secondaryBtnClick="onSecondaryBtnClick"
+				/>
+			</view>
+		</view>
+
+		<!-- 示例 2：综合表单登录模式 (账号密码 / 短信验证码) -->
+		<view class="demo-card">
+			<text class="card-title">2. 综合多 Tab 登录 (mode='mode1')</text>
+			<text class="card-desc">Tab 动态切换、密码密文、60 秒短信验证码倒计时与表单变更监听</text>
+			<view class="card-content mode1-container">
+				<ste-login
+					mode="mode1"
+					loginBoxHeight="680rpx"
+					:loginGroup="loginGroups"
+					:protocolCheck="formProtocolCheck"
+					baseProtocol="登录即代表同意"
+					:protocolData="protocolList"
+					:primaryBtn="formPrimaryBtns"
+					:secondaryBtn="formSecondaryBtns"
+					@update:protocolCheck="onFormProtocolChange"
+					@tabChange="onTabChange"
+					@formDataChange="onFormDataChange"
+					@getCode="onGetVerifyCode"
+					@primaryBtnClick="onPrimaryBtnClick"
+					@secondaryBtnClick="onSecondaryBtnClick"
+				/>
+			</view>
+			<!-- 实时表单数据回显 -->
+			<view class="form-result-box" v-if="formDataSummary != ''">
+				<text class="result-title">实时表单录入数据：</text>
+				<text class="result-content">{{ formDataSummary }}</text>
+			</view>
+		</view>
+
+		<!-- 示例 3：多账号下拉选择与业务说明 (select & txt) -->
+		<view class="demo-card">
+			<text class="card-title">3. 下拉多账号选择与业务提示</text>
+			<text class="card-desc">结合 ste-select 下拉选择器与 txt 业务说明卡片，适合企业多身份登录</text>
+			<view class="card-content mode1-container">
+				<ste-login
+					mode="mode1"
+					loginBoxHeight="640rpx"
+					:loginGroup="selectAccountGroup"
+					:primaryBtn="selectPrimaryBtns"
+					:secondaryBtn="selectSecondaryBtns"
+					@formDataChange="onSelectFormDataChange"
+					@primaryBtnClick="onPrimaryBtnClick"
+					@secondaryBtnClick="onSecondaryBtnClick"
+				/>
+			</view>
+		</view>
+	</scroll-view>
+</template>
+
+<script setup lang="uts">
+/**
+ * @file login.uvue
+ * @description ste-login 登录 原生演示页面
+ */
+import {
+	ProtocolItem,
+	BtnItem,
+	LoginItem,
+	LoginGroupItem,
+	BaseConfigItem
+} from '@/uni_modules/stellar-ui-uvue/components/ste-login/constants.uts';
+
+/** 通用协议列表 */
+const protocolList = ref<ProtocolItem[]>([
+	{ title: '用户服务协议', key: 'service' } as ProtocolItem,
+	{ title: '隐私政策细则', key: 'privacy' } as ProtocolItem
+]);
+
+/** 示例 1 状态 */
+const baseProtocolCheck = ref<boolean>(false);
+const basePrimaryBtns = ref<BtnItem[]>([
+	{ title: '微信一键授权登录', key: 'wx', round: true } as BtnItem
+]);
+const baseSecondaryBtns = ref<BtnItem[]>([
+	{ title: '使用其他手机号登录', key: 'other', round: true } as BtnItem,
+	{ title: '随便看看 (游客体验)', key: 'guest', round: true } as BtnItem
+]);
+
+/** 示例 2 状态 */
+const formProtocolCheck = ref<boolean>(true);
+const formDataSummary = ref<string>('');
+
+const loginGroups = ref<LoginGroupItem[]>([
+	{
+		title: '密码登录',
+		key: 'pwd',
+		items: [
+			{
+				title: '手机/账号',
+				key: 'username',
+				type: 'number',
+				placeholder: '请输入11位手机号',
+				maxlength: 11
+			} as LoginItem,
+			{
+				title: '登录密码',
+				key: 'password',
+				type: 'password',
+				placeholder: '请输入登录密码',
+				maxlength: 20
+			} as LoginItem
+		]
+	} as LoginGroupItem,
+	{
+		title: '验证码登录',
+		key: 'code',
+		items: [
+			{
+				title: '手机号码',
+				key: 'mobile',
+				type: 'number',
+				placeholder: '请输入注册手机号',
+				maxlength: 11
+			} as LoginItem,
+			{
+				title: '短信验证码',
+				key: 'verifyCode',
+				type: 'validate',
+				placeholder: '请输入6位验证码',
+				maxlength: 6
+			} as LoginItem
+		]
+	} as LoginGroupItem
+]);
+
+const formPrimaryBtns = ref<BtnItem[]>([
+	{ title: '立即登录', key: 'submit', round: true } as BtnItem
+]);
+const formSecondaryBtns = ref<BtnItem[]>([
+	{ title: '忘记密码？', key: 'forgot' } as BtnItem,
+	{ title: '立即注册新账号', key: 'register' } as BtnItem
+]);
+
+/** 示例 3 状态 */
+const selectAccountGroup = ref<LoginGroupItem[]>([
+	{
+		title: '身份选择',
+		key: 'switch',
+		items: [
+			{
+				title: '登录门店',
+				key: 'storeId',
+				type: 'select',
+				placeholder: '请选择关联门店',
+				selectData: [
+					{ title: '云创数智旗舰店 (总仓)', key: 'store_01' } as BaseConfigItem,
+					{ title: '高新科技园前置仓', key: 'store_02' } as BaseConfigItem,
+					{ title: '滨海新区配送服务中心', key: 'store_03' } as BaseConfigItem
+				]
+			} as LoginItem,
+			{
+				title: '业务提示',
+				key: 'tips',
+				type: 'txt',
+				value: '若您所属门店不在列表中，请先联系区域管理员进行权限开通与员工绑定。'
+			} as LoginItem
+		]
+	} as LoginGroupItem
+]);
+
+const selectPrimaryBtns = ref<BtnItem[]>([
+	{ title: '进入工作台', key: 'enter', round: true } as BtnItem
+]);
+const selectSecondaryBtns = ref<BtnItem[]>([
+	{ title: '切换企业组织', key: 'changeOrg' } as BtnItem
+]);
+
+/** 协议勾选变更 */
+function onBaseProtocolChange(checked : boolean) {
+	baseProtocolCheck.value = checked;
+}
+
+function onFormProtocolChange(checked : boolean) {
+	formProtocolCheck.value = checked;
+}
+
+/** 协议条目点击 */
+function onProtocolClick(item : ProtocolItem) {
+	uni.showToast({
+		title: `打开《${item.title}》条款详情`,
+		icon: 'none'
+	});
+}
+
+/** 主按钮点击 */
+function onPrimaryBtnClick(item : BtnItem) {
+	uni.showToast({
+		title: `触发主要按钮: ${item.title}`,
+		icon: 'none'
+	});
+}
+
+/** 次要按钮点击 */
+function onSecondaryBtnClick(item : BtnItem) {
+	uni.showToast({
+		title: `触发次要操作: ${item.title}`,
+		icon: 'none'
+	});
+}
+
+/** Tab 切换 */
+function onTabChange(item : BaseConfigItem) {
+	uni.showToast({
+		title: `切换为: ${item.title}`,
+		icon: 'none'
+	});
+}
+
+/** 表单变更 */
+function onFormDataChange(data : UTSJSONObject) {
+	formDataSummary.value = JSON.stringify(data);
+}
+
+function onSelectFormDataChange(data : UTSJSONObject) {
+	uni.showToast({
+		title: `已选中门店代码: ${data.getString('storeId') ?? ''}`,
+		icon: 'none'
+	});
+}
+
+/** 获取验证码 */
+function onGetVerifyCode(_suspend : () => void, next : () => void, _stop : () => void) {
+	uni.showToast({
+		title: '验证码已下发至手机，请查收！',
+		icon: 'success'
+	});
+	next();
+}
+</script>
+
+<style scoped>
+.page-root {
+	width: 100%;
+	height: 100%;
+	background-color: #f7f8fa;
+}
+
+.demo-header {
+	padding: 36rpx 32rpx 20rpx;
+}
+
+.demo-title {
+	font-size: 38rpx;
+	font-weight: bold;
+	color: #1f2329;
+}
+
+.demo-subtitle {
+	font-size: 24rpx;
+	color: #8f959e;
+	margin-top: 12rpx;
+	line-height: 36rpx;
+}
+
+.demo-card {
+	margin: 20rpx 24rpx;
+	background-color: #ffffff;
+	border-radius: 16rpx;
+	padding: 24rpx;
+}
+
+.card-title {
+	font-size: 28rpx;
+	font-weight: bold;
+	color: #1f2329;
+}
+
+.card-desc {
+	font-size: 22rpx;
+	color: #8f959e;
+	margin-top: 8rpx;
+	margin-bottom: 20rpx;
+	line-height: 32rpx;
+}
+
+.card-content {
+	border-radius: 16rpx;
+	overflow: hidden;
+	background-color: #fcfdfe;
+	border: 1rpx solid #edf0f5;
+}
+
+.base-container {
+	height: 720rpx;
+}
+
+.mode1-container {
+	height: 720rpx;
+	position: relative;
+	background-color: #e8effe;
+}
+
+.form-result-box {
+	margin-top: 16rpx;
+	padding: 16rpx;
+	background-color: #f8f9fa;
+	border-radius: 8rpx;
+}
+
+.result-title {
+	font-size: 24rpx;
+	font-weight: bold;
+	color: #1f2329;
+}
+
+.result-content {
+	font-size: 22rpx;
+	color: #0275ff;
+	margin-top: 6rpx;
+}
+</style>

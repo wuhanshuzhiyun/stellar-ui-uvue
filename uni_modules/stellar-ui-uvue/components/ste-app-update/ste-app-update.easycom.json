@@ -1,0 +1,114 @@
+{
+    "name": "ste-app-update",
+    "description": "应用更新组件，用于检测和提示APP版本更新。已全面兼容原生架构。",
+    "example": "<ste-app-update ref=\"appUpdateRef\" clientId=\"your-client-id\" clientSecret=\"your-client-secret\"></ste-app-update>",
+    "tutorial": "https://stellar-ui.intecloud.com.cn/?projectName=stellar-ui-uvue&menu=%E7%BB%84%E4%BB%B6&active=ste-app-update",
+    "attributes": [
+        {
+            "name": "clientId",
+            "description": "应用编码 (ClientId)，用于 HTTP Basic Authorization 身份鉴权",
+            "type": "string",
+            "default": ""
+        },
+        {
+            "name": "clientSecret",
+            "description": "应用密钥 (ClientSecret)，用于 HTTP Basic Authorization 身份鉴权",
+            "type": "string",
+            "default": ""
+        },
+        {
+            "name": "apiUrl",
+            "description": "更新 API 请求接口地址",
+            "type": "string",
+            "default": "https://inte-dev.intecloud.com.cn/inte-cloud/gw/blade-system/api/inte/client/ver/currentDetail"
+        },
+        {
+            "name": "appType",
+            "description": "APP 环境标识，版本号最后一位为环境标识 (如 dev/test/prod)，不匹配时不触发升级",
+            "type": "string",
+            "default": ""
+        },
+        {
+            "name": "btnText",
+            "description": "立即体验 / 立即更新按钮文本",
+            "type": "string",
+            "default": "立即体验"
+        },
+        {
+            "name": "appVersion",
+            "description": "当前应用版本号。为空时自动通过 uni.getAppBaseInfo().appVersion 获取",
+            "type": "string",
+            "default": ""
+        },
+        {
+            "name": "zIndex",
+            "description": "更新遮罩弹窗堆叠层级 (z-index)",
+            "type": "string/number",
+            "default": "998"
+        },
+        {
+            "name": "fallbackApiUrl",
+            "description": "兜底检测接口地址。配置后优先执行前置探针，若命中兜底配置则引导前往浏览器下载",
+            "type": "string",
+            "default": "https://stellar-public-prd.intecloud.com.cn/api/app-update/check"
+        },
+        {
+            "name": "strictVersionCheck",
+            "description": "严格版本检查。为 true 时新版本大于当前版本才弹窗，且当服务端返回 lastAllDetail 全量包且当前版本过低时，优先升级全量包 (APK)",
+            "type": "boolean",
+            "default": "false"
+        },
+        {
+            "name": "[event]cancel",
+            "description": "用户取消更新或点击关闭弹窗时触发"
+        },
+        {
+            "name": "[event]update",
+            "description": "发现可用新版本并弹出更新卡片时触发"
+        },
+        {
+            "name": "[event]no-update",
+            "description": "没有新版本或检测完毕无需更新时触发"
+        },
+        {
+            "name": "[event]skipped",
+            "description": "存在可用新版本但已被用户设置跳过时触发",
+            "params": [
+                { "name": "code", "description": "被跳过的版本代号 (如 '1.2608270.0')" },
+                { "name": "name", "description": "被跳过的版本展示名称 (如 '2.7.6.00')" }
+            ]
+        },
+        {
+            "name": "[event]skip-version",
+            "description": "用户点击【跳过此版本】时触发，参数为跳过的版本号代码",
+            "params": [
+                { "name": "version", "description": "被跳过的版本号代码 (如 '101')" }
+            ]
+        },
+        {
+            "name": "[event]fallback",
+            "description": "命中兜底更新配置时触发",
+            "params": [
+                { "name": "data", "description": "兜底更新数据，包含 title、description、downloadUrl" }
+            ]
+        },
+        {
+            "name": "[method]start",
+            "description": "触发版本更新检测主流程。回调参数 resVersion 类型为 UTSJSONObject，通过 $callMethod('start', callback) 唤起",
+            "params": [
+                {
+                    "name": "callback",
+                    "description": "可选回调函数：(resVersion, curVersion) => void"
+                }
+            ]
+        },
+        {
+            "name": "[method]getSkippedVersions",
+            "description": "获取当前本地存储中保存的所有跳过版本代号列表。返回类型为 string[]，通过 comp.$callMethod('getSkippedVersions') 获取"
+        },
+        {
+            "name": "[method]clearSkippedVersions",
+            "description": "清空本地已跳过的版本记录，恢复这些版本的更新提示。通过 comp.$callMethod('clearSkippedVersions') 调用"
+        }
+    ]
+}

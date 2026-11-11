@@ -1,0 +1,334 @@
+<template>
+	<view class="demo-page-root">
+		<scroll-view scroll-y="true" class="page">
+			<!-- 页面顶部标题区 -->
+			<view class="header">
+				<text class="title">MediaPreview 媒体预览</text>
+				<text class="desc">多媒体全屏查看组件，支持图片与视频轮播、双指缩放、单指拖拽漫游以及自定义操作插槽。</text>
+			</view>
+
+			<!-- 演示用例 1：基础单图预览 -->
+			<view class="demo-item">
+				<text class="demo-title">1. 基础单图预览</text>
+				<view class="demo-content">
+					<ste-image :src="imgUrl1" :width="240" :height="160" :radius="16" @click="onPreviewSingle" />
+				</view>
+				<view class="demo-result">
+					<text class="demo-result-text">💡 点击图片查看全屏效果，底部显示 1/1 页码</text>
+				</view>
+			</view>
+
+			<!-- 演示用例 2：多图轮播与定位 -->
+			<view class="demo-item">
+				<text class="demo-title">2. 多图轮播预览 (点击指定图片开始)</text>
+				<view class="demo-content">
+					<view class="thumb-row">
+						<view v-for="(url, index) in imgList" :key="index" class="thumb-box" @click="onPreviewMulti(index)">
+							<ste-image :src="url" :width="130" :height="130" :radius="12" />
+							<text class="thumb-tag">图 {{ index + 1 }}</text>
+						</view>
+					</view>
+				</view>
+				<view class="demo-result">
+					<text class="demo-result-text">💡 点击第 N 张图片即可直接定位到该图片开始全屏轮播</text>
+				</view>
+			</view>
+
+			<!-- 演示用例 3：双指定点缩放与拖拽漫游 -->
+			<view class="demo-item">
+				<text class="demo-title">3. 双指定点缩放与单指拖拽漫游</text>
+				<view class="demo-content">
+					<ste-image :src="imgUrl2" :width="240" :height="160" :radius="16" @click="onPreviewScale" />
+				</view>
+				<view class="demo-result">
+					<text class="demo-result-text">💡 开启 scale 属性：支持零漂移双指定点缩放、放大下单指拖拽漫游；双击可秒级定点放大或复位。</text>
+				</view>
+			</view>
+
+			<!-- 演示用例 4：底部自定义操作插槽 -->
+			<view class="demo-item">
+				<text class="demo-title">4. 自定义底部操作插槽 (Slot)</text>
+				<view class="demo-content">
+					<ste-image :src="imgUrl3" :width="240" :height="160" :radius="16" @click="onPreviewSlot" />
+				</view>
+				<view class="demo-result">
+					<text class="demo-result-text">💡 可以在全屏预览层底部注入自定义点赞、收藏、下载等操作按钮。</text>
+				</view>
+			</view>
+
+			<!-- 演示用例 5：事件监听与回调 -->
+			<view class="demo-item">
+				<text class="demo-title">5. 轮播切换与长按事件回调</text>
+				<view class="demo-content">
+					<ste-image :src="imgUrl1" :width="240" :height="160" :radius="16" @click="onPreviewEvent" />
+				</view>
+				<view class="demo-result">
+					<text class="demo-result-text">当前激活项下标：{{ currentActiveIndex }} (第 {{ currentActiveIndex + 1 }} 项)</text>
+					<text class="demo-result-text">已触发切换次数：{{ changeCount }} 次</text>
+					<text class="demo-result-text">最新长按项下标：{{ lastLongpressIndex }} (第 {{ lastLongpressIndex + 1 }} 项)</text>
+				</view>
+			</view>
+		</scroll-view>
+
+		<!-- 媒体预览核心组件实例 (独立于 scroll-view 外层，彻底杜绝滚动及 padding 坐标系污染) -->
+		<ste-media-preview
+			:show="showPreview"
+			:urls="previewUrls"
+			:index="previewIndex"
+			:scale="enableScale"
+			:showIndex="true"
+			@close="onClose"
+			@change="onChange"
+			@longpress="onLongpress"
+		>
+			<!-- 底部自定义插槽内容 -->
+			<view v-if="enableCustomSlot" class="custom-slot-box">
+				<view class="slot-btn" @click="onSlotAction('收藏')">
+					<text class="slot-btn-text">⭐️ 收藏图片</text>
+				</view>
+				<view class="slot-btn primary" @click="onSlotAction('保存')">
+					<text class="slot-btn-text">⬇️ 保存原图</text>
+				</view>
+			</view>
+		</ste-media-preview>
+	</view>
+</template>
+
+<script setup lang="uts">
+	/**
+	 * @file media-preview.uvue
+	 * @description MediaPreview 媒体预览交互式 Demo 页面
+	 */
+
+	import { ref } from 'vue'
+
+	defineOptions({ name: 'demo-media-preview' })
+
+	// 官方国内高速 CDN 静态图片资源（秒级秒开，彻底消除境外 picsum.photos 网络超时白屏缺陷）
+	const imgUrl1 = 'https://image.whzb.com/chain/StellarUI/image/banner1.png'
+	const imgUrl2 = 'https://image.whzb.com/chain/StellarUI/image/banner2.png'
+	const imgUrl3 = 'https://image.whzb.com/chain/StellarUI/bg4.jpg'
+
+	const imgList = ref<string[]>([
+		'https://image.whzb.com/chain/StellarUI/image/img1.jpg',
+		'https://image.whzb.com/chain/StellarUI/image/img2.jfif',
+		'https://image.whzb.com/chain/StellarUI/image/img3.jpg',
+		'https://image.whzb.com/chain/StellarUI/image/img4.jpg',
+	])
+
+	// 预览组件响应式控制参数
+	const showPreview = ref<boolean>(false)
+	const previewUrls = ref<string[]>([])
+	const previewIndex = ref<number | null>(null)
+	const enableScale = ref<boolean>(false)
+	const enableCustomSlot = ref<boolean>(false)
+
+	// 事件监听与状态展示
+	const currentActiveIndex = ref<number>(0)
+	const changeCount = ref<number>(0)
+	const lastLongpressIndex = ref<number>(0)
+
+	/** 1. 基础单图预览 */
+	function onPreviewSingle() {
+		previewUrls.value = [imgUrl1]
+		previewIndex.value = 0
+		enableScale.value = false
+		enableCustomSlot.value = false
+		currentActiveIndex.value = 0
+		showPreview.value = true
+	}
+
+	/** 2. 多图指定位置轮播预览 */
+	function onPreviewMulti(index : number) {
+		previewUrls.value = imgList.value
+		previewIndex.value = index
+		enableScale.value = false
+		enableCustomSlot.value = false
+		currentActiveIndex.value = index
+		showPreview.value = true
+	}
+
+	/** 3. 启用双指手势定点缩放与拖拽 */
+	function onPreviewScale() {
+		previewUrls.value = [imgUrl2]
+		previewIndex.value = 0
+		enableScale.value = true
+		enableCustomSlot.value = false
+		currentActiveIndex.value = 0
+		showPreview.value = true
+	}
+
+	/** 4. 底部自定义插槽功能 */
+	function onPreviewSlot() {
+		previewUrls.value = [imgUrl3]
+		previewIndex.value = 0
+		enableScale.value = false
+		enableCustomSlot.value = true
+		currentActiveIndex.value = 0
+		showPreview.value = true
+	}
+
+	/** 5. 事件回调监听 */
+	function onPreviewEvent() {
+		previewUrls.value = imgList.value
+		previewIndex.value = 0
+		enableScale.value = false
+		enableCustomSlot.value = false
+		currentActiveIndex.value = 0
+		changeCount.value = 0
+		lastLongpressIndex.value = 0
+		showPreview.value = true
+	}
+
+	/** 关闭浮层回调 */
+	function onClose() {
+		showPreview.value = false
+	}
+
+	/** 轮播切换回调 */
+	function onChange(index : number) {
+		currentActiveIndex.value = index
+		changeCount.value++
+		uni.showToast({
+			title : '切换至第 ' + (index + 1) + ' 项 (下标: ' + index + ')',
+			icon : 'none',
+		})
+	}
+
+	/** 长按图片回调 */
+	function onLongpress(index : number) {
+		lastLongpressIndex.value = index
+		uni.showToast({
+			title : '长按了第 ' + (index + 1) + ' 张图片 (下标: ' + index + ')',
+			icon : 'none',
+		})
+	}
+
+	/** 自定义插槽操作按钮点击 */
+	function onSlotAction(actionName : string) {
+		uni.showToast({
+			title : '已点击：' + actionName,
+			icon : 'none',
+		})
+	}
+</script>
+
+<style>
+	.demo-page-root {
+		flex: 1;
+		width: 100%;
+		height: 100%;
+		position: relative;
+	}
+
+	.page {
+		padding: 24rpx;
+		background-color: #f7f8fa;
+		flex: 1;
+		width: 100%;
+		height: 100%;
+	}
+
+	.header {
+		padding: 20rpx 8rpx 30rpx 8rpx;
+	}
+
+	.title {
+		font-size: 38rpx;
+		font-weight: bold;
+		color: #1f2329;
+	}
+
+	.desc {
+		font-size: 26rpx;
+		color: #8f959e;
+		margin-top: 12rpx;
+		line-height: 38rpx;
+	}
+
+	.demo-item {
+		background-color: #ffffff;
+		border-radius: 20rpx;
+		margin-bottom: 24rpx;
+		padding: 28rpx;
+	}
+
+	.demo-title {
+		font-size: 30rpx;
+		font-weight: bold;
+		color: #1f2329;
+		margin-bottom: 24rpx;
+	}
+
+	.demo-content {
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
+		align-items: center;
+		padding-top: 10rpx;
+		padding-bottom: 10rpx;
+	}
+
+	.thumb-row {
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
+		justify-content: space-between;
+		width: 100%;
+	}
+
+	.thumb-box {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		margin-bottom: 12rpx;
+	}
+
+	.thumb-tag {
+		font-size: 22rpx;
+		color: #646a73;
+		margin-top: 8rpx;
+	}
+
+	.demo-result {
+		margin-top: 20rpx;
+		padding: 16rpx 20rpx;
+		background-color: #f5f6f7;
+		border-radius: 12rpx;
+	}
+
+	.demo-result-text {
+		font-size: 24rpx;
+		color: #646a73;
+		line-height: 36rpx;
+	}
+
+	/* 自定义插槽按钮样式 */
+	.custom-slot-box {
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.slot-btn {
+		background-color: rgba(255, 255, 255, 0.25);
+		border-radius: 40rpx;
+		padding-left: 28rpx;
+		padding-right: 28rpx;
+		padding-top: 14rpx;
+		padding-bottom: 14rpx;
+		margin-left: 12rpx;
+		margin-right: 12rpx;
+	}
+
+	.slot-btn.primary {
+		background-color: #0090ff;
+	}
+
+	.slot-btn-text {
+		color: #ffffff;
+		font-size: 24rpx;
+		font-weight: 500;
+	}
+</style>

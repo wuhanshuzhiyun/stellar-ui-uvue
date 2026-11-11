@@ -1,0 +1,59 @@
+{
+    "name": "stellar-ui-uvue",
+    "version": "1.1.0",
+    "description": "基于 uni-app x (UTS/UVUE) 构建的跨端组件库，仅支持 uni-app x 原生架构，提供 90+ 高质量移动端组件。",
+    "author": "",
+    "license": "MIT",
+    "main": "./main.uts",
+    "keywords": [
+        "uni-app",
+        "uniappx",
+        "uts",
+        "uvue",
+        "组件库",
+        "StellarUI"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/wuhanshuzhiyun/stellar-ui-uvue.git"
+    },
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "module": "./main.uts",
+    "types": "./main.d.ts",
+    "exports": {
+        ".": {
+            "types": "./main.d.ts",
+            "default": "./main.uts"
+        },
+        "./components": "./index.ts",
+        "./components/*": "./components/*",
+        "./charts/*": "./Charts/*",
+        "./Charts/*": "./Charts/*",
+        "./types/refComponents": "./types/refComponents.d.ts",
+        "./types/index": "./types/index.uts",
+        "./types/*": "./types/*",
+        "./utils/utils": "./utils/utils.uts",
+        "./utils/*": "./utils/*",
+        "./config": "./config/index.uts",
+        "./config/*": "./config/*",
+        "./store": "./store/index.uts",
+        "./store/*": "./store/*",
+        "./package.json": "./package.json",
+        "./README.md": "./README.md"
+    },
+    "files": [
+        "main.uts",
+        "main.d.ts",
+        "index.ts",
+        "README.md",
+        "components/",
+        "Charts/",
+        "config/",
+        "store/",
+        "types/",
+        "utils/",
+        "static/app_update_img.png"
+    ]
+}

@@ -1,0 +1,125 @@
+{
+    "name": "ste-swipe-action-group",
+    "description": "滑动单元格组容器组件，统一管理子单元格的滑动行为与自动互斥关闭。",
+    "tutorial": "https://stellar-ui.intecloud.com.cn/?projectName=stellar-ui-uvue&menu=%E7%BB%84%E4%BB%B6&active=ste-swipe-action",
+    "attributes": [
+        {
+            "name": "mode",
+            "description": "统一设置组内单元格模式",
+            "type": "string",
+            "default": "right",
+            "values": [
+                {
+                    "name": "right",
+                    "description": "右滑"
+                },
+                {
+                    "name": "left",
+                    "description": "左滑"
+                },
+                {
+                    "name": "all",
+                    "description": "左右滑"
+                }
+            ]
+        },
+        {
+            "name": "autoClose",
+            "description": "打开时是否自动关闭组内其他单元格",
+            "type": "boolean",
+            "default": true
+        },
+        {
+            "name": "disabled",
+            "description": "统一禁用组内单元格",
+            "type": "boolean",
+            "default": false
+        },
+        {
+            "name": "swipeThreshold",
+            "description": "灵敏度（0-1之间的小数，数值越小灵敏度越高）",
+            "type": "number",
+            "default": 0.35
+        },
+        {
+            "name": "duration",
+            "description": "动画时长，单位ms",
+            "type": "number | string",
+            "default": 300
+        },
+        {
+            "name": "leftIcon",
+            "description": "是否显示左侧图标",
+            "type": "boolean",
+            "default": false
+        },
+        {
+            "name": "rightIcon",
+            "description": "是否显示右侧图标",
+            "type": "boolean",
+            "default": false
+        },
+        {
+            "name": "rootStyle",
+            "description": "根节点自定义样式",
+            "type": "object",
+            "default": {}
+        },
+        {
+            "name": "[event]open",
+            "description": "打开滑块时触发，参数为方向与下标",
+            "params": [
+                {
+                    "name": "direction",
+                    "description": "方向（值为left或right）"
+                },
+                {
+                    "name": "index",
+                    "description": "当前单元格索引"
+                }
+            ]
+        },
+        {
+            "name": "[event]close",
+            "description": "关闭滑块时触发",
+            "params": [
+                {
+                    "name": "index",
+                    "description": "当前单元格索引"
+                }
+            ]
+        },
+        {
+            "name": "[method]open",
+            "description": "打开指定单元格",
+            "params": [
+                {
+                    "name": "direction",
+                    "description": "left / right：打开的方向"
+                },
+                {
+                    "name": "index",
+                    "description": "需要打开的单元格下标"
+                }
+            ]
+        },
+        {
+            "name": "[method]close",
+            "description": "关闭指定单元格",
+            "params": [
+                {
+                    "name": "index",
+                    "description": "需要关闭的单元格下标"
+                }
+            ]
+        },
+        {
+            "name": "[method]closeAll",
+            "description": "关闭所有已打开的单元格"
+        },
+        {
+            "name": "[slot]default",
+            "description": "默认插槽，用于承载 ste-swipe-action 单元格列表"
+        }
+    ]
+}

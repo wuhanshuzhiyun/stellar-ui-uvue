@@ -1,0 +1,312 @@
+<template>
+	<view class="page-root">
+		<scroll-view :scroll-y="!scrollDisabled" class="page-scroll">
+			<view class="header">
+				<text class="title">Slider 滑块</text>
+				<text class="desc">在一组范围内滑动选择值</text>
+			</view>
+
+			<!-- 基础用法 -->
+			<view class="demo-item">
+				<text class="demo-item-title">基础用法</text>
+				<ste-slider :value="value1" @change="onValue1Change"></ste-slider>
+				<text class="result">当前值: {{ value1 }}</text>
+			</view>
+
+			<!-- 滑块条高度 & 滑块大小 -->
+			<view class="demo-item">
+				<text class="demo-item-title">滑块条高度 & 滑块大小</text>
+				<text class="demo-desc">barHeight=26</text>
+				<ste-slider :value="value2" :barHeight="26" @change="onValue2Change"></ste-slider>
+				<text class="result">当前值: {{ value2 }}</text>
+				<text class="demo-desc">buttonSize=50</text>
+				<ste-slider :value="value3" :buttonSize="50" @change="onValue3Change"></ste-slider>
+				<text class="result">当前值: {{ value3 }}</text>
+			</view>
+
+			<!-- 进度条颜色 -->
+			<view class="demo-item">
+				<text class="demo-item-title">进度条颜色</text>
+				<ste-slider :value="value4" activeColor="#ff0000" inactiveColor="#a9ee13" @change="onValue4Change"></ste-slider>
+				<text class="result">当前值: {{ value4 }}</text>
+			</view>
+
+			<!-- 范围选择 -->
+			<view class="demo-item">
+				<text class="demo-item-title">范围选择</text>
+				<ste-slider range :rangeStart="rangeStart1" :rangeEnd="rangeEnd1" @input="onRange1Input" @change="onRange1Change"></ste-slider>
+				<text class="result">范围: {{ rangeStart1 }} ~ {{ rangeEnd1 }}</text>
+			</view>
+
+			<!-- 竖向 -->
+			<view class="demo-item">
+				<text class="demo-item-title">竖向</text>
+				<view class="vertical-container">
+					<ste-slider :value="value5" vertical verticalHeight="400rpx" @change="onValue5Change" @dragStart="dragDisableScroll" @dragEnd="dragEnableScroll"></ste-slider>
+					<ste-slider :value="value6" vertical verticalHeight="400rpx" :range="true" :rangeStart="rangeStart2" :rangeEnd="rangeEnd2" @change="onRange2Change" @dragStart="dragDisableScroll" @dragEnd="dragEnableScroll"></ste-slider>
+				</view>
+				<text class="result">单值: {{ value5 }} | 范围: {{ rangeStart2 }} ~ {{ rangeEnd2 }}</text>
+			</view>
+
+			<!-- 禁用 -->
+			<view class="demo-item">
+				<text class="demo-item-title">禁用</text>
+				<ste-slider :value="30" disabled></ste-slider>
+			</view>
+
+			<!-- 只读 -->
+			<view class="demo-item">
+				<text class="demo-item-title">只读</text>
+				<ste-slider :value="50" readonly></ste-slider>
+			</view>
+
+			<!-- 间断点 -->
+			<view class="demo-item">
+				<text class="demo-item-title">间断点</text>
+				<ste-slider :value="value7" :step="10" showStops @change="onValue7Change"></ste-slider>
+				<text class="result">当前值: {{ value7 }}</text>
+			</view>
+
+			<!-- 标记 -->
+			<view class="demo-item">
+				<text class="demo-item-title">自定义标记</text>
+				<ste-slider :value="value8" :step="10" showStops :marks="marks1" @change="onValue8Change"></ste-slider>
+				<text class="result">当前值: {{ value8 }}</text>
+			</view>
+
+			<!-- 自定义滑块 -->
+			<view class="demo-item">
+				<text class="demo-item-title">自定义滑块</text>
+				<ste-slider :value="value9" activeColor="#ff0000" @change="onValue9Change">
+					<view slot="button" class="custom-slider-btn">
+						<text class="custom-slider-text">{{ value9 }}</text>
+					</view>
+				</ste-slider>
+				<text class="result">当前值: {{ value9 }}</text>
+			</view>
+
+			<!-- 回调事件 -->
+			<view class="demo-item">
+				<text class="demo-item-title">回调事件</text>
+				<ste-slider :value="value10" @input="onInput10" @change="onChange10" @dragStart="onDragStart10" @dragEnd="onDragEnd10"></ste-slider>
+				<text class="result">当前值: {{ value10 }}</text>
+				<text class="result">input: {{ inputCount10 }} | change: {{ changeCount10 }} | dragStart: {{ dragStartCount10 }} | dragEnd: {{ dragEndCount10 }}</text>
+			</view>
+		</scroll-view>
+	</view>
+</template>
+
+<script setup lang="uts">
+	import { ref } from 'vue'
+
+	defineOptions({ name: 'demo-slider' })
+
+	// 控制 scroll-view 滚动状态（竖向拖动时禁用滚动）
+	const scrollDisabled = ref<boolean>(false)
+	function dragDisableScroll(e : any) {
+		scrollDisabled.value = true
+	}
+	function dragEnableScroll(e : any) {
+		scrollDisabled.value = false
+	}
+
+	// 基础用法
+	const value1 = ref<number>(30)
+	function onValue1Change(val : any) {
+		if (val != null) {
+			value1.value = val as number
+		}
+	}
+
+	// 滑块条高度
+	const value2 = ref<number>(40)
+	function onValue2Change(val : any) {
+		if (val != null) {
+			value2.value = val as number
+		}
+	}
+
+	// 滑块大小
+	const value3 = ref<number>(50)
+	function onValue3Change(val : any) {
+		if (val != null) {
+			value3.value = val as number
+		}
+	}
+
+	// 颜色
+	const value4 = ref<number>(30)
+	function onValue4Change(val : any) {
+		if (val != null) {
+			value4.value = val as number
+		}
+	}
+
+	// 范围选择
+	const rangeStart1 = ref<number>(10)
+	const rangeEnd1 = ref<number>(60)
+	function onRange1Input(val : any) {
+		// input 事件在拖动时触发
+	}
+	function onRange1Change(val : any) {
+		if (val != null && typeof val === 'object') {
+			const arr = val as any[]
+			if (arr.length >= 2) {
+				rangeStart1.value = arr[0] as number
+				rangeEnd1.value = arr[1] as number
+			}
+		}
+	}
+
+	// 竖向
+	const value5 = ref<number>(40)
+	const value6 = ref<number>(0)
+	function onValue5Change(val : any) {
+		if (val != null) {
+			value5.value = val as number
+		}
+	}
+
+	const rangeStart2 = ref<number>(20)
+	const rangeEnd2 = ref<number>(70)
+	function onRange2Change(val : any) {
+		if (val != null && typeof val === 'object') {
+			const arr = val as any[]
+			if (arr.length >= 2) {
+				rangeStart2.value = arr[0] as number
+				rangeEnd2.value = arr[1] as number
+			}
+		}
+	}
+
+	// 间断点
+	const value7 = ref<number>(30)
+	function onValue7Change(val : any) {
+		if (val != null) {
+			value7.value = val as number
+		}
+	}
+
+	// 标记
+	const value8 = ref<number>(30)
+	const marks1 = ref({
+		'0': '0',
+		'25': '25',
+		'50': '50',
+		'75': '75',
+		'100': '100',
+	} as UTSJSONObject)
+	function onValue8Change(val : any) {
+		if (val != null) {
+			value8.value = val as number
+		}
+	}
+
+	// 自定义滑块
+	const value9 = ref<number>(35)
+	function onValue9Change(val : any) {
+		if (val != null) {
+			value9.value = val as number
+		}
+	}
+
+	// 回调事件
+	const value10 = ref<number>(20)
+	const inputCount10 = ref<number>(0)
+	const changeCount10 = ref<number>(0)
+	const dragStartCount10 = ref<number>(0)
+	const dragEndCount10 = ref<number>(0)
+
+	function onInput10(val : any) {
+		inputCount10.value = inputCount10.value + 1
+		if (val != null) {
+			value10.value = val as number
+		}
+	}
+	function onChange10(val : any) {
+		changeCount10.value = changeCount10.value + 1
+	}
+	function onDragStart10(e : any) {
+		dragStartCount10.value = dragStartCount10.value + 1
+	}
+	function onDragEnd10(e : any) {
+		dragEndCount10.value = dragEndCount10.value + 1
+	}
+</script>
+
+<style>
+	.page-root {
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+	}
+
+	.page-scroll {
+		flex: 1;
+		padding: 20rpx;
+	}
+
+	.header {
+		margin-bottom: 30rpx;
+	}
+
+	.title {
+		font-size: 36rpx;
+		font-weight: bold;
+	}
+
+	.desc {
+		font-size: 24rpx;
+		color: #969799;
+		margin-top: 8rpx;
+	}
+
+	.demo-item {
+		margin-bottom: 30rpx;
+		padding: 20rpx;
+		background-color: #ffffff;
+		border-radius: 12rpx;
+		flex-direction: column;
+	}
+
+	.demo-item-title {
+		font-size: 28rpx;
+		font-weight: bold;
+		margin-bottom: 16rpx;
+		color: #333333;
+	}
+
+	.demo-desc {
+		font-size: 24rpx;
+		color: #969799;
+		margin-bottom: 8rpx;
+	}
+
+	.result {
+		font-size: 24rpx;
+		color: #999999;
+		margin-top: 8rpx;
+	}
+
+	.vertical-container {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		height: 400rpx;
+		justify-content: center;
+	}
+
+	.custom-slider-btn {
+		background-color: #ff0000;
+		border-radius: 20rpx;
+		padding-left: 16rpx;
+		padding-right: 16rpx;
+		padding-top: 4rpx;
+		padding-bottom: 4rpx;
+	}
+
+	.custom-slider-text {
+		color: #ffffff;
+		font-size: 24rpx;
+	}
+</style>

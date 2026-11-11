@@ -1,0 +1,253 @@
+<template>
+	<scroll-view scroll-y="true" class="page-root">
+		<!-- 顶部导航标题区 -->
+		<view class="demo-header">
+			<text class="demo-title">FunctionList 功能列表</text>
+			<text class="demo-subtitle">用于横向横滑展示业务卡片、配图、副标题胶囊与操作按钮，支持单条全宽与多条横滑形态</text>
+		</view>
+
+		<!-- 示例 1：基础用法 (单条数据) -->
+		<view class="demo-card">
+			<text class="card-title">1. 基础用法 (单条卡片全宽铺满)</text>
+			<text class="card-desc">单条数据时自适应撑满卡片宽度，展示配图、状态与操作按钮</text>
+			<view class="card-content">
+				<ste-function-list
+					title="今日餐食"
+					subhead="食刻准备 到点开吃"
+					:data="singleData"
+					buttonText="核销"
+					buttonIcon="&#xe693;"
+					@click-header="onHeaderClick"
+					@click-item="onItemClick"
+				/>
+			</view>
+		</view>
+
+		<!-- 示例 2：多项横滑功能列表 -->
+		<view class="demo-card">
+			<text class="card-title">2. 多条数据横滑联动</text>
+			<text class="card-desc">多项数据支持横向丝滑滑动，卡片按规范宽度自动露出一截下一项</text>
+			<view class="card-content">
+				<ste-function-list
+					title="待办任务"
+					subhead="今日待跟进"
+					:data="multipleData"
+					buttonText="去办理"
+					buttonIcon="&#xe674;"
+					@click-item="onItemClick"
+				/>
+			</view>
+		</view>
+
+		<!-- 示例 3：自定义每项按钮配色与插槽定制 -->
+		<view class="demo-card">
+			<text class="card-title">3. 单项个性化按钮与插槽</text>
+			<text class="card-desc">不同数据项可自定义独立的按钮文案、背景色与副标题插槽</text>
+			<view class="card-content">
+				<ste-function-list
+					title="会员专属特权"
+					:data="customButtonData"
+					@click-item="onItemClick"
+				>
+					<template #subhead>
+						<view class="vip-badge">
+							<text class="vip-badge-text">VIP 权益</text>
+						</view>
+					</template>
+				</ste-function-list>
+			</view>
+		</view>
+
+		<!-- 示例 4：空数据状态占位 -->
+		<view class="demo-card">
+			<text class="card-title">4. 空数据状态占位</text>
+			<text class="card-desc">列表无数据时展示专属空状态图标、提示说明与引导操作按钮</text>
+			<view class="card-content">
+				<ste-function-list
+					title="下午茶预订"
+					subhead="美味不打烊"
+					:data="emptyDataList"
+					emptyImage="https://image.whzb.com/chain/StellarUI/bg1.jpg"
+					emptyText="暂无下午茶餐券，去商城逛逛吧~"
+					emptyButtonText="去选购"
+					@click-empty="onEmptyClick"
+				/>
+			</view>
+		</view>
+	</scroll-view>
+</template>
+
+<script setup lang="uts">
+/**
+ * @file function-list.uvue
+ * @description ste-function-list 功能列表 原生演示页面
+ */
+import { FunctionListItem } from '@/uni_modules/stellar-ui-uvue/components/ste-function-list/constants.uts';
+
+/** 示例 1：单条点餐核销卡片 */
+const singleData = ref<FunctionListItem[]>([
+	{
+		title: '早餐 · 梅姨家常菜',
+		subhead: '红烧牛肉面、海盐芝士燕麦奶、黑胡椒煎鸡蛋',
+		statusText: '当前不可取消',
+		image: 'https://image.whzb.com/chain/StellarUI/image/img1.jpg',
+		buttonText: '核销'
+	}
+]);
+
+/** 示例 2：多条待办任务横滑 */
+const multipleData = ref<FunctionListItem[]>([
+	{
+		title: '午餐 · 谷田稻香精品便当',
+		subhead: '五常大米饭、秘制红烧肉、蒜蓉油麦菜',
+		statusText: '12:00 准时送达',
+		image: 'https://image.whzb.com/chain/StellarUI/image/img2.jfif',
+		buttonText: '查看详情'
+	},
+	{
+		title: '下午茶 · 星巴克特调拿铁',
+		subhead: '大杯热拿铁 + 经典提拉米苏蛋糕',
+		statusText: '备餐制作中',
+		image: 'https://image.whzb.com/chain/StellarUI/image/img3.jpg',
+		buttonText: '取餐码'
+	},
+	{
+		title: '晚餐 · 轻食低卡鸡胸肉沙拉',
+		subhead: '香煎鸡胸肉、牛油果、紫甘蓝、油醋汁',
+		statusText: '预约 18:30 配送',
+		image: 'https://image.whzb.com/chain/StellarUI/image/img4.jpg',
+		buttonText: '修改时间'
+	}
+]);
+
+/** 示例 3：单项自定义按钮与配色 */
+const customButtonData = ref<FunctionListItem[]>([
+	{
+		title: '尊享洗车服务券',
+		subhead: '全国 500+ 网点标准精洗',
+		statusText: '本月剩余 2 次',
+		image: 'https://image.whzb.com/chain/StellarUI/image/banner1.png',
+		buttonText: '立即预约',
+		buttonBg: '#0275ff',
+		buttonColor: '#ffffff'
+	},
+	{
+		title: '机场贵宾厅服务',
+		subhead: '安检快捷通道与静音休息室',
+		statusText: '全年无限次',
+		image: 'https://image.whzb.com/chain/StellarUI/image/banner2.png',
+		buttonText: '生成凭证',
+		buttonBg: '#00b578',
+		buttonColor: '#ffffff'
+	},
+	{
+		title: '免费道路紧急救援',
+		subhead: '搭电、换胎、100公里拖车',
+		statusText: '24小时守护',
+		image: 'https://image.whzb.com/chain/StellarUI/image/img5.jfif',
+		buttonText: '一键呼叫',
+		buttonBg: '#fa8c16',
+		buttonColor: '#ffffff'
+	}
+]);
+
+/** 示例 4：空列表数据 */
+const emptyDataList = ref<FunctionListItem[]>([]);
+
+/** 头部点击回调 */
+function onHeaderClick(type : string) {
+	uni.showToast({
+		title: `点击了头部: ${type}`,
+		icon: 'none'
+	});
+}
+
+/** 项点击回调 */
+function onItemClick(type : string, item : FunctionListItem) {
+	uni.showToast({
+		title: `点击了[${type}]: ${item.title}`,
+		icon: 'none'
+	});
+}
+
+/** 空状态点击回调 */
+function onEmptyClick(type : string) {
+	uni.showToast({
+		title: `点击了空状态: ${type}`,
+		icon: 'none'
+	});
+}
+</script>
+
+<style lang="scss" scoped>
+.page-root {
+	flex: 1;
+	background-color: #f7f8fa;
+	padding: 24rpx;
+}
+
+.demo-header {
+	margin-bottom: 24rpx;
+
+	.demo-title {
+		font-size: 38rpx;
+		font-weight: bold;
+		color: #1a1a1a;
+	}
+
+	.demo-subtitle {
+		margin-top: 8rpx;
+		font-size: 24rpx;
+		color: #8a8a8a;
+		line-height: 36rpx;
+	}
+}
+
+.demo-card {
+	background-color: #ffffff;
+	border-radius: 16rpx;
+	padding: 24rpx;
+	margin-bottom: 24rpx;
+
+	.card-title {
+		font-size: 30rpx;
+		font-weight: 600;
+		color: #333333;
+		margin-bottom: 6rpx;
+	}
+
+	.card-desc {
+		font-size: 24rpx;
+		color: #999999;
+		margin-bottom: 20rpx;
+		line-height: 34rpx;
+	}
+
+	.card-content {
+		display: flex;
+		flex-direction: column;
+		background-color: #f2f3f5;
+		padding: 20rpx;
+		border-radius: 12rpx;
+	}
+}
+
+.vip-badge {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	height: 44rpx;
+	background-color: #f9f0ff;
+	border-radius: 22rpx;
+	padding-left: 14rpx;
+	padding-right: 14rpx;
+	margin-left: 18rpx;
+
+	.vip-badge-text {
+		font-size: 24rpx;
+		color: #722ed1;
+		line-height: 44rpx;
+		font-weight: 500;
+	}
+}
+</style>

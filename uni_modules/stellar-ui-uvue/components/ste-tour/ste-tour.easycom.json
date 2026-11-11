@@ -1,0 +1,154 @@
+{
+    "name": "ste-tour",
+    "description": "Tour 指引组件，用于在页面中分步聚焦高亮特定功能区域，向用户展示操作指引与气泡卡片。(UTS/UVUE)。",
+    "example": "<ste-tour v-model:show=\"show\" :steps=\"steps\"></ste-tour>",
+    "tutorial": "https://stellar-ui.intecloud.com.cn/?projectName=stellar-ui-uvue&menu=%E7%BB%84%E4%BB%B6&active=ste-tour",
+    "attributes": [
+        {
+            "name": "show",
+            "description": "是否显示指引，支持 v-model:show 双向绑定",
+            "type": "boolean",
+            "default": false
+        },
+        {
+            "name": "current",
+            "description": "当前步骤索引（从 0 开始），支持 v-model:current 双向绑定",
+            "type": "number",
+            "default": 0
+        },
+        {
+            "name": "steps",
+            "description": "步骤配置列表，每项包含 message、target、title、position 等，类型为强类型 TourStep[]；target 属性为目标节点 ID（无需带 # 号）",
+            "type": "TourStep[]",
+            "default": []
+        },
+        {
+            "name": "offset",
+            "description": "气泡位置偏移量，格式为：[x, y]，单位 px",
+            "type": "number[]",
+            "default": [
+                0,
+                0
+            ]
+        },
+        {
+            "name": "showTitleBar",
+            "description": "是否显示顶部标题栏及关闭按钮",
+            "type": "boolean",
+            "default": false
+        },
+        {
+            "name": "showFooter",
+            "description": "是否显示底部按钮栏（仅多步骤时生效）",
+            "type": "boolean",
+            "default": true
+        },
+        {
+            "name": "mask",
+            "description": "是否显示暗色背景遮罩层",
+            "type": "boolean",
+            "default": true
+        },
+        {
+            "name": "maskClose",
+            "description": "是否点击背景遮罩层关闭指引（兼容 maskClose 与 maskColse 历史写法）",
+            "type": "boolean",
+            "default": true
+        },
+        {
+            "name": "showPrevStep",
+            "description": "是否显示上一步按钮",
+            "type": "boolean",
+            "default": true
+        },
+        {
+            "name": "background",
+            "description": "背景遮罩层颜色",
+            "type": "string",
+            "default": "rgba(0,0,0,0.5)"
+        },
+        {
+            "name": "radius",
+            "description": "高亮聚焦框与气泡卡片圆角（rpx 或 px）",
+            "type": "number | string",
+            "default": 18
+        },
+        {
+            "name": "messageBg",
+            "description": "气泡卡片背景色",
+            "type": "string",
+            "default": "#ffffff"
+        },
+        {
+            "name": "messageColor",
+            "description": "气泡卡片文字颜色",
+            "type": "string",
+            "default": "#000000"
+        },
+        {
+            "name": "nextStepTxt",
+            "description": "下一步按钮文字",
+            "type": "string",
+            "default": "下一步"
+        },
+        {
+            "name": "prevStepTxt",
+            "description": "上一步按钮文字",
+            "type": "string",
+            "default": "上一步"
+        },
+        {
+            "name": "completeTxt",
+            "description": "完成按钮文字",
+            "type": "string",
+            "default": "完成"
+        },
+        {
+            "name": "[event]change",
+            "description": "步骤切换时触发",
+            "params": [
+                {
+                    "name": "current",
+                    "type": "number",
+                    "description": "当前步骤索引（从 0 开始）"
+                }
+            ]
+        },
+        {
+            "name": "[event]close",
+            "description": "指引完全关闭时触发"
+        },
+        {
+            "name": "[event]update:show",
+            "description": "show 属性双向绑定更新事件",
+            "params": [
+                {
+                    "name": "show",
+                    "type": "boolean",
+                    "description": "当前显示状态"
+                }
+            ]
+        },
+        {
+            "name": "[event]update:current",
+            "description": "current 属性双向绑定更新事件",
+            "params": [
+                {
+                    "name": "current",
+                    "type": "number",
+                    "description": "当前步骤索引"
+                }
+            ]
+        },
+        {
+            "name": "[slot]default",
+            "description": "气泡描述内容自定义插槽。模板中自定义插槽内容时直接放置自定义节点，若使用作用域参数建议进行类型转换",
+            "params": [
+                {
+                    "name": "item",
+                    "description": "当前步骤数据对象 (TourStep)"
+                }
+            ]
+        }
+    ]
+}

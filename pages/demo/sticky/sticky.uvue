@@ -1,0 +1,144 @@
+<template>
+	<scroll-view scroll-y="true" class="page" @scroll="onScroll">
+		<view class="header">
+			<text class="title">Sticky 吸顶</text>
+			<text class="desc">用于常驻页面顶部的信息、操作展示</text>
+		</view>
+
+		<view class="section">
+			<text class="section-title">基础用法</text>
+			<text class="hint">滚动页面，即可看到下方标题栏目吸顶</text>
+			<ste-sticky
+				:scrollTop="scrollTop"
+				placeholderId="sticky-1"
+				@fixed="onFixed"
+				@unfixed="onUnfixed"
+			>
+				<view class="sticky-title">
+					<text class="sticky-title-text">这是一个吸顶的标题栏目</text>
+				</view>
+			</ste-sticky>
+		</view>
+
+		<view class="content-block">
+			<text class="content-block-text">内容 1</text>
+		</view>
+		<view class="content-block">
+			<text class="content-block-text">内容 2</text>
+		</view>
+		<view class="content-block">
+			<text class="content-block-text">内容 3</text>
+		</view>
+
+		<view class="section">
+			<text class="section-title">自定义偏移</text>
+			<text class="hint">offsetTop=40，吸顶位置距离顶部 40px</text>
+			<ste-sticky
+				:scrollTop="scrollTop"
+				:offsetTop="40"
+				placeholderId="sticky-2"
+			>
+				<view class="sticky-title sticky-title-custom">
+					<text class="sticky-title-text">自定义偏移的吸顶栏目</text>
+				</view>
+			</ste-sticky>
+		</view>
+
+		<view class="content-block">
+			<text class="content-block-text">内容 4</text>
+		</view>
+		<view class="content-block">
+			<text class="content-block-text">内容 5</text>
+		</view>
+		<view class="content-block">
+			<text class="content-block-text">内容 6</text>
+		</view>
+
+		<view class="content-block">
+			<text class="content-block-text">页面底部</text>
+		</view>
+	</scroll-view>
+</template>
+
+<script setup lang="uts">
+	import { ref } from 'vue'
+
+	// 滚动位置（由 scroll-view @scroll 提供）
+	const scrollTop = ref(0)
+
+	// scroll-view 滚动事件
+	function onScroll(e : UniScrollEvent) {
+		const top = e.detail.scrollTop
+		scrollTop.value = top
+	}
+
+	function onFixed() {
+		console.log('sticky: 触发吸顶')
+	}
+	function onUnfixed() {
+		console.log('sticky: 取消吸顶')
+	}
+</script>
+
+<style>
+	.page {
+		flex: 1;
+		padding: 20rpx;
+	}
+	.header {
+		margin-bottom: 30rpx;
+	}
+	.title {
+		font-size: 36rpx;
+		font-weight: bold;
+	}
+	.desc {
+		font-size: 26rpx;
+		color: #666;
+		margin-top: 10rpx;
+	}
+	.section {
+		margin-bottom: 30rpx;
+	}
+	.section-title {
+		font-size: 28rpx;
+		font-weight: bold;
+		margin-bottom: 10rpx;
+	}
+	.hint {
+		font-size: 24rpx;
+		color: #888;
+		margin-bottom: 20rpx;
+	}
+	.sticky-title {
+		width: 100%;
+		height: 44px;
+		background-color: #4a90e2;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-direction: row;
+	}
+	.sticky-title-custom {
+		background-color: #50c878;
+	}
+	.sticky-title-text {
+		color: #ffffff;
+		font-size: 28rpx;
+	}
+	.content-block {
+		width: 100%;
+		height: 200rpx;
+		background-color: #f5f5f5;
+		margin-bottom: 20rpx;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-direction: row;
+		border-radius: 12rpx;
+	}
+	.content-block-text {
+		color: #333;
+		font-size: 28rpx;
+	}
+</style>

@@ -1,0 +1,280 @@
+<template>
+	<view class="page-root">
+		<scroll-view scroll-y="true" class="page-scroll">
+			<view class="header">
+				<text class="title">AppUpdate APP更新</text>
+				<text class="desc">用于检测应用新版本、展示升级日志与执行 APK 安装</text>
+			</view>
+
+			<!-- 基础用法 -->
+			<view class="demo-item">
+				<text class="demo-item-title">检查更新</text>
+				<text class="demo-desc">配置 ClientId 与密钥，触发版本检测</text>
+				<view class="btn-group">
+					<ste-button @click="checkForUpdates" mode="primary">检查应用更新</ste-button>
+				</view>
+			</view>
+
+			<!-- 版本比对与跳过记录管理 -->
+			<view class="demo-item">
+				<text class="demo-item-title">跳过版本管理</text>
+				<text class="demo-desc">当非强制更新时，用户可点击“跳过此版本”并不再提示</text>
+				<view class="btn-group">
+					<ste-button @click="getSkippedList" mode="default">获取跳过版本列表</ste-button>
+					<view style="height: 16rpx;"></view>
+					<ste-button @click="clearSkipped" mode="warning">清空跳过版本记录</ste-button>
+				</view>
+				<view class="result-box">
+					<text class="result-title">已跳过版本列表:</text>
+					<text class="result-content">{{ skippedListText }}</text>
+				</view>
+			</view>
+
+			<!-- 事件日志输出展示 -->
+			<view class="demo-item">
+				<text class="demo-item-title">运行日志</text>
+				<scroll-view scroll-y="true" class="log-box">
+					<text class="log-item" v-for="(log, idx) in logs" :key="idx">{{ log }}</text>
+					<text class="log-empty" v-if="logs.length == 0">暂无日志</text>
+				</scroll-view>
+				<view style="margin-top: 16rpx;">
+					<ste-button @click="clearLogs" size="small">清空日志</ste-button>
+				</view>
+			</view>
+		</scroll-view>
+
+		<!-- AppUpdate 组件挂载 -->
+		<ste-app-update
+			ref="appUpdateRef"
+			clientId="workbench_android"
+			clientSecret="gkS6lEEncqAocYK2qsrvPQZykm3ISeMx"
+			:strictVersionCheck="true"
+			@update="onUpdateFound"
+			@no-update="onNoUpdate"
+			@skipped="onVersionAlreadySkipped"
+			@cancel="onUpdateCancel"
+			@skip-version="onVersionSkipped"
+			@fallback="onFallbackTriggered"
+		></ste-app-update>
+	</view>
+</template>
+
+<script setup lang="uts">
+/**
+ * @file app-update.uvue
+ * @description ste-app-update 组件 uni-app x 原生交互式 Demo
+ */
+import { ref } from 'vue'
+
+/** 组件实例引用 */
+const appUpdateRef = ref<ComponentPublicInstance | null>(null);
+
+/** 已跳过版本展示文本 */
+const skippedListText = ref('[] 无记录');
+
+/** 事件日志数组 */
+const logs = ref<string[]>([]);
+
+/**
+ * 记录日志
+ */
+function addLog(msg: string) {
+	const now = new Date();
+	const time = now.getHours().toString().padStart(2, '0') + ':' +
+		now.getMinutes().toString().padStart(2, '0') + ':' +
+		now.getSeconds().toString().padStart(2, '0');
+	logs.value.unshift('[' + time + '] ' + msg);
+}
+
+/**
+ * 清空日志
+ */
+function clearLogs() {
+	logs.value = [];
+}
+
+/**
+ * 开始检测版本更新
+ */
+function checkForUpdates() {
+	addLog('触发检查更新 start()...');
+	if (appUpdateRef.value != null) {
+		const comp = appUpdateRef.value!;
+		comp.$callMethod('start', (resVersion: UTSJSONObject, version: string) => {
+			const code = resVersion.getString('code');
+			const name = resVersion.getString('name');
+			addLog('检测回调 -> 本地版本: ' + version + '，服务器版本: ' + (code != null ? code! : '') + ' (v' + (name != null ? name! : '') + ')');
+		});
+	}
+}
+
+/**
+ * 获取已跳过版本列表
+ */
+function getSkippedList() {
+	if (appUpdateRef.value != null) {
+		const comp = appUpdateRef.value!;
+		const res = comp.$callMethod('getSkippedVersions') as string[] | null;
+		if (res != null && res.length > 0) {
+			skippedListText.value = JSON.stringify(res);
+			addLog('获取跳过记录: ' + JSON.stringify(res));
+		} else {
+			skippedListText.value = '[] 暂无跳过版本';
+			addLog('获取跳过记录: 空');
+		}
+	}
+}
+
+/**
+ * 清除已跳过版本记录
+ */
+function clearSkipped() {
+	if (appUpdateRef.value != null) {
+		const comp = appUpdateRef.value!;
+		comp.$callMethod('clearSkippedVersions');
+		skippedListText.value = '[] 已清空';
+		addLog('已清空本地跳过版本记录');
+		uni.showToast({ title: '已清空跳过记录', icon: 'success' });
+	}
+}
+
+/**
+ * 事件监听：发现可用新版本
+ */
+function onUpdateFound() {
+	addLog('事件通知: @update (已弹出更新提示)');
+}
+
+/**
+ * 事件监听：未发现新版本
+ */
+function onNoUpdate() {
+	addLog('事件通知: @no-update (当前已是最新版本)');
+	uni.showToast({ title: '当前已是最新版本', icon: 'none' });
+}
+
+/**
+ * 事件监听：新版本已在跳过记录中
+ */
+function onVersionAlreadySkipped(code: string, name: string) {
+	const verText = name != '' ? 'v' + name : code;
+	addLog('事件通知: @skipped (最新版本 ' + verText + ' 已在跳过列表中，未弹窗)');
+	uni.showToast({ title: '最新版本 (' + verText + ') 已被跳过', icon: 'none' });
+}
+
+/**
+ * 事件监听：用户取消更新
+ */
+function onUpdateCancel() {
+	addLog('事件通知: @cancel (用户关闭了弹窗)');
+}
+
+/**
+ * 事件监听：用户主动跳过此版本
+ */
+function onVersionSkipped(ver: string) {
+	addLog('事件通知: @skip-version (跳过版本: ' + ver + ')');
+	getSkippedList();
+}
+
+/**
+ * 事件监听：命中兜底更新
+ */
+function onFallbackTriggered(fData: UTSJSONObject) {
+	addLog('事件通知: @fallback (命中紧急兜底更新)');
+}
+</script>
+
+<style>
+.page-root {
+	flex: 1;
+	background-color: #f7f8fa;
+}
+
+.page-scroll {
+	flex: 1;
+	padding: 24rpx;
+}
+
+.header {
+	margin-bottom: 32rpx;
+	padding-top: 16rpx;
+}
+
+.title {
+	font-size: 40rpx;
+	font-weight: bold;
+	color: #1f2329;
+}
+
+.desc {
+	font-size: 26rpx;
+	color: #8f959e;
+	margin-top: 8rpx;
+}
+
+.demo-item {
+	background-color: #ffffff;
+	border-radius: 16rpx;
+	padding: 28rpx;
+	margin-bottom: 24rpx;
+}
+
+.demo-item-title {
+	font-size: 32rpx;
+	font-weight: 600;
+	color: #1f2329;
+	margin-bottom: 8rpx;
+}
+
+.demo-desc {
+	font-size: 24rpx;
+	color: #8f959e;
+	margin-bottom: 24rpx;
+}
+
+.btn-group {
+	margin-bottom: 16rpx;
+}
+
+.result-box {
+	background-color: #f7f8fa;
+	border-radius: 12rpx;
+	padding: 16rpx 20rpx;
+	margin-top: 16rpx;
+}
+
+.result-title {
+	font-size: 24rpx;
+	color: #646a73;
+	font-weight: 500;
+	margin-bottom: 6rpx;
+}
+
+.result-content {
+	font-size: 24rpx;
+	color: #1388f7;
+	font-family: monospace;
+}
+
+.log-box {
+	background-color: #1f2329;
+	border-radius: 12rpx;
+	padding: 20rpx;
+	height: 280rpx;
+}
+
+.log-item {
+	font-size: 22rpx;
+	color: #52c41a;
+	font-family: monospace;
+	line-height: 1.6;
+}
+
+.log-empty {
+	font-size: 22rpx;
+	color: #8f959e;
+	text-align: center;
+	margin-top: 60rpx;
+}
+</style>

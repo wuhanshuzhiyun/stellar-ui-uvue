@@ -1,0 +1,80 @@
+{
+    "name": "ste-qrcode",
+    "description": "能够将文本或 URL 转换生成高质量二维码的组件，支持自定义尺寸、前景色/背景色配色以及中心 Logo 图标叠加。",
+    "example": "<ste-qrcode content='https://example.com' :size='200'></ste-qrcode>",
+    "tutorial": "https://stellar-ui.intecloud.com.cn/?projectName=stellar-ui-uvue&menu=%E7%BB%84%E4%BB%B6&active=ste-qrcode",
+    "attributes": [
+        {
+            "name": "content",
+            "description": "二维码内容（如网址或文本）",
+            "type": "String",
+            "default": ""
+        },
+        {
+            "name": "size",
+            "description": "二维码尺寸",
+            "type": "Number|String",
+            "default": 200
+        },
+        {
+            "name": "background",
+            "description": "背景颜色",
+            "type": "String",
+            "default": "#ffffff"
+        },
+        {
+            "name": "foreground",
+            "description": "前景色（线条颜色）",
+            "type": "String",
+            "default": "#000000"
+        },
+        {
+            "name": "foregroundImageSrc",
+            "description": "二维码中心 Logo 图标路径",
+            "type": "String",
+            "default": ""
+        },
+        {
+            "name": "foregroundImageWidth",
+            "description": "Logo 图标宽度，默认取二维码尺寸的四分之一",
+            "type": "Number|String",
+            "default": null
+        },
+        {
+            "name": "foregroundImageHeight",
+            "description": "Logo 图标高度，默认取二维码尺寸的四分之一",
+            "type": "Number|String",
+            "default": null
+        },
+        {
+            "name": "rootStyle",
+            "description": "根节点自定义样式",
+            "type": "Object",
+            "default": {}
+        },
+        {
+            "name": "[event]click",
+            "description": "点击二维码区域触发"
+        },
+        {
+            "name": "[event]success",
+            "description": "二维码绘制成功时触发",
+            "params": [
+                {
+                    "name": "content",
+                    "description": "已绘制的内容"
+                }
+            ]
+        },
+        {
+            "name": "[event]error",
+            "description": "二维码绘制失败时触发",
+            "params": [
+                {
+                    "name": "error",
+                    "description": "错误信息"
+                }
+            ]
+        }
+    ]
+}

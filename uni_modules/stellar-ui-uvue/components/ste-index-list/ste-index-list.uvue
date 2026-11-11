@@ -1,0 +1,612 @@
+<template>
+	<!--
+		ste-index-list 索引列表组件容器
+		模块职责：提供基于锚点的快速索引滚动容器、右侧手势触控字母索引条与当前分组大字气泡提示
+	-->
+	<view class="ste-index-list-root" :style="rootStyle">
+		<!-- 原生纵向滚动容器 -->
+		<scroll-view
+			:id="scrollId"
+			class="ste-index-list-scroll"
+			scroll-y="true"
+			:scroll-into-view="scrollIntoViewId"
+			@scroll="handleScroll"
+		>
+			<view :id="contentId" class="ste-index-list-content">
+				<slot></slot>
+			</view>
+		</scroll-view>
+
+		<!-- 分组标题顶部固定吸顶条（当开启 sticky 且存在激活项时悬浮显示） -->
+		<view
+			v-if="sticky && currentActiveTitle != ''"
+			class="ste-index-list-sticky-bar"
+		>
+			<text class="sticky-bar-text" :style="stickyTextStyle">{{ currentActiveTitle }}</text>
+		</view>
+
+		<!-- 右侧字母手势触控索引条 -->
+		<view
+			:id="barId"
+			class="ste-index-bar"
+			@touchstart.stop="handleTouchStart"
+			@touchmove.stop.prevent="handleTouchMove"
+			@touchend.stop="handleTouchEnd"
+			@touchcancel.stop="handleTouchEnd"
+		>
+			<view
+				v-for="(item, index) in registeredItems"
+				:key="item.id"
+				class="ste-index-bar-item"
+				@click="scrollToIndex(index)"
+			>
+				<text
+					class="index-bar-letter"
+					:style="getLetterStyle(index)"
+				>{{ item.title }}</text>
+			</view>
+		</view>
+
+		<!-- 屏幕中央大字母浮动指示气泡（滑动索引条时即时呈现） -->
+		<view v-if="bubbleVisible" class="ste-index-bubble">
+			<text class="bubble-text">{{ bubbleLetter }}</text>
+		</view>
+	</view>
+</template>
+
+<script setup lang="uts">
+	import { ref, computed, watch, provide, onMounted, onUnmounted, nextTick } from 'vue'
+	import { INDEX_LIST_KEY, IndexListContext, IndexItemRegisterData } from './constants.uts'
+	import { normalizeFontSize } from '../../config/index.uts'
+
+	defineOptions({
+		name: 'ste-index-list',
+		options: {
+			virtualHost: true
+		}
+	})
+
+	/**
+	 * 组件属性契约定义
+	 */
+	type IndexListProps = {
+		/** 当前激活的索引下标 */
+		active ?: number
+		/** 容器高度，支持 rpx、px、% 或数字 */
+		height ?: any
+		/** 是否开启分组标题吸顶效果 */
+		sticky ?: boolean
+		/** 非激活态索引文字颜色 */
+		inactiveColor ?: string
+		/** 激活态索引文字颜色（未设置时默认取蓝色 #1890ff） */
+		activeColor ?: string
+	}
+
+	const props = withDefaults(defineProps<IndexListProps>(), {
+		active: 0,
+		height: '100%',
+		sticky: true,
+		inactiveColor: '#666666',
+		activeColor: '#1890ff'
+	})
+
+	/**
+	 * 事件派发声明
+	 */
+	const emit = defineEmits<{
+		(e : 'change', index : number) : void
+		(e : 'update:active', index : number) : void
+		(e : 'clickItem', title : string, text : string) : void
+	}>()
+
+	/** 内部受控的当前激活索引下标 */
+	const dataActiveIndex = ref(0)
+
+	/** 滚动容器目标锚点 ID */
+	const scrollIntoViewId = ref('')
+
+	/** 已注册的子项数据列表 */
+	const registeredItems = ref<Array<IndexItemRegisterData>>([] as Array<IndexItemRegisterData>)
+
+	/** 大字气泡可见性 */
+	const bubbleVisible = ref(false)
+
+	/** 大字气泡当前显示的字母 */
+	const bubbleLetter = ref('')
+
+	/** 大字气泡关闭定时器 ID */
+	let bubbleTimer : number | null = null
+
+	/**
+	 * 索引条节点唯一 ID
+	 * 原先硬编码为 `ste-index-bar`，同一页面上存在两个索引列表时会同时命中两个节点，
+	 * 测量到的坐标可能来自另一个实例，手势与高亮全部错位。
+	 */
+	const barId = ref<string>('ste-index-bar-' + Math.floor(Math.random() * 1000000).toString())
+
+	/** 滚动视口节点唯一 ID（用于换算最大可滚动距离） */
+	const scrollId = ref<string>('ste-index-scroll-' + Math.floor(Math.random() * 1000000).toString())
+
+	/**
+	 * 内容层节点唯一 ID（偏移基准层）
+	 * 偏移基准必须取内容层 top 而不是首项 top：默认插槽里、第一个 item 之前
+	 * 还可能放其它内容（如搜索框、提示条），此时 scrollTop=0 对应的是内容层顶部，
+	 * 若用首项 top 做基准，各分组的偏移会被系统性算小，滚动高亮整体提前。
+	 */
+	const contentId = ref<string>('ste-index-content-' + Math.floor(Math.random() * 1000000).toString())
+
+	/** 索引条节点测量信息缓存（视口坐标） */
+	let barTop = 0
+	let barHeight = 0
+
+	/** 滚动视口高度与最大可滚动距离缓存 */
+	let scrollViewHeight = 0.0
+	let maxScrollTop = 0.0
+
+	/** 布局刷新防抖定时器 */
+	let refreshTimer : number | null = null
+
+	/** 各分组项顶部偏移距离缓存 */
+	const itemOffsets = ref<Array<number>>([] as Array<number>)
+
+	/** 根容器计算样式 */
+	const rootStyle = computed(() : UTSJSONObject => {
+		const style : UTSJSONObject = {}
+		if (typeof props.height == 'number') {
+			style['height'] = `${props.height}px`
+		} else if (typeof props.height == 'string') {
+			style['height'] = `${props.height}`
+		}
+		return style
+	})
+
+	/** 当前高亮分组的标题文字 */
+	const currentActiveTitle = computed(() : string => {
+		const items = registeredItems.value
+		const idx = dataActiveIndex.value
+		if (idx >= 0 && idx < items.length) {
+			return items[idx].title
+		}
+		return ''
+	})
+
+	/** 吸顶栏文字样式 */
+	const stickyTextStyle = computed(() : UTSJSONObject => {
+		const style : UTSJSONObject = {}
+		if (props.activeColor != '') {
+			style['color'] = props.activeColor
+		}
+		// 字号跟随全局字号设置（吸顶条 72rpx 固定高，1.5× 仍可容纳）
+		style['fontSize'] = normalizeFontSize(28)
+		return style
+	})
+
+	/**
+	 * 获取指定索引字母的样式
+	 * @param index 索引下标
+	 */
+	function getLetterStyle(index : number) : UTSJSONObject {
+		const style : UTSJSONObject = {}
+		if (index == dataActiveIndex.value) {
+			style['color'] = props.activeColor != '' ? props.activeColor : '#1890ff'
+			style['fontWeight'] = 'bold'
+		} else {
+			style['color'] = props.inactiveColor != '' ? props.inactiveColor : '#666666'
+		}
+		return style
+	}
+
+	/**
+	 * 更新指定下标为激活项，并派发双向绑定与 change 事件
+	 * @param index 激活目标下标
+	 */
+	function setActive(index : number) {
+		if (index != dataActiveIndex.value && index >= 0 && index < registeredItems.value.length) {
+			dataActiveIndex.value = index
+			emit('change', index)
+			emit('update:active', index)
+		}
+	}
+
+	/**
+	 * 滚动到指定索引项
+	 * @param index 索引下标
+	 */
+	function scrollToIndex(index : number) {
+		if (index < 0 || index >= registeredItems.value.length) return
+		const item = registeredItems.value[index]
+		// 切换锚点 ID 触发原生 scroll-into-view
+		scrollIntoViewId.value = ''
+		nextTick(() => {
+			scrollIntoViewId.value = item.id
+			setActive(index)
+		})
+	}
+
+	/**
+	 * 刷新索引条与各分组项在容器内的物理坐标
+	 */
+	function refreshLayoutOffsets() {
+		// 1. 测量索引条自身的视口位置
+		const barQuery = uni.createSelectorQuery()
+		barQuery.select('#' + barId.value).boundingClientRect((res : any) => {
+			if (res != null) {
+				const node = res as NodeInfo
+				barTop = node.top ?? 0
+				barHeight = node.height ?? 0
+			}
+		}).exec()
+
+		// 2. 按注册 id 逐项测量各分组在视口中的 top
+		// 不能用 selectAll('.ste-index-item-root')：它是全页面查询，页面上存在第二个索引列表时
+		// 会把别的实例的子项一并量进来，offsets 长度与 registeredItems 不一致，滚动高亮整体错位。
+		const items = registeredItems.value
+		if (items.length == 0) {
+			itemOffsets.value = []
+			return
+		}
+		// 第 0 个查询留给内容层（偏移基准），第 1 个留给滚动视口，其余按下标顺序对应各分组
+		const query = uni.createSelectorQuery()
+		query.select('#' + contentId.value).boundingClientRect()
+		query.select('#' + scrollId.value).boundingClientRect()
+		for (let i = 0; i < items.length; i++) {
+			query.select('#' + items[i].id).boundingClientRect()
+		}
+		query.exec((res : Array<any>) => {
+			if (res == null || res.length == 0) return
+
+			const contentNode = res[0] as NodeInfo | null
+			const scrollNode = res[1] as NodeInfo | null
+			if (scrollNode != null) {
+				scrollViewHeight = scrollNode.height ?? 0.0
+			}
+
+			const newOffsets : Array<number> = []
+			// 基准取内容层 top：scrollTop 是相对内容层顶部的滚动距离，
+			// 首项之前还有其它内容时，首项 top ≠ scrollTop 的原点
+			let baseTop = 0.0
+			let hasBase = false
+			let lastBottom = 0.0
+			let hasBottom = false
+			for (let i = 0; i < items.length; i++) {
+				const raw = i + 2 < res.length ? res[i + 2] : null
+				const node = raw as NodeInfo | null
+				if (node == null) {
+					// 该项尚未挂载或查询失败：沿用上一项偏移占位，避免后续项整体前移错位
+					newOffsets.push(newOffsets.length > 0 ? newOffsets[newOffsets.length - 1] : 0.0)
+					continue
+				}
+				const nodeTop = node.top ?? 0.0
+				if (!hasBase) {
+					if (contentNode != null) {
+						baseTop = contentNode.top ?? nodeTop
+					} else {
+						// 内容层量不到时退回首项 top（旧基准），保证功能不劣化
+						baseTop = nodeTop
+					}
+					hasBase = true
+				}
+				newOffsets.push(nodeTop - baseTop)
+				lastBottom = node.bottom ?? 0.0
+				hasBottom = true
+			}
+			itemOffsets.value = newOffsets
+
+			// 内容总高 = 末项 bottom - 内容层 top，最大可滚动距离 = 内容总高 - 视口高
+			if (hasBase && hasBottom && scrollViewHeight > 0) {
+				const contentHeight = lastBottom - baseTop
+				const m = contentHeight - scrollViewHeight
+				maxScrollTop = m > 0 ? m : 0.0
+			} else {
+				maxScrollTop = 0.0
+			}
+		})
+	}
+
+	/**
+	 * 合并短时间内的多次布局刷新请求
+	 * 每个子项挂载都会各自触发一次刷新，N 个分组就是 N 轮全量测量（每轮 N+1 次节点查询），
+	 * 用防抖合并成一次，避免首屏抖动与无谓开销。
+	 */
+	function scheduleRefresh() {
+		if (refreshTimer != null) {
+			clearTimeout(refreshTimer!)
+			refreshTimer = null
+		}
+		refreshTimer = setTimeout(() => {
+			refreshTimer = null
+			refreshLayoutOffsets()
+		}, 50)
+	}
+
+	/**
+	 * 监听容器滚动，计算当前所处的分组并反向高亮右侧字母
+	 */
+	function handleScroll(e : UniScrollEvent) {
+		const scrollTop = e.detail.scrollTop
+		const offsets = itemOffsets.value
+		if (offsets.length == 0) return
+
+		// 末尾若干分组内容不足一屏时，锚点顶不到容器顶部，scrollTop 会停在最大滚动距离。
+		// 此时若仍按 offsets 递增比较，最后几个分组永远点亮不了（点 Z，高亮却停在 Y）。
+		if (maxScrollTop > 0 && scrollTop >= maxScrollTop - 2) {
+			const lastIdx = offsets.length - 1
+			if (lastIdx != dataActiveIndex.value) {
+				setActive(lastIdx)
+			}
+			return
+		}
+
+		let targetIndex = 0
+		for (let i = 0; i < offsets.length; i++) {
+			if (scrollTop >= offsets[i] - 10) {
+				targetIndex = i
+			} else {
+				break
+			}
+		}
+		if (targetIndex != dataActiveIndex.value) {
+			setActive(targetIndex)
+		}
+	}
+
+	/**
+	 * 显示中央大字母气泡
+	 * @param letter 提示字母
+	 */
+	function showBubble(letter : string) {
+		bubbleLetter.value = letter
+		bubbleVisible.value = true
+		if (bubbleTimer != null) {
+			clearTimeout(bubbleTimer!)
+			bubbleTimer = null
+		}
+	}
+
+	/**
+	 * 隐藏中央大字母气泡
+	 */
+	function hideBubble() {
+		if (bubbleTimer != null) {
+			clearTimeout(bubbleTimer!)
+		}
+		bubbleTimer = setTimeout(() => {
+			bubbleVisible.value = false
+			bubbleTimer = null
+		}, 300)
+	}
+
+	/**
+	 * 根据触摸点 clientY 换算出当前触摸的索引项
+	 * @param clientY 触摸点的垂直屏幕坐标
+	 */
+	function updateTouchIndex(clientY : number) {
+		const total = registeredItems.value.length
+		if (total == 0 || barHeight <= 0) return
+		// 索引条上下各有 16rpx 内边距（见样式 padding-top / padding-bottom），
+		// 直接用 barHeight 均分会把可触摸区算高，越靠底部累计误差越大，末几项会判到相邻字母上。
+		const padPx = uni.rpx2px(16)
+		const contentHeight = barHeight - padPx * 2
+		if (contentHeight <= 0) return
+		const clampedY = Math.max(0, Math.min(clientY - barTop - padPx, contentHeight))
+		const itemH = contentHeight / total
+		let targetIdx = Math.floor(clampedY / itemH)
+		if (targetIdx >= total) {
+			targetIdx = total - 1
+		}
+		if (targetIdx < 0) return
+		const item = registeredItems.value[targetIdx]
+		showBubble(item.title)
+		// 手指在同一字母区间内滑动时不必反复触发锚点跳转，否则每一帧都在发起滚动
+		if (targetIdx == dataActiveIndex.value) return
+		scrollToIndex(targetIdx)
+	}
+
+	/**
+	 * 索引条触摸开始
+	 */
+	function handleTouchStart(e : UniTouchEvent) {
+		if (e.touches.length == 0) return
+		const y = e.touches[0].clientY
+		// 外层页面滚动后索引条的视口坐标已经变了，缓存值会失效。
+		// 按下时重新测量一次再换算，避免整条手势的判定区间整体偏移。
+		const query = uni.createSelectorQuery()
+		query.select('#' + barId.value).boundingClientRect((res : any) => {
+			if (res != null) {
+				const node = res as NodeInfo
+				barTop = node.top ?? 0
+				barHeight = node.height ?? 0
+			}
+			updateTouchIndex(y)
+		}).exec()
+	}
+
+	/**
+	 * 索引条滑动
+	 */
+	function handleTouchMove(e : UniTouchEvent) {
+		if (e.touches.length > 0) {
+			updateTouchIndex(e.touches[0].clientY)
+		}
+	}
+
+	/**
+	 * 索引条触摸结束
+	 */
+	function handleTouchEnd(e : UniTouchEvent) {
+		hideBubble()
+	}
+
+	/**
+	 * 初始化与外部手动重置接口
+	 */
+	function init() {
+		scheduleRefresh()
+	}
+
+	// 监听外部 active 属性变化
+	watch(() : number => props.active, (newVal : number) => {
+		if (newVal != dataActiveIndex.value) {
+			dataActiveIndex.value = newVal
+			scrollToIndex(newVal)
+		}
+	})
+
+	// 注入通信上下文给子组件
+	const context : IndexListContext = {
+		getActiveIndex: () : number => dataActiveIndex.value,
+		getActiveTitle: () : string => currentActiveTitle.value,
+		getActiveAnchorId: () : string => {
+			const items = registeredItems.value
+			const idx = dataActiveIndex.value
+			if (idx >= 0 && idx < items.length) {
+				return items[idx].id
+			}
+			return ''
+		},
+		getSticky: () : boolean => props.sticky,
+		getActiveColor: () : string => props.activeColor,
+		getInactiveColor: () : string => props.inactiveColor,
+		onClickItem: (title : string, text : string) => {
+			emit('clickItem', title, text)
+		},
+		registerItem: (data : IndexItemRegisterData) => {
+			// 按 id 覆盖式注册，重复注册不会产生重复字母项（子项 title 变更后会重新注册）
+			// 拷贝后整体回写，而不是原地 push：App 端对 ref 数组的原地变更通知不可靠，
+			// push 不触发更新时右侧索引条会整个渲染不出来。
+			const list = registeredItems.value.slice()
+			let exists = false
+			for (let i = 0; i < list.length; i++) {
+				if (list[i].id == data.id) {
+					list[i] = data
+					exists = true
+					break
+				}
+			}
+			if (!exists) {
+				list.push(data)
+			}
+			registeredItems.value = list
+			scheduleRefresh()
+		},
+		unregisterItem: (id : string) => {
+			const list = registeredItems.value.slice()
+			const idx = list.findIndex((item : IndexItemRegisterData) : boolean => item.id == id)
+			if (idx >= 0) {
+				list.splice(idx, 1)
+				registeredItems.value = list
+				scheduleRefresh()
+			}
+		}
+	}
+
+	provide(INDEX_LIST_KEY, context)
+
+	onMounted(() => {
+		dataActiveIndex.value = props.active
+		scheduleRefresh()
+	})
+
+	onUnmounted(() => {
+		// 气泡关闭定时器与布局防抖定时器都必须销毁，否则组件卸载后仍会回调
+		if (bubbleTimer != null) {
+			clearTimeout(bubbleTimer!)
+			bubbleTimer = null
+		}
+		if (refreshTimer != null) {
+			clearTimeout(refreshTimer!)
+			refreshTimer = null
+		}
+	})
+
+	defineExpose({
+		init
+	})
+</script>
+
+<style>
+	.ste-index-list-root {
+		width: 100%;
+		position: relative;
+		overflow: hidden;
+	}
+
+	.ste-index-list-scroll {
+		width: 100%;
+		height: 100%;
+	}
+
+	.ste-index-list-content {
+		width: 100%;
+		flex-direction: column;
+	}
+
+	/* 顶部吸顶标题栏 */
+	.ste-index-list-sticky-bar {
+		position: absolute;
+		left: 0;
+		top: 0;
+		right: 0;
+		height: 72rpx;
+		padding-left: 32rpx;
+		padding-right: 32rpx;
+		background-color: #f5f6f8;
+		justify-content: center;
+		z-index: 10;
+	}
+
+	.sticky-bar-text {
+		font-weight: bold;
+		color: #1890ff;
+	}
+
+	/* 右侧字母导航条 */
+	.ste-index-bar {
+		position: absolute;
+		right: 12rpx;
+		top: 50%;
+		transform: translateY(-50%);
+		z-index: 20;
+		background-color: #ffffff;
+		width: 48rpx;
+		padding-top: 16rpx;
+		padding-bottom: 16rpx;
+		border-radius: 24rpx;
+		align-items: center;
+		justify-content: center;
+		box-shadow: 0 0 10rpx rgba(0, 0, 0, 0.1);
+	}
+
+	.ste-index-bar-item {
+		width: 44rpx;
+		height: 40rpx;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.index-bar-letter {
+		font-size: 22rpx;
+		text-align: center;
+	}
+
+	/* 中央大字母气泡指示器 */
+	.ste-index-bubble {
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		transform: translate(-50%, -50%);
+		width: 140rpx;
+		height: 140rpx;
+		background-color: rgba(0, 0, 0, 0.65);
+		border-radius: 20rpx;
+		align-items: center;
+		justify-content: center;
+		z-index: 999;
+	}
+
+	.bubble-text {
+		font-size: 64rpx;
+		font-weight: bold;
+		color: #ffffff;
+	}
+</style>

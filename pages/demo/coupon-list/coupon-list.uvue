@@ -1,0 +1,215 @@
+<template>
+	<scroll-view scroll-y="true" class="page-root">
+		<!-- 顶部导航标题区 -->
+		<view class="demo-header">
+			<text class="demo-title">CouponList 优惠券</text>
+			<text class="demo-subtitle">限时秒杀抢购券、满减折扣券卡片，支持倒计时、半圆环进度条与规则列表</text>
+		</view>
+
+		<!-- 示例 1：限时秒杀抢购券 (带倒计时与半圆环进度条) -->
+		<view class="demo-card">
+			<text class="card-title">限时抢购券</text>
+			<text class="card-desc">秒级递减倒计时引擎，右上角异步 Canvas 半圆进度条，底部规则展开</text>
+			<view class="coupon-box">
+				<ste-coupon-list
+					:data="couponData1"
+					:endTime="endTime1"
+					:progress="75"
+					progressText="已抢75%"
+					buttonText="立即抢"
+					@buttonClick="onBuy"
+					@footerClick="onFooterClick"
+					@countDown="onCountDown"
+				></ste-coupon-list>
+			</view>
+		</view>
+
+		<!-- 示例 2：普通满减券 (文字描述与去使用) -->
+		<view class="demo-card">
+			<text class="card-title">基础满减券</text>
+			<text class="card-desc">常规商品副标题描述、满减门槛与去使用操作引导</text>
+			<view class="coupon-box">
+				<ste-coupon-list
+					:data="couponData2"
+					buttonText="去使用"
+					@buttonClick="onUse"
+					@footerClick="onFooterClick"
+				></ste-coupon-list>
+			</view>
+		</view>
+
+		<!-- 示例 3：已抢光售罄状态 (按钮禁用与 Position 插槽) -->
+		<view class="demo-card">
+			<text class="card-title">已抢光/禁用状态</text>
+			<text class="card-desc">操作按钮置灰禁用，右上角 position 插槽自定义印章标签</text>
+			<view class="coupon-box">
+				<ste-coupon-list
+					:data="couponData3"
+					:progress="100"
+					progressText="已抢光"
+					buttonText="已抢光"
+					:buttonDisabled="true"
+				>
+					<template #position>
+						<view class="soldout-badge">
+							<text class="soldout-badge-text">已售罄</text>
+						</view>
+					</template>
+				</ste-coupon-list>
+			</view>
+		</view>
+	</scroll-view>
+</template>
+
+<script setup lang="uts">
+/**
+ * @file coupon-list.uvue
+ * @description CouponList 优惠券卡片组件 Demo 演示页面
+ */
+
+import { ref } from 'vue';
+import type { CouponData } from '@/uni_modules/stellar-ui-uvue/components/ste-coupon-list/constants.uts';
+
+// ==================== 事件交互回调 ====================
+
+function onBuy() {
+	uni.showToast({
+		title: '点击立即抢购！',
+		icon: 'none'
+	});
+}
+
+function onUse() {
+	uni.showToast({
+		title: '跳转去使用优惠券',
+		icon: 'none'
+	});
+}
+
+function onFooterClick(index: number) {
+	uni.showToast({
+		title: '点击使用规则第 ' + (index + 1) + ' 项',
+		icon: 'none'
+	});
+}
+
+function onCountDown(seconds: number) {
+	// 秒级变动事件通知
+	if (seconds <= 0) {
+		console.log('抢购倒计时已结束');
+	}
+}
+
+// ==================== 示例 1 数据 (限时抢购) ====================
+// 2小时30分钟后截止
+const endTime1 = ref(Date.now() + (2 * 3600 + 30 * 60) * 1000);
+
+const couponData1 = ref<CouponData>({
+	title: '安格斯谷饲原切牛排套餐【限时秒杀】',
+	image: 'https://image.whzb.com/chain/StellarUI/image/img5.jfif',
+	price: 99.0,
+	constraint: '满299可用',
+	footers: [
+		'1、本券不可用于部分特价特惠商品及其他优惠券叠加使用',
+		'2、仅限商城自营冷链配送专区使用，超时自动作废'
+	]
+} as CouponData);
+
+// ==================== 示例 2 数据 (普通满减) ====================
+const couponData2 = ref<CouponData>({
+	title: '休闲零食专场通用优惠券',
+	desc: '有效期至 2025.12.31',
+	image: 'https://image.whzb.com/chain/StellarUI/image/img5.jfif',
+	price: 20.0,
+	constraint: '满99减20',
+	footers: [
+		'1、全场休闲食品通用，每个订单限用一张'
+	]
+} as CouponData);
+
+// ==================== 示例 3 数据 (已售罄) ====================
+const couponData3 = ref<CouponData>({
+	title: '限量特供大额立减无门槛券',
+	desc: '今日秒杀名额已抢光',
+	image: 'https://image.whzb.com/chain/StellarUI/image/img5.jfif',
+	price: 50.0,
+	constraint: '无门槛',
+	footers: [
+		'1、每日 10:00 准时开抢，明日请早'
+	]
+} as CouponData);
+</script>
+
+<style>
+/* 页面根容器 */
+.page-root {
+	flex: 1;
+	background-color: #f5f5f5;
+	padding: 24rpx;
+}
+
+/* 顶部标题区 */
+.demo-header {
+	margin-bottom: 24rpx;
+}
+
+.demo-title {
+	font-size: 36rpx;
+	font-weight: bold;
+	color: #1a1a1a;
+}
+
+.demo-subtitle {
+	font-size: 24rpx;
+	color: #8c8c8c;
+	margin-top: 8rpx;
+}
+
+/* 示例卡片容器 */
+.demo-card {
+	background-color: #ffffff;
+	border-radius: 16rpx;
+	padding: 24rpx;
+	margin-bottom: 24rpx;
+}
+
+.card-title {
+	font-size: 28rpx;
+	font-weight: bold;
+	color: #262626;
+}
+
+.card-desc {
+	font-size: 22rpx;
+	color: #8c8c8c;
+	margin-top: 6rpx;
+	margin-bottom: 16rpx;
+}
+
+/* 优惠券包装层 */
+.coupon-box {
+	width: 100%;
+	border-radius: 16rpx;
+	background-color: #f9f9fb;
+	padding: 12rpx;
+}
+
+/* 售罄印章插槽样式 */
+.soldout-badge {
+	position: absolute;
+	top: 16rpx;
+	right: 130rpx;
+	padding-left: 12rpx;
+	padding-right: 12rpx;
+	padding-top: 4rpx;
+	padding-bottom: 4rpx;
+	background-color: rgba(0, 0, 0, 0.45);
+	border-radius: 6rpx;
+}
+
+.soldout-badge-text {
+	font-size: 18rpx;
+	color: #ffffff;
+	font-weight: bold;
+}
+</style>

@@ -1,0 +1,322 @@
+<template>
+	<scroll-view direction="vertical" class="page">
+		<!-- 顶部标题 -->
+		<view class="header">
+			<text class="title">NoticeBar 公告栏</text>
+			<text class="desc">用于循环播放展示一组消息通知，支持水平滚动（across）与垂直平滑轮播（vertical），适配全端渲染。</text>
+		</view>
+
+		<!-- 1. 基础水平滚动 -->
+		<view class="section">
+			<text class="section-title">1. 基础水平滚动</text>
+			<view class="demo-card">
+				<ste-notice-bar :list="basicList" />
+			</view>
+		</view>
+
+		<!-- 2. 自定义样式与背景 -->
+		<view class="section">
+			<text class="section-title">2. 自定义颜色与渐变背景</text>
+			<view class="demo-card">
+				<ste-notice-bar
+					:list="styleList"
+					background="#FFFBE8"
+					color="#ED6A0C"
+				/>
+			</view>
+			<view class="demo-card" style="margin-top: 16rpx;">
+				<ste-notice-bar
+					:list="styleList2"
+					background="linear-gradient(to right, #EBF5FF, #F3E8FF)"
+					color="#0958D9"
+					:width="650"
+				/>
+			</view>
+		</view>
+
+		<!-- 3. 垂直轮播模式 -->
+		<view class="section">
+			<text class="section-title">3. 垂直平滑轮播</text>
+			<view class="demo-card">
+				<ste-notice-bar
+					:list="verticalList"
+					direction="vertical"
+					background="#F6FFED"
+					color="#389E0D"
+				/>
+			</view>
+		</view>
+
+		<!-- 4. 滚动速率与翻滚速度 -->
+		<view class="section">
+			<text class="section-title">4. 滚动速率控制</text>
+			<text class="sub-desc">水平高速 (100 px/s) vs 垂直快速翻滚 (200 ms)</text>
+			<view class="demo-card">
+				<ste-notice-bar :list="fastAcrossList" :acrossSpeed="100" />
+			</view>
+			<view class="demo-card" style="margin-top: 16rpx;">
+				<ste-notice-bar
+					:list="verticalList"
+					direction="vertical"
+					:verticalSpeed="200"
+					background="#FFF0F6"
+					color="#C41D7F"
+				/>
+			</view>
+		</view>
+
+		<!-- 5. 延时启动与停留时间 -->
+		<view class="section">
+			<text class="section-title">5. 延时与停留时间</text>
+			<text class="sub-desc">延时 2 秒启动，垂直每项停留 3 秒</text>
+			<view class="demo-card">
+				<ste-notice-bar
+					:list="verticalList"
+					direction="vertical"
+					:delay="2000"
+					:standTime="3000"
+				/>
+			</view>
+		</view>
+
+		<!-- 6. 禁用滚动（静态展示） -->
+		<view class="section">
+			<text class="section-title">6. 禁用滚动 (静态公告)</text>
+			<view class="demo-card">
+				<ste-notice-bar
+					:list="staticList"
+					:scrollable="false"
+					background="#F0F5FF"
+					color="#2F54EB"
+				/>
+			</view>
+		</view>
+
+		<!-- 7. 关闭模式 -->
+		<view class="section">
+			<text class="section-title">7. 关闭模式 (可隐藏)</text>
+			<view class="demo-card" v-if="showClosableBar">
+				<ste-notice-bar
+					:list="closableList"
+					closeMode
+					background="#FFF2E8"
+					color="#D4380D"
+					@close="onNoticeClose"
+				/>
+			</view>
+			<view v-else class="reset-wrap">
+				<button class="reset-btn" @click="showClosableBar = true">重新显示已关闭的公告栏</button>
+			</view>
+		</view>
+
+		<!-- 8. 自定义插槽 -->
+		<view class="section">
+			<text class="section-title">8. 自定义左右插槽</text>
+			<view class="demo-card">
+				<ste-notice-bar :list="slotList" background="#FCFDFD" color="#1890FF">
+					<!-- 自定义左侧图标 -->
+					<template #leftIcon>
+						<ste-icon code="&#xe682;" size="32" color="#1890FF"></ste-icon>
+					</template>
+					<!-- 自定义右侧操作按钮 -->
+					<template #rightIcon>
+						<view class="slot-action" @click="onActionClick">
+							<text class="slot-action-text">查看详情</text>
+							<ste-icon code="&#xe696;" size="24" color="#1890FF"></ste-icon>
+						</view>
+					</template>
+				</ste-notice-bar>
+			</view>
+		</view>
+
+		<!-- 9. 事件监听 -->
+		<view class="section">
+			<text class="section-title">9. 事件监听 (@click / @end)</text>
+			<view class="demo-card">
+				<ste-notice-bar
+					:list="eventList"
+					@click="onNoticeClick"
+					@end="onNoticeEnd"
+				/>
+			</view>
+			<view class="result-box" v-if="lastEventText != ''">
+				<text class="result-text">最新触发事件：{{ lastEventText }}</text>
+			</view>
+		</view>
+
+		<!-- 底部占位 -->
+		<view class="footer-space"></view>
+	</scroll-view>
+</template>
+
+<script setup lang="uts">
+	/**
+	 * @file notice-bar.uvue
+	 * @description NoticeBar 公告栏组件全场景交互式演示 Demo
+	 */
+	import { ref } from 'vue'
+
+	// ==================== 演示数据源 ====================
+	const basicList = ref<string[]>([
+		'Stellar UI uvue 现已全面升级适配 uni-app x / UTS！',
+		'高性能跨端组件库，支持 iOS、Android、H5 及小程序全端畅享！',
+		'欢迎体验 NoticeBar 公告栏组件。'
+	])
+
+	const styleList = ref<string[]>([
+		'⚠️ 系统维护提醒：今晚 24:00 - 02:00 将进行服务器网络扩容升级，请提前保存数据。'
+	])
+
+	const styleList2 = ref<string[]>([
+		'✨ VIP 专属权益：恭喜您已升级为 Stellar 黄金会员，专享全场免运费特权！'
+	])
+
+	const verticalList = ref<string[]>([
+		'🔥 热门活动：新用户注册专享 8.8 折大额优惠券已发放到账！',
+		'🎉 会员日福利：本周五会员日全场双倍积分，参与抽奖赢好礼！',
+		'📦 物流提醒：您的订单包裹正在由顺丰速运加急派送中。'
+	])
+
+	const fastAcrossList = ref<string[]>([
+		'⚡️ 高速横向滚动：Stellar UI uvue 采用物理位移渲染，全端极致流畅、毫无卡顿！'
+	])
+
+	const staticList = ref<string[]>([
+		'📌 静态提示：当前网络连接良好，数据同步正常。'
+	])
+
+	const closableList = ref<string[]>([
+		'💡 点击右侧「关闭」图标可立即隐藏此公告通知栏。'
+	])
+
+	const slotList = ref<string[]>([
+		'📢 重要通知：2026 年度 Stellar 开发者大会即将召开，报名通道现已开启！'
+	])
+
+	const eventList = ref<string[]>([
+		'第一条消息：点击此公告区域或等待轮播结束查看事件日志。',
+		'第二条消息：滚动完成将触发 @end 回调。'
+	])
+
+	// ==================== 状态控制 ====================
+	const showClosableBar = ref(true)
+	const lastEventText = ref('')
+
+	// ==================== 事件处理 ====================
+	function onNoticeClose(e: any) {
+		uni.showToast({
+			title: '公告栏已关闭',
+			icon: 'none',
+		})
+	}
+
+	function onActionClick() {
+		uni.showToast({
+			title: '点击了右侧操作按钮',
+			icon: 'none',
+		})
+	}
+
+	function onNoticeClick(index: number) {
+		lastEventText.value = `点击了第 ${index + 1} 条公告（index: ${index}）`
+		uni.showToast({
+			title: `点击了第 ${index + 1} 条`,
+			icon: 'none',
+		})
+	}
+
+	function onNoticeEnd(index: number) {
+		lastEventText.value = `第 ${index + 1} 条公告播放完成（index: ${index}）`
+	}
+</script>
+
+<style>
+.page {
+	padding: 24rpx;
+	background-color: #f7f8fa;
+	flex:1
+}
+
+.header {
+	margin-bottom: 30rpx;
+}
+
+.title {
+	font-size: 38rpx;
+	font-weight: bold;
+	color: #1f2329;
+}
+
+.desc {
+	font-size: 26rpx;
+	color: #8f959e;
+	margin-top: 10rpx;
+	line-height: 1.5;
+}
+
+.section {
+	margin-bottom: 36rpx;
+}
+
+.section-title {
+	font-size: 30rpx;
+	font-weight: bold;
+	color: #1f2329;
+	margin-bottom: 16rpx;
+}
+
+.sub-desc {
+	font-size: 24rpx;
+	color: #8f959e;
+	margin-bottom: 12rpx;
+}
+
+.demo-card {
+	display: flex;
+	flex-direction: column;
+	border-radius: 16rpx;
+	box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+}
+
+.reset-wrap {
+	margin-top: 10rpx;
+}
+
+.reset-btn {
+	font-size: 26rpx;
+	color: #1890ff;
+	background-color: #e6f7ff;
+	border-radius: 12rpx;
+	padding: 10rpx 20rpx;
+	border: 1px solid #91d5ff;
+}
+
+.slot-action {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+.slot-action-text {
+	font-size: 24rpx;
+	color: #1890ff;
+	margin-right: 4rpx;
+}
+
+.result-box {
+	margin-top: 16rpx;
+	padding: 16rpx 20rpx;
+	background-color: #f0f5ff;
+	border-radius: 10rpx;
+	border-left: 6rpx solid #2f54eb;
+}
+
+.result-text {
+	font-size: 24rpx;
+	color: #1d39c4;
+}
+
+.footer-space {
+	height: 60rpx;
+}
+</style>

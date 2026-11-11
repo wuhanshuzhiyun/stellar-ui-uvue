@@ -1,0 +1,13 @@
+{
+  "name": "uniappx-vue3",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Stellar UI uvue uni-app x 组件库",
+  "scripts": {
+    "generate": "node scripts/index.js",
+    "generate:types": "node scripts/components-type.js",
+    "generate:doc": "node scripts/props-md.js",
+    "generate:pages": "node scripts/view-pages.js",
+    "generate:demo": "node scripts/gen-demo-pages.js"
+  }
+}

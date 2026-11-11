@@ -1,0 +1,249 @@
+<template>
+	<view class="page-root">
+		<scroll-view scroll-y="true" class="page-scroll">
+			<view class="header">
+				<text class="title">Popup 弹出层</text>
+				<text class="desc">由其他控件触发，屏幕滑出或弹出一块自定义内容区域</text>
+			</view>
+
+			<view class="section">
+				<text class="section-title">01 组件类型 - 基础使用</text>
+				<view class="btn-row">
+					<ste-button @click="showCenter = true" width="100%" :round="false" background="#ffffff"
+						borderColor="#0090FF" color="#0090FF">中间弹出</ste-button>
+				</view>
+				<view class="btn-row">
+					<ste-button @click="showTop = true" width="100%" :round="false" background="#ffffff"
+						borderColor="#0090FF" color="#0090FF">顶部弹出</ste-button>
+				</view>
+				<view class="btn-row">
+					<ste-button @click="showBottom = true" width="100%" :round="false" background="#ffffff"
+						borderColor="#0090FF" color="#0090FF">底部弹出</ste-button>
+				</view>
+				<view class="btn-row">
+					<ste-button @click="showLeft = true" width="100%" :round="false" background="#ffffff"
+						borderColor="#0090FF" color="#0090FF">左侧弹出</ste-button>
+				</view>
+				<view class="btn-row">
+					<ste-button @click="showRight = true" width="100%" :round="false" background="#ffffff"
+						borderColor="#0090FF" color="#0090FF">右侧弹出</ste-button>
+				</view>
+			</view>
+
+			<view class="section">
+				<text class="section-title">02 组件样式 - 背景色</text>
+				<view class="btn-row">
+					<ste-button @click="bgShow = true" width="100%" :round="false" background="#ffffff"
+						borderColor="#0090FF" color="#0090FF">背景色弹窗</ste-button>
+				</view>
+			</view>
+
+			<view class="section">
+				<text class="section-title">02 组件样式 - 圆角</text>
+				<view class="btn-row">
+					<ste-button @click="roundShow = true" width="100%" :round="false" background="#ffffff"
+						borderColor="#0090FF" color="#0090FF">圆角弹窗</ste-button>
+				</view>
+			</view>
+
+			<view class="section">
+				<text class="section-title">02 组件样式 - 偏移</text>
+				<view class="btn-row">
+					<ste-button @click="offsetShow = true" width="100%" :round="false" background="#ffffff"
+						borderColor="#0090FF" color="#0090FF">偏移弹窗</ste-button>
+				</view>
+			</view>
+
+			<view class="section">
+				<text class="section-title">03 组件状态 - 遮罩不可关闭</text>
+				<view class="btn-row">
+					<ste-button @click="maskShow = true" width="100%" :round="false" background="#ffffff"
+						borderColor="#0090FF" color="#0090FF">遮罩不可关闭</ste-button>
+				</view>
+			</view>
+
+			<view class="section">
+				<text class="section-title">03 组件状态 - 关闭按钮</text>
+				<view class="btn-row">
+					<ste-button @click="closeShow = true" width="100%" :round="false" background="#ffffff"
+						borderColor="#0090FF" color="#0090FF">带关闭按钮</ste-button>
+				</view>
+			</view>
+
+			<view class="section">
+				<text class="section-title">03 组件状态 - 动画时间</text>
+				<view class="btn-row">
+					<ste-button @click="durationShow = true" width="100%" :round="false" background="#ffffff"
+						borderColor="#0090FF" color="#0090FF">动画 800ms</ste-button>
+				</view>
+			</view>
+
+			<view class="section">
+				<text class="section-title">03 组件状态 - 异步关闭</text>
+				<view class="btn-row">
+					<ste-button @click="syncShow = true" width="100%" :round="false" background="#ffffff"
+						borderColor="#0090FF" color="#0090FF">异步关闭（2秒）</ste-button>
+				</view>
+			</view>
+		</scroll-view>
+
+		<!-- 中间弹窗 -->
+		<ste-popup :show="showCenter" @update:show="onCenter" position="center" :width="300" :height="300">
+			<text style="font-size: 32rpx; color: #333;">中间弹窗</text>
+		</ste-popup>
+
+		<!-- 顶部弹窗 -->
+		<ste-popup :show="showTop" @update:show="onTop" position="top" :height="200">
+			<text style="font-size: 32rpx; color: #333; padding: 40rpx;">顶部弹窗</text>
+		</ste-popup>
+
+		<!-- 底部弹窗（圆角） -->
+		<ste-popup :show="showBottom" @update:show="onBottom" position="bottom" :height="200" :round="true">
+			<text style="font-size: 32rpx; color: #333; padding: 40rpx;">底部弹窗（圆角）</text>
+		</ste-popup>
+
+		<!-- 左侧弹窗 -->
+		<ste-popup :show="showLeft" @update:show="onLeft" position="left" :width="200">
+			<text style="font-size: 32rpx; color: #333; padding: 40rpx;">左侧弹窗</text>
+		</ste-popup>
+
+		<!-- 右侧弹窗 -->
+		<ste-popup :show="showRight" @update:show="onRight" position="right" :width="200">
+			<text style="font-size: 32rpx; color: #333; padding: 40rpx;">右侧弹窗</text>
+		</ste-popup>
+
+		<!-- 背景色 -->
+		<ste-popup :show="bgShow" @update:show="onBg" position="center" :width="300" :height="300"
+			backgroundColor="#eff3dd">
+			<text style="font-size: 32rpx; color: #333;">背景色弹窗</text>
+		</ste-popup>
+
+		<!-- 圆角 -->
+		<ste-popup :show="roundShow" @update:show="onRound" position="center" :width="300" :height="300" :round="true">
+			<text style="font-size: 32rpx; color: #333;">圆角弹窗</text>
+		</ste-popup>
+
+		<!-- 偏移 -->
+		<ste-popup :show="offsetShow" @update:show="onOffset" position="center" :width="300" :height="300" :offsetX="50"
+			:offsetY="-50">
+			<text style="font-size: 32rpx; color: #333;">偏移弹窗</text>
+		</ste-popup>
+
+		<!-- 遮罩不可关闭 -->
+		<ste-popup :show="maskShow" @update:show="onMask" position="center" :width="300" :height="300"
+			:isMaskClick="false">
+			<text style="font-size: 32rpx; color: #333;">遮罩不可关闭</text>
+			<text style="font-size: 24rpx; color: #666; margin-top: 20rpx;">点击遮罩不会关闭</text>
+		</ste-popup>
+
+		<!-- 带关闭按钮 -->
+		<ste-popup :show="closeShow" @update:show="onClose" position="center" :width="300" :height="300"
+			:showClose="true">
+			<text style="font-size: 32rpx; color: #333;">带关闭按钮</text>
+		</ste-popup>
+
+		<!-- 动画时间 -->
+		<ste-popup :show="durationShow" @update:show="onDuration" position="center" :width="300" :height="300"
+			:duration="800">
+			<text style="font-size: 32rpx; color: #333;">动画 800ms</text>
+		</ste-popup>
+
+		<!-- 异步关闭 -->
+		<ste-popup :show="syncShow" @update:show="onSync" position="bottom" :height="200"
+			@close="onSyncClose">
+			<text style="font-size: 32rpx; color: #333; padding: 40rpx;">异步关闭（2秒后）</text>
+		</ste-popup>
+	</view>
+</template>
+
+<script setup lang="uts">
+	import { ref } from 'vue'
+
+	defineOptions({ name: 'demo-popup' })
+
+	const showCenter = ref(false)
+	const showTop = ref(false)
+	const showBottom = ref(false)
+	const showLeft = ref(false)
+	const showRight = ref(false)
+	const bgShow = ref(false)
+	const roundShow = ref(false)
+	const offsetShow = ref(false)
+	const maskShow = ref(false)
+	const closeShow = ref(false)
+	const durationShow = ref(false)
+	const syncShow = ref(false)
+
+	function onCenter(v : boolean) { showCenter.value = v }
+	function onTop(v : boolean) { showTop.value = v }
+	function onBottom(v : boolean) { showBottom.value = v }
+	function onLeft(v : boolean) { showLeft.value = v }
+	function onRight(v : boolean) { showRight.value = v }
+	function onBg(v : boolean) { bgShow.value = v }
+	function onRound(v : boolean) { roundShow.value = v }
+	function onOffset(v : boolean) { offsetShow.value = v }
+	function onMask(v : boolean) { maskShow.value = v }
+	function onClose(v : boolean) { closeShow.value = v }
+	function onDuration(v : boolean) { durationShow.value = v }
+	function onSync(v : boolean) { syncShow.value = v }
+
+	function onSyncClose(suspend : () => void, next : () => void, stop : () => void) {
+		// 挂起关闭流程，等异步操作完成后再调用 next() 关闭
+		suspend()
+		uni.showToast({
+			title: '加载中...',
+			icon: 'loading',
+		})
+		setTimeout(() => {
+			uni.hideToast()
+			// 调用 next() 继续关闭流程
+			next()
+		}, 2000)
+	}
+</script>
+
+<style>
+	.page-root {
+		flex: 1;
+		background-color: #f5f5f5;
+	}
+
+	.page-scroll {
+		flex: 1;
+		padding: 20rpx;
+	}
+
+	.header {
+		margin-bottom: 20rpx;
+	}
+
+	.title {
+		font-size: 36rpx;
+		font-weight: bold;
+		color: #333333;
+	}
+
+	.desc {
+		font-size: 26rpx;
+		color: #8f9ca2;
+		margin-top: 8rpx;
+	}
+
+	.section {
+		margin-bottom: 30rpx;
+		background-color: #ffffff;
+		border-radius: 16rpx;
+		padding: 24rpx;
+	}
+
+	.section-title {
+		font-size: 28rpx;
+		font-weight: bold;
+		color: #333333;
+		margin-bottom: 20rpx;
+	}
+
+	.btn-row {
+		margin-bottom: 16rpx;
+	}
+</style>

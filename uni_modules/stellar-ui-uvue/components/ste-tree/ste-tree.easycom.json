@@ -1,0 +1,184 @@
+{
+    "name": "ste-tree",
+    "description": "Tree 树形控件，用于展示层级化结构数据，支持手风琴模式、异步懒加载、默认展开、关键词搜索过滤与多插槽自定义。(UTS/UVUE)。",
+    "example": "<ste-tree :options=\"options\"></ste-tree>",
+    "tutorial": "https://stellar-ui.intecloud.com.cn/?projectName=stellar-ui-uvue&menu=%E7%BB%84%E4%BB%B6&active=ste-tree",
+    "attributes": [
+        {
+            "name": "options",
+            "description": "树形结构源数据列表（若组件渲染完成后动态修改，请手动调用 init 方法），类型为强类型 SteTreeNode[]（自定义业务字段需通过 titleKey/valueKey 映射或挂载在 raw 上）",
+            "type": "SteTreeNode[]",
+            "default": []
+        },
+        {
+            "name": "valueKey",
+            "description": "节点唯一标识字段名",
+            "type": "string",
+            "default": "value"
+        },
+        {
+            "name": "titleKey",
+            "description": "节点标题展示字段名",
+            "type": "string",
+            "default": "title"
+        },
+        {
+            "name": "childrenKey",
+            "description": "子节点数组字段名",
+            "type": "string",
+            "default": "children"
+        },
+        {
+            "name": "accordion",
+            "description": "是否开启手风琴模式（展开当前节点时自动收起同级兄弟节点）",
+            "type": "boolean",
+            "default": true
+        },
+        {
+            "name": "childrenPadding",
+            "description": "子节点层级缩进距离，单位 rpx（支持数字或带单位字符串）",
+            "type": "number | string",
+            "default": 40
+        },
+        {
+            "name": "openNodes",
+            "description": "默认展开的节点 value 列表（初始化时自动向上展开祖先链）。类型为 string[]（数字请转为字符串）",
+            "type": "string[]",
+            "default": []
+        },
+        {
+            "name": "searchTitle",
+            "description": "节点搜索关键词（支持动态过滤并高亮保留父级路径）",
+            "type": "string",
+            "default": ""
+        },
+        {
+            "name": "[event]click",
+            "description": "点击节点标题行时触发",
+            "params": [
+                {
+                    "name": "node",
+                    "type": "SteTreeNode",
+                    "description": "当前点击的节点数据对象"
+                }
+            ]
+        },
+        {
+            "name": "[event]open",
+            "description": "节点展开后触发",
+            "params": [
+                {
+                    "name": "node",
+                    "type": "SteTreeNode",
+                    "description": "当前展开的节点数据对象"
+                }
+            ]
+        },
+        {
+            "name": "[event]close",
+            "description": "节点收起后触发",
+            "params": [
+                {
+                    "name": "node",
+                    "type": "SteTreeNode",
+                    "description": "当前收起的节点数据对象"
+                }
+            ]
+        },
+        {
+            "name": "[event]beforeOpen",
+            "description": "节点展开前触发（用于异步懒加载子数据）。next 回调参数为 SteTreeNode[]",
+            "params": [
+                {
+                    "name": "node",
+                    "type": "SteTreeNode",
+                    "description": "当前即将展开的节点数据对象"
+                },
+                {
+                    "name": "suspend",
+                    "type": "BeforeOpenSuspend",
+                    "description": "调用该函数挂起等待异步操作完成，显示加载菊花"
+                },
+                {
+                    "name": "next",
+                    "type": "BeforeOpenNext",
+                    "description": "调用该函数注入子节点数据并继续展开"
+                },
+                {
+                    "name": "stop",
+                    "type": "BeforeOpenStop",
+                    "description": "调用该函数中断展开流程并重置加载状态"
+                }
+            ]
+        },
+        {
+            "name": "[method]init",
+            "description": "初始化并重新格式化树数据方法",
+            "returnValue": "void"
+        },
+        {
+            "name": "[method]open",
+            "description": "打开/展开指定节点方法（自动展开其所有祖先节点）",
+            "params": [
+                {
+                    "name": "value",
+                    "type": "string",
+                    "description": "节点唯一标识值"
+                }
+            ],
+            "returnValue": "void"
+        },
+        {
+            "name": "[method]close",
+            "description": "关闭/收起指定节点方法",
+            "params": [
+                {
+                    "name": "value",
+                    "type": "string",
+                    "description": "节点唯一标识值"
+                }
+            ],
+            "returnValue": "void"
+        },
+        {
+            "name": "[method]search",
+            "description": "根据关键词搜索过滤节点方法",
+            "params": [
+                {
+                    "name": "keyword",
+                    "type": "string",
+                    "description": "搜索关键词"
+                }
+            ],
+            "returnValue": "void"
+        },
+        {
+            "name": "[slot]default",
+            "description": "节点左侧标题与内容自定义插槽。模板中，解构的作用域参数 node 建议配合 (node as SteTreeNode) 或辅助函数安全读取属性以保障 Kotlin 强类型检查",
+            "params": [
+                {
+                    "name": "node",
+                    "description": "当前节点数据对象"
+                },
+                {
+                    "name": "depth",
+                    "description": "当前节点层级深度（从 0 开始）"
+                }
+            ]
+        },
+        {
+            "name": "[slot]open",
+            "description": "右侧展开/收起图标自定义插槽",
+            "params": [
+                {
+                    "name": "open",
+                    "description": "当前节点是否处于展开状态 (boolean)"
+                }
+            ]
+        },
+        {
+            "name": "[slot]loading",
+            "description": "懒加载中菊花动画自定义插槽"
+        }
+    ]
+}

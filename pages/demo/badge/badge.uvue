@@ -1,0 +1,146 @@
+<template>
+	<scroll-view scroll-y="true" class="page">
+		<view class="section">
+			<text class="section-title">基础用法</text>
+			<view class="demo-row">
+				<ste-badge :content="5">
+					<view class="badge-slot"><text class="badge-slot-text">消息</text></view>
+				</ste-badge>
+				<ste-badge :content="10">
+					<view class="badge-slot"><text class="badge-slot-text">回复</text></view>
+				</ste-badge>
+				<ste-badge :content="120">
+					<view class="badge-slot"><text class="badge-slot-text">评论</text></view>
+				</ste-badge>
+			</view>
+		</view>
+
+		<view class="section">
+			<text class="section-title">最大值</text>
+			<view class="demo-row">
+				<ste-badge :content="50" :max="99">
+					<view class="badge-slot"><text class="badge-slot-text">最多99</text></view>
+				</ste-badge>
+				<ste-badge :content="200" :max="99">
+					<view class="badge-slot"><text class="badge-slot-text">超过99</text></view>
+				</ste-badge>
+			</view>
+		</view>
+
+		<view class="section">
+			<text class="section-title">小红点</text>
+			<view class="demo-row">
+				<ste-badge :show-dot="true">
+					<view class="badge-slot"><text class="badge-slot-text">点我</text></view>
+				</ste-badge>
+			</view>
+		</view>
+
+		<view class="section">
+			<text class="section-title">自定义颜色</text>
+			<view class="demo-row">
+				<ste-badge :content="8" background="#07c160">
+					<view class="badge-slot"><text class="badge-slot-text">绿色</text></view>
+				</ste-badge>
+				<ste-badge :content="8" background="#ff9900">
+					<view class="badge-slot"><text class="badge-slot-text">橙色</text></view>
+				</ste-badge>
+				<ste-badge :content="8" background="linear-gradient(to right, #4253d8, #d533ba)">
+					<view class="badge-slot"><text class="badge-slot-text">渐变</text></view>
+				</ste-badge>
+			</view>
+		</view>
+
+		<view class="section">
+			<text class="section-title">位置</text>
+			<view class="demo-row">
+				<ste-badge :content="1" position="topRight">
+					<view class="badge-slot"><text class="badge-slot-text">右上</text></view>
+				</ste-badge>
+				<ste-badge :content="1" position="topLeft">
+					<view class="badge-slot"><text class="badge-slot-text">左上</text></view>
+				</ste-badge>
+				<ste-badge :content="1" position="bottomLeft">
+					<view class="badge-slot"><text class="badge-slot-text">左下</text></view>
+				</ste-badge>
+				<ste-badge :content="1" position="bottomRight">
+					<view class="badge-slot"><text class="badge-slot-text">右下</text></view>
+				</ste-badge>
+			</view>
+		</view>
+
+		<view class="section">
+			<text class="section-title">显示零</text>
+			<view class="demo-row">
+				<ste-badge :content="0">
+					<view class="badge-slot"><text class="badge-slot-text">默认不显示0</text></view>
+				</ste-badge>
+				<ste-badge :content="0" :show-zero="true">
+					<view class="badge-slot"><text class="badge-slot-text">显示0</text></view>
+				</ste-badge>
+			</view>
+		</view>
+
+		<view class="section">
+			<text class="section-title">自定义偏移</text>
+			<view class="demo-row">
+				<ste-badge :content="5" :offset-x="10" :offset-y="10">
+					<view class="badge-slot"><text class="badge-slot-text">偏移</text></view>
+				</ste-badge>
+			</view>
+		</view>
+
+		<view class="section">
+			<text class="section-title">边框</text>
+			<view class="demo-row">
+				<ste-badge :content="5" :show-border="true" border-color="#ffffff">
+					<view class="badge-slot badge-slot-dark"><text class="badge-slot-text-dark">白边框</text></view>
+				</ste-badge>
+			</view>
+		</view>
+	</scroll-view>
+</template>
+
+<script setup lang="uts">
+</script>
+
+<style>
+.page {
+	padding: 20rpx;
+}
+.section {
+	margin-bottom: 30rpx;
+}
+.section-title {
+	font-size: 28rpx;
+	font-weight: bold;
+	margin-bottom: 16rpx;
+	color: #333333;
+}
+.demo-row {
+	flex-direction: row;
+	align-items: center;
+	flex-wrap: wrap;
+}
+.badge-slot {
+	margin-left: 15rpx;
+	margin-right: 15rpx;
+	padding-left: 20rpx;
+	padding-right: 20rpx;
+	padding-top: 10rpx;
+	padding-bottom: 10rpx;
+	background-color: #f2f3f5;
+	border-radius: 8rpx;
+}
+.badge-slot-text {
+	font-size: 28rpx;
+	color: #333333;
+}
+.badge-slot-dark {
+	background-color: #333333;
+}
+.badge-slot-text-dark {
+	font-size: 28rpx;
+	color: #ffffff;
+}
+</style>

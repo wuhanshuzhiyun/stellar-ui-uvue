@@ -1,0 +1,268 @@
+<template>
+	<scroll-view scroll-y="true" class="page">
+		<view class="header">
+			<text class="title">Select 下拉选</text>
+			<text class="subtitle">基础功能版本（default 模式）</text>
+		</view>
+
+		<view class="content">
+			<!-- 基础用法 - 单列单选 -->
+			<view class="demo-item">
+				<text class="demo-label">基础用法（单列单选）</text>
+				<ste-select v-model="value1" :list="options1" placeholder="请选择城市" @change="onChange1"></ste-select>
+				<text class="demo-value">选中值：{{ displayValue1 }}</text>
+			</view>
+
+			<!-- 多选模式 -->
+			<view class="demo-item">
+				<text class="demo-label">多选模式</text>
+				<ste-select v-model="value2" :list="options1" :multiple="true" placeholder="请选择城市（可多选）"
+					@change="onChange2"></ste-select>
+				<text class="demo-value">选中值：{{ displayValue2 }}</text>
+			</view>
+
+			<!-- 多列选择 -->
+			<view class="demo-item">
+				<text class="demo-label">多列选择（省市区）</text>
+				<ste-select v-model="value3" :list="options3" placeholder="请选择地区" @change="onChange3"></ste-select>
+				<text class="demo-value">选中值：{{ displayValue3 }}</text>
+			</view>
+
+			<!-- 禁用状态 -->
+			<view class="demo-item">
+				<text class="demo-label">禁用状态</text>
+				<ste-select v-model="value4" :list="options1" :disabled="true" placeholder="此选择器已禁用"></ste-select>
+			</view>
+
+			<!-- 可清除 -->
+			<view class="demo-item">
+				<text class="demo-label">可清除</text>
+				<ste-select v-model="value5" :list="options1" :clearable="true" placeholder="选择后可清除"
+					@change="onChange5"></ste-select>
+				<text class="demo-value">选中值：{{ displayValue5 }}</text>
+			</view>
+
+			<!-- 自定义样式 -->
+			<view class="demo-item">
+				<text class="demo-label">自定义样式</text>
+				<ste-select v-model="value6" :list="options1" :height="80" :font-size="32" border-color="#0090FF"
+					:border-radius="12" background="#f0f9ff" placeholder="自定义高度和颜色" @change="onChange6"></ste-select>
+			</view>
+
+			<!-- 加载中 -->
+			<view class="demo-item">
+				<text class="demo-label">加载中状态</text>
+				<ste-select v-model="value7" :list="emptyList" :loading="true" placeholder="数据加载中..."></ste-select>
+			</view>
+
+			<!-- 空数据 -->
+			<view class="demo-item">
+				<text class="demo-label">空数据</text>
+				<ste-select v-model="value8" :list="emptyList" placeholder="暂无数据"></ste-select>
+			</view>
+		</view>
+	</scroll-view>
+</template>
+
+<script setup lang="uts">
+	import { ref, computed } from 'vue'
+
+	// 单列选项
+	const options1 = ref([
+		{ label: '北京', value: 'beijing' },
+		{ label: '上海', value: 'shanghai' },
+		{ label: '广州', value: 'guangzhou' },
+		{ label: '深圳', value: 'shenzhen' },
+		{ label: '杭州', value: 'hangzhou' },
+		{ label: '成都', value: 'chengdu' },
+	])
+
+	// 多列选项（省市区）- 级联联动：嵌套 children 树，滑动省后市/区列表联动重建
+	const options3 = ref<UTSJSONObject[]>([
+		{
+			label: '浙江省', value: 'zhejiang',
+			children: [
+				{
+					label: '杭州市', value: 'hangzhou',
+					children: [
+						{ label: '西湖区', value: 'xihu' },
+						{ label: '滨江区', value: 'binjiang' },
+						{ label: '余杭区', value: 'yuhang' },
+					] as UTSJSONObject[],
+				} as UTSJSONObject,
+				{
+					label: '宁波市', value: 'ningbo',
+					children: [
+						{ label: '海曙区', value: 'haishu' },
+						{ label: '江北区', value: 'jiangbei' },
+						{ label: '北仑区', value: 'beilun' },
+					] as UTSJSONObject[],
+				} as UTSJSONObject,
+				{
+					label: '温州市', value: 'wenzhou',
+					children: [
+						{ label: '鹿城区', value: 'lucheng' },
+						{ label: '洞头区', value: 'dongtou' },
+						{ label: '永嘉县', value: 'yongjia' },
+					] as UTSJSONObject[],
+				} as UTSJSONObject,
+			] as UTSJSONObject[],
+		} as UTSJSONObject,
+		{
+			label: '江苏省', value: 'jiangsu',
+			children: [
+				{
+					label: '南京市', value: 'nanjing',
+					children: [
+						{ label: '玄武区', value: 'xuanwu' },
+						{ label: '秦淮区', value: 'qinhuai' },
+						{ label: '建邺区', value: 'jianye' },
+					] as UTSJSONObject[],
+				} as UTSJSONObject,
+				{
+					label: '苏州市', value: 'suzhou',
+					children: [
+						{ label: '姑苏区', value: 'gusu' },
+						{ label: '吴江区', value: 'wujiang' },
+					] as UTSJSONObject[],
+				} as UTSJSONObject,
+			] as UTSJSONObject[],
+		} as UTSJSONObject,
+		{
+			label: '广东省', value: 'guangdong',
+			children: [
+				{
+					label: '广州市', value: 'guangzhou',
+					children: [
+						{ label: '天河区', value: 'tianhe' },
+						{ label: '越秀区', value: 'yuexiu' },
+						{ label: '荔湾区', value: 'liwan' },
+					] as UTSJSONObject[],
+				} as UTSJSONObject,
+				{
+					label: '深圳市', value: 'shenzhen',
+					children: [
+						{ label: '福田区', value: 'futian' },
+						{ label: '南山区', value: 'nanshan' },
+					] as UTSJSONObject[],
+				} as UTSJSONObject,
+			] as UTSJSONObject[],
+		} as UTSJSONObject,
+	])
+
+	// 空列表（带类型）
+	const emptyList = ref([] as UTSJSONObject[])
+
+	// 绑定值
+	const value1 = ref('')
+	const value2 = ref([] as Array<string | number>)
+	const value3 = ref([] as Array<string | number>)
+	const value4 = ref('shanghai')
+	const value5 = ref('')
+	const value6 = ref('')
+	const value7 = ref('')
+	const value8 = ref('')
+
+	// 显示值计算
+	const displayValue1 = computed(() : string => {
+		const val = value1.value
+		if (val == null || val == '') {
+			return '未选择'
+		}
+		return val as string
+	})
+
+	const displayValue2 = computed(() : string => {
+		if (value2.value.length == 0) {
+			return '未选择'
+		}
+		const arr : string[] = []
+		for (let i = 0; i < value2.value.length; i++) {
+			arr.push(value2.value[i] as string)
+		}
+		return arr.join(', ')
+	})
+
+	const displayValue3 = computed(() : string => {
+		if (value3.value.length == 0) {
+			return '未选择'
+		}
+		const arr : string[] = []
+		for (let i = 0; i < value3.value.length; i++) {
+			arr.push(value3.value[i] as string)
+		}
+		return arr.join(' / ')
+	})
+
+	const displayValue5 = computed(() : string => {
+		const val = value5.value
+		if (val == null || val == '') {
+			return '未选择'
+		}
+		return val as string
+	})
+
+	// 事件处理
+	const onChange1 = (value : any, option : any) => {
+		console.log('单列选择：', value, option)
+	}
+
+	const onChange2 = (value : any, option : any) => {
+		console.log('多选：', value, option)
+	}
+
+	const onChange3 = (value : any, option : any) => {
+		console.log('多列选择：', value, option)
+	}
+
+	const onChange5 = (value : any, option : any) => {
+		console.log('可清除选择：', value, option)
+	}
+
+	const onChange6 = (value : any, option : any) => {
+		console.log('自定义样式选择：', value, option)
+	}
+</script>
+
+<style>
+	.page {
+		padding: 20rpx;
+		flex: 1
+	}
+
+	.header {
+		margin-bottom: 40rpx;
+	}
+
+	.title {
+		font-size: 40rpx;
+		font-weight: bold;
+		margin-bottom: 10rpx;
+	}
+
+	.subtitle {
+		font-size: 24rpx;
+		color: #999999;
+	}
+
+	.content {
+		flex-direction: column;
+	}
+
+	.demo-item {
+		margin-bottom: 40rpx;
+	}
+
+	.demo-label {
+		font-size: 28rpx;
+		color: #333333;
+		margin-bottom: 16rpx;
+		font-weight: 500;
+	}
+
+	.demo-value {
+		font-size: 24rpx;
+		color: #666666;
+		margin-top: 12rpx;
+	}
+</style>

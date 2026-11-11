@@ -1,0 +1,49 @@
+{
+    "name": "ste-scroll-to",
+    "description": "ScrollTo 滚动锚点组件，支持锚点跳转定位与滚动事件双向联动，专用于 (UTS/UVUE)",
+    "example": "<ste-scroll-to v-model:active=\"active\"><ste-scroll-to-item>节点1</ste-scroll-to-item></ste-scroll-to>",
+    "tutorial": "https://stellar-ui.intecloud.com.cn/?projectName=stellar-ui-uvue&menu=%E7%BB%84%E4%BB%B6&active=ste-scroll-to",
+    "attributes": [
+        {
+            "name": "active",
+            "description": "当前激活的子项下标，支持 v-model:active 双向绑定",
+            "type": "number",
+            "default": 0
+        },
+        {
+            "name": "height",
+            "description": "滚动区域高度，支持 rpx、px、% 或数字",
+            "type": "number | string",
+            "default": "100%"
+        },
+        {
+            "name": "[event]change",
+            "description": "激活子项改变时触发",
+            "params": [
+                {
+                    "name": "index",
+                    "description": "(index: number) => void，当前激活的子项下标"
+                }
+            ]
+        },
+        {
+            "name": "[event]update:active",
+            "description": "激活子项下标更新时触发（用于 v-model 双向绑定）",
+            "params": [
+                {
+                    "name": "index",
+                    "description": "(index: number) => void"
+                }
+            ]
+        },
+        {
+            "name": "[method]init",
+            "description": "重新测量并刷新所有子锚点在容器中的布局位置信息（适用于异步加载内容后调用）",
+            "params": []
+        },
+        {
+            "name": "[slot]default",
+            "description": "默认插槽，承载 ste-scroll-to-item 锚点子项"
+        }
+    ]
+}

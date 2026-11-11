@@ -1,0 +1,293 @@
+<template>
+	<view class="page-root">
+		<scroll-view scroll-y="true" class="page-scroll">
+			<view class="header">
+				<text class="title">Checkbox 复选框</text>
+				<text class="desc">在一组备选项中进行多选</text>
+			</view>
+
+			<!-- 基础用法 -->
+			<view class="demo-item">
+				<text class="demo-item-title">基础用法</text>
+				<view class="demo-content">
+					<ste-checkbox v-model="value1">复选框</ste-checkbox>
+				</view>
+			</view>
+
+			<!-- 禁用 -->
+			<view class="demo-item">
+				<text class="demo-item-title">禁用</text>
+				<view class="demo-content">
+					<ste-checkbox v-model="value2" disabled>禁用未选中</ste-checkbox>
+				</view>
+				<view class="demo-content">
+					<ste-checkbox v-model="value3" disabled>禁用已选中</ste-checkbox>
+				</view>
+			</view>
+
+			<!-- 只读 -->
+			<view class="demo-item">
+				<text class="demo-item-title">只读</text>
+				<view class="demo-content">
+					<ste-checkbox v-model="value4" readonly>只读未选中</ste-checkbox>
+				</view>
+				<view class="demo-content">
+					<ste-checkbox v-model="value5" readonly>只读已选中</ste-checkbox>
+				</view>
+			</view>
+
+			<!-- 自定义形状 -->
+			<view class="demo-item">
+				<text class="demo-item-title">自定义形状</text>
+				<view class="demo-content">
+					<ste-checkbox v-model="value6">圆形（默认）</ste-checkbox>
+				</view>
+				<view class="demo-content">
+					<ste-checkbox v-model="value7" shape="square">方形</ste-checkbox>
+				</view>
+			</view>
+
+			<!-- 自定义图标大小 -->
+			<view class="demo-item">
+				<text class="demo-item-title">自定义图标大小</text>
+				<view class="demo-content">
+					<ste-checkbox v-model="value8" iconSize="60">60rpx</ste-checkbox>
+				</view>
+				<view class="demo-content">
+					<ste-checkbox v-model="value8b" iconSize="24">24rpx</ste-checkbox>
+				</view>
+			</view>
+
+			<!-- 自定义图标颜色 -->
+			<view class="demo-item">
+				<text class="demo-item-title">自定义图标颜色</text>
+				<view class="demo-content">
+					<ste-checkbox v-model="value9a" checkedColor="#ee0a24">红色</ste-checkbox>
+				</view>
+				<view class="demo-content">
+					<ste-checkbox v-model="value9b" checkedColor="#07c160">绿色</ste-checkbox>
+				</view>
+				<view class="demo-content">
+					<ste-checkbox v-model="value9c" checkedColor="#ff976a">橙色</ste-checkbox>
+				</view>
+			</view>
+
+			<!-- 左侧文本 -->
+			<view class="demo-item">
+				<text class="demo-item-title">左侧文本</text>
+				<view class="demo-content">
+					<ste-checkbox v-model="value10">右边</ste-checkbox>
+				</view>
+				<view class="demo-content">
+					<ste-checkbox v-model="value11" textPosition="left">左边</ste-checkbox>
+				</view>
+			</view>
+
+			<!-- 自定义文本 -->
+			<view class="demo-item">
+				<text class="demo-item-title">自定义文本</text>
+				<view class="demo-content">
+					<ste-checkbox v-model="value12" textSize="50" textInactiveColor="green" textActiveColor="#d276a3">复选框</ste-checkbox>
+				</view>
+			</view>
+
+			<!-- 回调事件 -->
+			<view class="demo-item">
+				<text class="demo-item-title">回调事件</text>
+				<view class="demo-content">
+					<ste-checkbox v-model="value13" @change="onChange13" @click="onClick13">change事件</ste-checkbox>
+				</view>
+				<text class="result">值: {{ value13 }}, change: {{ changeCount }}, click: {{ clickCount }}</text>
+			</view>
+
+			<!-- 复选框组 -->
+			<view class="demo-item">
+				<text class="demo-item-title">复选框组</text>
+				<ste-checkbox-group v-model="groupValue1" @change="onGroupChange1">
+					<ste-checkbox name="a">复选框a</ste-checkbox>
+					<ste-checkbox name="b">复选框b</ste-checkbox>
+					<ste-checkbox name="c">复选框c</ste-checkbox>
+				</ste-checkbox-group>
+				<text class="result">选中: {{ groupValue1 }}</text>
+			</view>
+
+			<!-- 水平排列 -->
+			<view class="demo-item">
+				<text class="demo-item-title">水平排列</text>
+				<ste-checkbox-group v-model="groupValue2" direction="row">
+					<ste-checkbox name="a">复选框a</ste-checkbox>
+					<ste-checkbox name="b">复选框b</ste-checkbox>
+					<ste-checkbox name="c">复选框c</ste-checkbox>
+				</ste-checkbox-group>
+				<text class="result">选中: {{ groupValue2 }}</text>
+			</view>
+
+			<!-- 限制最大可选数 -->
+			<view class="demo-item">
+				<text class="demo-item-title">限制最大可选数(max=2)</text>
+				<ste-checkbox-group v-model="groupValue3" :max="2">
+					<ste-checkbox name="a">复选框a</ste-checkbox>
+					<ste-checkbox name="b">复选框b</ste-checkbox>
+					<ste-checkbox name="c">复选框c</ste-checkbox>
+				</ste-checkbox-group>
+				<text class="result">选中: {{ groupValue3 }}（最多选2个）</text>
+			</view>
+
+			<!-- 组属性继承 -->
+			<view class="demo-item">
+				<text class="demo-item-title">组属性继承（方形+左文本+禁用第三个）</text>
+				<ste-checkbox-group v-model="groupValue4" shape="square" textPosition="left">
+					<ste-checkbox name="a">复选框a</ste-checkbox>
+					<ste-checkbox name="b" disabled>复选框b（禁用）</ste-checkbox>
+					<ste-checkbox name="c" shape="circle">复选框c（覆盖组方形）</ste-checkbox>
+				</ste-checkbox-group>
+				<text class="result">选中: {{ groupValue4 }}</text>
+			</view>
+
+			<!-- 组自定义颜色 -->
+			<view class="demo-item">
+				<text class="demo-item-title">组自定义颜色和大小</text>
+				<ste-checkbox-group v-model="groupValue5" checkedColor="#ee0a24" iconSize="48" textSize="32">
+					<ste-checkbox name="a">复选框a</ste-checkbox>
+					<ste-checkbox name="b">复选框b</ste-checkbox>
+					<ste-checkbox name="c">复选框c</ste-checkbox>
+				</ste-checkbox-group>
+				<text class="result">选中: {{ groupValue5 }}</text>
+			</view>
+
+			<!-- 组禁用 -->
+			<view class="demo-item">
+				<text class="demo-item-title">组禁用</text>
+				<ste-checkbox-group v-model="groupValue6" disabled>
+					<ste-checkbox name="a">复选框a</ste-checkbox>
+					<ste-checkbox name="b">复选框b</ste-checkbox>
+				</ste-checkbox-group>
+				<text class="result">选中: {{ groupValue6 }}（全部禁用）</text>
+			</view>
+
+			<!-- 组只读 -->
+			<view class="demo-item">
+				<text class="demo-item-title">组只读（不置灰）</text>
+				<ste-checkbox-group v-model="groupValue7" readonly>
+					<ste-checkbox name="a">复选框a</ste-checkbox>
+					<ste-checkbox name="b">复选框b</ste-checkbox>
+				</ste-checkbox-group>
+				<text class="result">选中: {{ groupValue7 }}（只读不置灰）</text>
+			</view>
+
+			<!-- 列间距 -->
+			<view class="demo-item">
+				<text class="demo-item-title">自定义间距(columnGap=30)</text>
+				<ste-checkbox v-model="value14" columnGap="30">间距30rpx</ste-checkbox>
+			</view>
+
+			<!-- 边距 -->
+			<view class="demo-item">
+				<text class="demo-item-title">自定义边距(marginLeft=40)</text>
+				<ste-checkbox v-model="value15" marginLeft="40">左边距40rpx</ste-checkbox>
+			</view>
+		</scroll-view>
+	</view>
+</template>
+
+<script setup lang="uts">
+	import { ref } from 'vue'
+
+	defineOptions({ name: 'demo-checkbox' })
+
+	// 单个 checkbox
+	const value1 = ref(false)
+	const value2 = ref(false)
+	const value3 = ref(true)
+	const value4 = ref(false)
+	const value5 = ref(true)
+	const value6 = ref(false)
+	const value7 = ref(true)
+	const value8 = ref(false)
+	const value8b = ref(false)
+	const value9a = ref(false)
+	const value9b = ref(false)
+	const value9c = ref(false)
+	const value10 = ref(false)
+	const value11 = ref(true)
+	const value12 = ref(false)
+	const value13 = ref(false)
+	const value14 = ref(false)
+	const value15 = ref(false)
+
+	// 事件计数
+	const changeCount = ref(0)
+	const clickCount = ref(0)
+
+	function onChange13(val : any) {
+		changeCount.value++
+	}
+	function onClick13(val : any) {
+		clickCount.value++
+	}
+
+	// 复选框组
+	const groupValue1 = ref([] as string[])
+	const groupValue2 = ref([] as string[])
+	const groupValue3 = ref([] as string[])
+	const groupValue4 = ref([] as string[])
+	const groupValue5 = ref([] as string[])
+	const groupValue6 = ref(['a'] as string[])
+	const groupValue7 = ref(['a', 'b'] as string[])
+
+	function onGroupChange1(val : any[]) {
+		// 示例回调
+	}
+</script>
+
+<style>
+.page-root {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+}
+
+.page-scroll {
+	flex: 1;
+	padding: 20rpx;
+}
+
+.header {
+	margin-bottom: 30rpx;
+}
+
+.title {
+	font-size: 36rpx;
+	font-weight: bold;
+}
+
+.desc {
+	font-size: 24rpx;
+	color: #969799;
+	margin-top: 8rpx;
+}
+
+.demo-item {
+	margin-bottom: 30rpx;
+	padding: 20rpx;
+	background-color: #ffffff;
+	border-radius: 12rpx;
+}
+
+.demo-item-title {
+	font-size: 28rpx;
+	font-weight: bold;
+	margin-bottom: 16rpx;
+	color: #333333;
+}
+
+.demo-content {
+	margin-bottom: 12rpx;
+}
+
+.result {
+	font-size: 24rpx;
+	color: #999999;
+	margin-top: 8rpx;
+}
+</style>

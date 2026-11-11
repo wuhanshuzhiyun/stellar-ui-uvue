@@ -1,0 +1,129 @@
+<template>
+	<scroll-view scroll-y="true" class="page">
+		<view class="header">
+			<text class="title">Text 文本</text>
+			<text class="desc">显示文本文字的组件</text>
+		</view>
+
+		<!-- 可选 -->
+		<view class="demo-item">
+			<text class="demo-item-title">可选</text>
+			<view class="demo-card">
+				<ste-text :selectable="true">Stellar UI，全面的组件和便捷的工具会让您信手拈来，如鱼得水</ste-text>
+			</view>
+		</view>
+
+		<!-- 空格 -->
+		<view class="demo-item">
+			<text class="demo-item-title">空格</text>
+			<view class="row-block">
+				<view class="row-col">
+					<text class="demo-label">ensp</text>
+					<ste-text space="ensp">{{ text1 }}</ste-text>
+				</view>
+				<view class="row-col">
+					<text class="demo-label">emsp</text>
+					<ste-text space="emsp">{{ text2 }}</ste-text>
+				</view>
+				<view class="row-col">
+					<text class="demo-label">nbsp</text>
+					<ste-text space="nbsp">{{ text3 }}</ste-text>
+				</view>
+			</view>
+		</view>
+
+		<!-- 解码 -->
+		<view class="demo-item">
+			<text class="demo-item-title">解码</text>
+			<view class="demo-card">
+				<ste-text :decode="true">Stellar&nbsp;UI</ste-text>
+			</view>
+			<view class="demo-card">
+				<ste-text :decode="true">Stellar&amp;UI</ste-text>
+			</view>
+			<view class="demo-card">
+				<ste-text :decode="true">Stellar&apos;UI</ste-text>
+			</view>
+			<view class="demo-card">
+				<ste-text :decode="true">Stellar&ensp;UI</ste-text>
+			</view>
+			<view class="demo-card">
+				<ste-text :decode="true">Stellar&emsp;UI</ste-text>
+			</view>
+		</view>
+
+		<!-- 换行省略 -->
+		<view class="demo-item">
+			<text class="demo-item-title">换行省略</text>
+			<view class="row-block">
+				<view class="row-col">
+					<text class="demo-label">默认换行</text>
+					<ste-text>Stellar UI，全面的组件和便捷的工具会让您信手拈来，如鱼得水。Stellar UI，全面的组件和便捷的工具会让您信手拈来，如鱼得水。</ste-text>
+				</view>
+				<view class="row-col">
+					<text class="demo-label">lines=2</text>
+					<ste-text :lines="2">Stellar UI，全面的组件和便捷的工具会让您信手拈来，如鱼得水。Stellar UI，全面的组件和便捷的工具会让您信手拈来，如鱼得水。</ste-text>
+				</view>
+				<view class="row-col">
+					<text class="demo-label">lines=3</text>
+					<ste-text :lines="3">Stellar UI，全面的组件和便捷的工具会让您信手拈来，如鱼得水。Stellar UI，全面的组件和便捷的工具会让您信手拈来，如鱼得水。</ste-text>
+				</view>
+			</view>
+		</view>
+	</scroll-view>
+</template>
+
+<script setup lang="uts">
+	import { ref } from 'vue'
+
+	const text1 = ref('是你   是你')
+	const text2 = ref('是你   是你')
+	const text3 = ref('是你   是你')
+</script>
+
+<style>
+.page {
+	padding: 20rpx;
+	flex: 1;
+}
+.header {
+	margin-bottom: 30rpx;
+}
+.title {
+	font-size: 36rpx;
+	font-weight: bold;
+}
+.desc {
+	font-size: 24rpx;
+	color: #969799;
+	margin-top: 8rpx;
+}
+.demo-item {
+	margin-bottom: 30rpx;
+}
+.demo-item-title {
+	font-size: 28rpx;
+	font-weight: bold;
+	margin-bottom: 16rpx;
+	color: #333333;
+}
+.demo-card {
+	padding: 20rpx;
+	background-color: #ffffff;
+	border-radius: 12rpx;
+	margin-bottom: 12rpx;
+}
+.row-block {
+	flex-direction: row;
+	align-items: flex-start;
+}
+.row-col {
+	flex: 1;
+	margin-right: 12rpx;
+}
+.demo-label {
+	font-size: 24rpx;
+	color: #969799;
+	margin-bottom: 8rpx;
+}
+</style>

@@ -1,0 +1,318 @@
+<template>
+	<scroll-view scroll-y="true" class="page-container">
+		<!-- 头部导航与功能简介 -->
+		<view class="page-header">
+			<text class="page-title">LoginInfo 登录信息卡片</text>
+			<text class="page-desc">常用于个人中心与首页顶部，聚合展示用户头像、昵称、身份等级，或引导未登录用户快速跳转登录。</text>
+		</view>
+
+		<view class="demo-content">
+			<!-- 用例 1：基础已登录状态 -->
+			<view class="demo-card">
+				<text class="card-title">1. 基础已登录状态 (loginStatus=1)</text>
+				<text class="card-desc">展示用户圆形头像、加粗昵称与副标题身份标签，点击头像或用户信息可触发事件。</text>
+				<view class="card-inner">
+					<ste-login-info
+						avatar="https://image.whzb.com/chain/StellarUI/图片.jpg"
+						nickname="星瀚体验官·小百"
+						subTitle="中百食堂·终身常客"
+						subTitleIcon="&#xe670;"
+						@avatar-click="onAvatarClick('小百')"
+						@user-click="onUserClick('小百')"
+					/>
+				</view>
+			</view>
+
+			<!-- 用例 2：未登录引导状态 -->
+			<view class="demo-card">
+				<text class="card-title">2. 未登录引导状态 (loginStatus=0)</text>
+				<text class="card-desc">未登录时自动切换为占位头像，显示引导文案与向右指示箭头，点击即可拉起登录流程。</text>
+				<view class="card-inner">
+					<ste-login-info
+						:loginStatus="0"
+						loginTitle="点击登录 / 注册新账号"
+						loginSrc="https://image.whzb.com/chain/StellarUI/%E5%9B%BE%E7%89%87.jpg"
+						@avatar-click="onUnloginAvatarClick"
+						@login-title-click="onLoginTitleClick"
+					/>
+				</view>
+			</view>
+
+			<!-- 用例 3：自定义副标题颜色与自定义插槽 -->
+			<view class="demo-card">
+				<text class="card-title">3. 自定义高亮颜色与自定义插槽</text>
+				<text class="card-desc">支持通过 subColor 自定义副标题颜色，或使用 #desc 自定义徽章插槽。</text>
+				<!-- 3.1 自定义颜色 -->
+				<view class="card-inner mb-16">
+					<ste-login-info
+						avatar="https://image.whzb.com/chain/StellarUI/图片.jpg"
+						nickname="黑金尊享会员"
+						subTitle="SVIP 8 级钻石特权卡"
+						subTitleIcon="&#xe670;"
+						subColor="#d97706"
+						@avatar-click="onAvatarClick('SVIP')"
+						@user-click="onUserClick('SVIP')"
+					/>
+				</view>
+				<!-- 3.2 使用 #desc 自定义插槽 -->
+				<view class="card-inner">
+					<ste-login-info
+						avatar="https://image.whzb.com/chain/StellarUI/图片.jpg"
+						nickname="极客开发者"
+						@avatar-click="onAvatarClick('极客')"
+						@user-click="onUserClick('极客')"
+					>
+						<template #desc>
+							<view class="custom-badge-row">
+								<view class="badge-tag">
+									<text class="badge-tag-text">UTS 原生</text>
+								</view>
+								<text class="badge-score-text">成长积分: 9999</text>
+							</view>
+						</template>
+					</ste-login-info>
+				</view>
+			</view>
+
+			<!-- 用例 4：动态状态响应与切换 -->
+			<view class="demo-card">
+				<text class="card-title">4. 动态响应式切换与交互演示</text>
+				<text class="card-desc">点击下方按钮可动态切换登录态、模拟用户登录登出以及修改昵称。</text>
+				<view class="card-inner mb-24">
+					<ste-login-info
+						:loginStatus="dynamicStatus"
+						:avatar="dynamicAvatar"
+						:nickname="dynamicNickname"
+						:subTitle="dynamicSubTitle"
+						subTitleIcon="&#xe670;"
+						loginTitle="立即登录开启专属服务"
+						@avatar-click="onAvatarClick('动态卡片')"
+						@user-click="onUserClick('动态卡片')"
+						@login-title-click="onDynamicLoginClick"
+					/>
+				</view>
+				<!-- 状态操作控制按钮组 -->
+				<view class="btn-group">
+					<view class="btn-item">
+						<ste-button
+							:mode="dynamicStatus == 1 ? 100 : 200"
+							@click="toggleLoginStatus"
+						>
+							{{ dynamicStatus == 1 ? '退出为未登录' : '切换为已登录' }}
+						</ste-button>
+					</view>
+					<view class="btn-item" v-if="dynamicStatus == 1">
+						<ste-button
+							mode="200"
+							background="#67c23a"
+							borderColor="#67c23a"
+							color="#ffffff"
+							@click="changeNickname"
+						>
+							随机变更昵称
+						</ste-button>
+					</view>
+				</view>
+			</view>
+
+			<!-- 操作反馈日志 -->
+			<view class="demo-card">
+				<text class="card-title">操作状态反馈</text>
+				<view class="log-box">
+					<text class="log-text">{{ logText }}</text>
+				</view>
+			</view>
+		</view>
+	</scroll-view>
+</template>
+
+<script setup lang="uts">
+	/**
+	 * @file login-info.uvue
+	 * @description LoginInfo 登录信息卡片 - uni-app x / UTS 演示页面
+	 */
+	import { ref } from 'vue'
+
+	// 操作反馈日志
+	const logText = ref('等待交互操作中...')
+
+	// ==================== 4. 动态演示状态 ====================
+	const dynamicStatus = ref(1)
+	const dynamicAvatar = ref('https://image.whzb.com/chain/StellarUI/图片.jpg')
+	const dynamicNickname = ref('旅行探索家')
+	const dynamicSubTitle = ref('认证摄影师 · 粉丝 12.8w')
+
+	let nicknameIndex = 0
+	const nicknameList = [
+		'旅行探索家',
+		'全栈架构师',
+		'星瀚先锋开发者',
+		'Stellar UI 核心贡献者',
+	]
+
+	/**
+	 * 切换登录与未登录状态
+	 */
+	function toggleLoginStatus() {
+		if (dynamicStatus.value == 1) {
+			dynamicStatus.value = 0
+			logText.value = '已切换为【未登录状态】，展示引导登录卡片'
+		} else {
+			dynamicStatus.value = 1
+			logText.value = '已切换为【已登录状态】，展示当前用户信息'
+		}
+	}
+
+	/**
+	 * 随机更新昵称
+	 */
+	function changeNickname() {
+		nicknameIndex = (nicknameIndex + 1) % nicknameList.length
+		dynamicNickname.value = nicknameList[nicknameIndex]
+		logText.value = `已更新用户昵称为：${dynamicNickname.value}`
+	}
+
+	// ==================== 交互事件回调 ====================
+	function onAvatarClick(source : string) {
+		logText.value = `已触发【头像点击事件 (avatar-click)】，来源：${source}`
+	}
+
+	function onUserClick(source : string) {
+		logText.value = `已触发【用户信息点击 (user-click)】，来源：${source}`
+	}
+
+	function onUnloginAvatarClick() {
+		logText.value = '点击了未登录卡片的占位头像'
+	}
+
+	function onLoginTitleClick() {
+		logText.value = '已触发【未登录标题点击 (login-title-click)】，模拟拉起登录授权弹窗'
+	}
+
+	function onDynamicLoginClick() {
+		dynamicStatus.value = 1
+		logText.value = '点击未登录卡片引导，已成功模拟登录！'
+	}
+</script>
+
+<style scoped>
+	/* 页面根容器 */
+	.page-container {
+		flex: 1;
+		background-color: #f7f8fa;
+	}
+
+	/* 顶部头部说明 */
+	.page-header {
+		padding: 40rpx 32rpx 24rpx;
+		background-color: #ffffff;
+		margin-bottom: 24rpx;
+	}
+
+	.page-title {
+		font-size: 40rpx;
+		font-weight: bold;
+		color: #1a1a1a;
+		margin-bottom: 12rpx;
+	}
+
+	.page-desc {
+		font-size: 26rpx;
+		color: #8c8c8c;
+		line-height: 38rpx;
+	}
+
+	/* 演示卡片列表区 */
+	.demo-content {
+		padding: 0 24rpx 48rpx;
+	}
+
+	.demo-card {
+		background-color: #ffffff;
+		border-radius: 16rpx;
+		padding: 32rpx;
+		margin-bottom: 24rpx;
+	}
+
+	.card-title {
+		font-size: 30rpx;
+		font-weight: 600;
+		color: #333333;
+		margin-bottom: 8rpx;
+	}
+
+	.card-desc {
+		font-size: 24rpx;
+		color: #999999;
+		line-height: 34rpx;
+		margin-bottom: 24rpx;
+	}
+
+	/* 单个组件嵌入底盒（灰色底衬托白色卡片） */
+	.card-inner {
+		background-color: #f2f3f5;
+		border-radius: 16rpx;
+		padding: 16rpx;
+	}
+
+	.mb-16 {
+		margin-bottom: 16rpx;
+	}
+
+	.mb-24 {
+		margin-bottom: 24rpx;
+	}
+
+	/* 自定义插槽样式 */
+	.custom-badge-row {
+		flex-direction: row;
+		align-items: center;
+	}
+
+	.badge-tag {
+		background-color: #0090ff;
+		border-radius: 6rpx;
+		padding: 2rpx 10rpx;
+		margin-right: 12rpx;
+	}
+
+	.badge-tag-text {
+		color: #ffffff;
+		font-size: 20rpx;
+		font-weight: 600;
+	}
+
+	.badge-score-text {
+		color: #0090ff;
+		font-size: 24rpx;
+		font-weight: 500;
+	}
+
+	/* 控制按钮组 */
+	.btn-group {
+		flex-direction: row;
+		flex-wrap: wrap;
+		align-items: center;
+	}
+
+	.btn-item {
+		margin-right: 20rpx;
+		margin-bottom: 12rpx;
+	}
+
+	/* 操作日志盒子 */
+	.log-box {
+		background-color: #f9f9f9;
+		border-radius: 8rpx;
+		padding: 20rpx;
+		border-left-width: 6rpx;
+		border-left-style: solid;
+		border-left-color: #0090ff;
+	}
+
+	.log-text {
+		font-size: 24rpx;
+		color: #555555;
+		line-height: 36rpx;
+	}
+</style>

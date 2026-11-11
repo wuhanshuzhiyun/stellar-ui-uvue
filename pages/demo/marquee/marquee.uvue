@@ -1,0 +1,119 @@
+<template>
+	<scroll-view scroll-y="true" class="page">
+		<view class="header">
+			<text class="title">Marquee 走马灯（UVue）</text>
+		</view>
+
+		<view class="section">
+			<text class="section-title">基础用法</text>
+			<ste-marquee :list="list"></ste-marquee>
+		</view>
+
+		<view class="section">
+			<text class="section-title">自定义样式</text>
+			<ste-marquee :list="list" containerBg="#f5f5f5" containerPadding="20rpx" containerRadius="16rpx"
+				itemBg="#ffffff" itemPadding="16rpx 24rpx" itemRadius="8rpx"></ste-marquee>
+		</view>
+
+		<view class="section">
+			<text class="section-title">自定义颜色</text>
+			<ste-marquee :list="colorList" containerBg="#fff8e6" itemBg="#ffe0a0" itemRadius="6rpx"></ste-marquee>
+		</view>
+
+		<view class="section">
+			<text class="section-title">调整滚动速度（100px/s）</text>
+			<ste-marquee :list="list" :speed="100"></ste-marquee>
+		</view>
+
+		<view class="section">
+			<text class="section-title">垂直排列间距</text>
+			<ste-marquee :list="list" :gap="40" containerPadding="12rpx" containerBg="#f0f0f0"
+				containerRadius="12rpx"></ste-marquee>
+		</view>
+
+		<view class="section">
+			<text class="section-title">点击事件</text>
+			<ste-marquee :list="list" @click="onClick"></ste-marquee>
+			<text v-if="clickMsg != ''" class="click-result">{{ clickMsg }}</text>
+		</view>
+
+		<view class="section">
+			<text class="section-title">播放控制</text>
+			<view class="btn-row">
+				<button size="mini" @click="onPlay">播放</button>
+				<button size="mini" @click="onPause">暂停</button>
+				<button size="mini" @click="onStop">停止</button>
+			</view>
+			<ste-marquee ref="marqueeRef" :list="list" containerBg="#e8f4ff" containerRadius="8rpx"></ste-marquee>
+		</view>
+	</scroll-view>
+</template>
+
+<script setup lang="uts">
+	import { ref } from 'vue'
+
+	const list = ref<UTSJSONObject[]>([
+		{ id: 1, text: '恭喜用户138****1234获得一等奖' } as UTSJSONObject,
+		{ id: 2, text: '恭喜用户139****5678获得二等奖' } as UTSJSONObject,
+		{ id: 3, text: '恭喜用户137****9012获得三等奖' } as UTSJSONObject,
+		{ id: 4, text: '恭喜用户135****3456获得幸运奖' } as UTSJSONObject,
+	])
+
+	const colorList = ref<UTSJSONObject[]>([
+		{ id: 1, text: '系统维护通知：今晚 22:00 - 23:00 进行系统升级', color: '#ff6600' } as UTSJSONObject,
+		{ id: 2, text: '新版本已发布，请前往应用商店更新', color: '#0090FF' } as UTSJSONObject,
+		{ id: 3, text: '限时优惠：全场商品 8 折起', color: '#ff0000' } as UTSJSONObject,
+	])
+
+	const clickMsg = ref('')
+	const marqueeRef = ref<SteMarqueeComponentPublicInstance | null>(null)
+
+	function onClick(item: UTSJSONObject, index: number) {
+		clickMsg.value = '点击了：' + (item['text'] as string)
+	}
+
+	function onPlay() {
+		marqueeRef.value?.play()
+	}
+	function onPause() {
+		marqueeRef.value?.pause()
+	}
+	function onStop() {
+		marqueeRef.value?.stop()
+	}
+</script>
+
+<style>
+	.page {
+		padding: 20rpx;
+		flex-direction: column;
+	}
+	.header {
+		margin-bottom: 20rpx;
+	}
+	.title {
+		font-size: 36rpx;
+		font-weight: bold;
+	}
+	.section {
+		margin-bottom: 30rpx;
+		padding: 20rpx;
+		background-color: #ffffff;
+		border-radius: 12rpx;
+		flex-direction: column;
+	}
+	.section-title {
+		font-size: 28rpx;
+		color: #333333;
+		margin-bottom: 16rpx;
+	}
+	.btn-row {
+		flex-direction: row;
+		margin-bottom: 16rpx;
+	}
+	.click-result {
+		font-size: 26rpx;
+		color: #0090FF;
+		margin-top: 12rpx;
+	}
+</style>

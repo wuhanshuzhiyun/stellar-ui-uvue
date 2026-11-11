@@ -1,0 +1,161 @@
+<template>
+	<scroll-view scroll-y="true" class="page">
+		<view class="header">
+			<text class="title">Switch 开关</text>
+			<text class="desc">表示两种相互对立的状态间的切换</text>
+		</view>
+
+		<!-- 基础用法 -->
+		<view class="demo-item">
+			<text class="demo-item-title">基础用法</text>
+			<view class="demo-row">
+				<ste-switch v-model="val1"></ste-switch>
+			</view>
+			<text class="result">当前状态: {{ val1 ? '开' : '关' }}</text>
+		</view>
+
+		<!-- 禁用 -->
+		<view class="demo-item">
+			<text class="demo-item-title">禁用</text>
+			<text class="demo-desc">disabled（关）</text>
+			<view class="demo-row">
+				<ste-switch v-model="val2" disabled></ste-switch>
+			</view>
+			<text class="demo-desc">disabled（开）</text>
+			<view class="demo-row">
+				<ste-switch v-model="val3" disabled></ste-switch>
+			</view>
+		</view>
+
+		<!-- 只读 -->
+		<view class="demo-item">
+			<text class="demo-item-title">只读</text>
+			<text class="demo-desc">readonly（不置灰，但不可点击）</text>
+			<view class="demo-row">
+				<ste-switch v-model="val4" readonly></ste-switch>
+			</view>
+		</view>
+
+		<!-- 自定义大小 -->
+		<view class="demo-item">
+			<text class="demo-item-title">自定义大小</text>
+			<text class="demo-desc">size=80</text>
+			<view class="demo-row">
+				<ste-switch v-model="val5" :size="80"></ste-switch>
+			</view>
+			<text class="demo-desc">size=36</text>
+			<view class="demo-row">
+				<ste-switch v-model="val6" :size="36"></ste-switch>
+			</view>
+		</view>
+
+		<!-- 自定义颜色 -->
+		<view class="demo-item">
+			<text class="demo-item-title">自定义颜色</text>
+			<text class="demo-desc">activeColor=#07c160</text>
+			<view class="demo-row">
+				<ste-switch v-model="val7" activeColor="#07c160"></ste-switch>
+			</view>
+			<text class="demo-desc">activeColor=#ff5722, inactiveColor=#dcdcdc</text>
+			<view class="demo-row">
+				<ste-switch v-model="val8" activeColor="#ff5722" inactiveColor="#dcdcdc"></ste-switch>
+			</view>
+		</view>
+
+		<!-- 加载中 -->
+		<view class="demo-item">
+			<text class="demo-item-title">加载中</text>
+			<view class="demo-row">
+				<ste-switch v-model="val9" loading></ste-switch>
+			</view>
+			<view class="demo-row">
+				<ste-switch v-model="val10" loading></ste-switch>
+			</view>
+		</view>
+
+	</scroll-view>
+</template>
+
+<script setup lang="uts">
+	import { ref } from 'vue'
+
+	defineOptions({ name: 'demo-switch' })
+
+	// 基础用法
+	const val1 = ref<boolean>(false)
+
+	// 禁用
+	const val2 = ref<boolean>(false)
+	const val3 = ref<boolean>(true)
+
+	// 只读
+	const val4 = ref<boolean>(true)
+
+	// 自定义大小
+	const val5 = ref<boolean>(true)
+	const val6 = ref<boolean>(false)
+
+	// 自定义颜色
+	const val7 = ref<boolean>(true)
+	const val8 = ref<boolean>(true)
+
+	// 加载中
+	const val9 = ref<boolean>(false)
+	const val10 = ref<boolean>(true)
+</script>
+
+<style>
+	.page {
+		padding: 20rpx;
+		flex: 1;
+	}
+
+	.header {
+		margin-bottom: 30rpx;
+	}
+
+	.title {
+		font-size: 36rpx;
+		font-weight: bold;
+	}
+
+	.desc {
+		font-size: 24rpx;
+		color: #969799;
+		margin-top: 8rpx;
+	}
+
+	.demo-item {
+		margin-bottom: 30rpx;
+		padding: 20rpx;
+		background-color: #ffffff;
+		border-radius: 12rpx;
+		flex-direction: column;
+	}
+
+	.demo-item-title {
+		font-size: 28rpx;
+		font-weight: bold;
+		margin-bottom: 16rpx;
+		color: #333333;
+	}
+
+	.demo-desc {
+		font-size: 24rpx;
+		color: #969799;
+		margin-bottom: 8rpx;
+		margin-top: 12rpx;
+	}
+
+	.demo-row {
+		flex-direction: row;
+		align-items: center;
+		margin-bottom: 8rpx;
+	}
+
+	.result {
+		font-size: 24rpx;
+		color: #999999;
+		margin-top: 12rpx;
+	}
+</style>

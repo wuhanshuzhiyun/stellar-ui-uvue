@@ -1,0 +1,311 @@
+<template>
+	<!--
+		Swiper 轮播组件演示页面
+		规范要求：顶级容器 scroll-view 必须设置 flex: 1 以保障页面手势滚动顺畅响应
+	-->
+	<scroll-view direction="vertical" class="page">
+		<!-- 页面顶部标题与功能简介 -->
+		<view class="header">
+			<text class="title">Swiper 轮播</text>
+			<text class="desc">基于原生高性能渲染引擎封装，支持水平/垂直轮播、首尾无缝循环与优雅胶囊指示器。</text>
+		</view>
+
+		<!-- 控制与状态卡片 -->
+		<view class="control-card">
+			<view class="control-row">
+				<text class="control-label">自动播放 (autoplay)：</text>
+				<button class="mini-btn" size="mini" @click="toggleAutoplay">
+					{{ isAutoplay ? '已开启' : '已暂停' }}
+				</button>
+			</view>
+			<view class="control-row">
+				<text class="control-label">无缝循环 (circular)：</text>
+				<button class="mini-btn" size="mini" @click="toggleCircular">
+					{{ isCircular ? '已开启' : '已关闭' }}
+				</button>
+			</view>
+			<view class="status-row">
+				<text class="status-tip">当前基础轮播下标: {{ currentBasic }}</text>
+				<text class="status-tip">最近切换事件: {{ lastEventInfo }}</text>
+			</view>
+		</view>
+
+		<!-- 示例 1: 基础水平轮播 + 胶囊指示器 -->
+		<view class="section">
+			<text class="section-title">基础用法（胶囊指示器）</text>
+			<view class="swiper-wrapper-basic">
+				<ste-swiper
+					v-model:current="currentBasic"
+					:autoplay="isAutoplay"
+					:circular="isCircular"
+					:indicatorDots="true"
+					height="320rpx"
+					@change="onBasicChange"
+				>
+					<ste-swiper-item v-for="(item, index) in bannerList" :key="index">
+						<view class="banner-card" :style="{ backgroundColor: item.bg }">
+							<text class="banner-num">#0{{ index + 1 }}</text>
+							<text class="banner-title">{{ item.title }}</text>
+							<text class="banner-desc">{{ item.desc }}</text>
+						</view>
+					</ste-swiper-item>
+				</ste-swiper>
+			</view>
+		</view>
+
+		<!-- 示例 2: 卡片轮播与自定义指示器配色 -->
+		<view class="section">
+			<text class="section-title">卡片轮播（自定义圆角与指示器色）</text>
+			<view class="swiper-wrapper-card">
+				<ste-swiper
+					:circular="true"
+					:autoplay="isAutoplay"
+					:indicatorDots="true"
+					indicatorActiveColor="#ff4d4f"
+					indicatorColor="rgba(255, 255, 255, 0.6)"
+					height="320rpx"
+				>
+					<ste-swiper-item v-for="(item, index) in cardList" :key="index">
+						<view class="card-item" :style="{ backgroundColor: item.bg }">
+							<text class="card-title">{{ item.title }}</text>
+							<text class="card-sub">{{ item.desc }}</text>
+						</view>
+					</ste-swiper-item>
+				</ste-swiper>
+			</view>
+		</view>
+
+		<!-- 示例 3: 纵向垂直滚动公告 -->
+		<view class="section">
+			<text class="section-title">纵向跑马灯公告</text>
+			<view class="notice-wrapper">
+				<ste-swiper
+					direction="vertical"
+					:autoplay="true"
+					:circular="true"
+					:interval="2500"
+					height="100rpx"
+				>
+					<ste-swiper-item v-for="(notice, index) in noticeList" :key="index">
+						<view class="notice-item">
+							<text class="notice-tag">热门</text>
+							<text class="notice-text">{{ notice }}</text>
+						</view>
+					</ste-swiper-item>
+				</ste-swiper>
+			</view>
+		</view>
+	</scroll-view>
+</template>
+
+<script setup lang="uts">
+	import { ref } from 'vue'
+
+	type BannerData = {
+		title : string
+		desc : string
+		bg : string
+	}
+
+	/** 当前基础轮播下标 */
+	const currentBasic = ref(0)
+
+	/** 自动播放控制 */
+	const isAutoplay = ref(true)
+
+	/** 首尾循环控制 */
+	const isCircular = ref(true)
+
+	/** 事件日志反馈 */
+	const lastEventInfo = ref('暂无切换')
+
+	/** 横幅列表数据 */
+	const bannerList = ref<Array<BannerData>>([
+		{ title: '原生渲染引擎', desc: '基于 uni-app x 原生 Swiper 架构驱动', bg: '#1890ff' },
+		{ title: '极速手势高刷', desc: '完全摆脱 JS 线程通信延迟，120fps 顺滑跟随', bg: '#00c250' },
+		{ title: '双向数据同步', desc: 'v-model:current 与 change 事件无缝互通', bg: '#faad14' },
+		{ title: '精巧胶囊指示', desc: '现代长条胶囊过渡动效，品质感十足', bg: '#722ed1' }
+	])
+
+	/** 卡片模式列表 */
+	const cardList = ref<Array<BannerData>>([
+		{ title: '黑金会员特权', desc: '专属购物权益与全场免运费', bg: '#2f54eb' },
+		{ title: '超级品类盛典', desc: '海量尖货限时抢购低至五折', bg: '#eb2f96' },
+		{ title: '积分随心兑换', desc: '大牌数码与生活好礼专区', bg: '#fa8c16' }
+	])
+
+	/** 垂直公告数据 */
+	const noticeList = ref<Array<string>>([
+		'恭喜用户 138****6688 获得免单大奖！',
+		'Stellar UI uvue 原生轮播组件适配发布',
+		'夏季特惠火爆进行中，领券立减 100 元'
+	])
+
+	function toggleAutoplay() {
+		isAutoplay.value = !isAutoplay.value
+	}
+
+	function toggleCircular() {
+		isCircular.value = !isCircular.value
+	}
+
+	function onBasicChange(index : number, source : string) {
+		lastEventInfo.value = `下标 ${index}（来源: ${source}）`
+	}
+</script>
+
+<style>
+	/* 遵循全局规范：顶级 scroll-view 必须 flex: 1 */
+	.page {
+		flex: 1;
+		background-color: #f5f6f8;
+		padding: 24rpx;
+	}
+
+	.header {
+		margin-bottom: 24rpx;
+	}
+
+	.title {
+		font-size: 38rpx;
+		font-weight: bold;
+		color: #1f1f1f;
+		margin-bottom: 8rpx;
+	}
+
+	.desc {
+		font-size: 26rpx;
+		color: #8c8c8c;
+		line-height: 38rpx;
+	}
+
+	.control-card {
+		background-color: #ffffff;
+		border-radius: 16rpx;
+		padding: 20rpx;
+		margin-bottom: 24rpx;
+	}
+
+	.control-row {
+		flex-direction: row;
+		align-items: center;
+		margin-bottom: 12rpx;
+	}
+
+	.control-label {
+		font-size: 26rpx;
+		color: #595959;
+		margin-right: 12rpx;
+	}
+
+	.mini-btn {
+		font-size: 22rpx;
+	}
+
+	.status-row {
+		border-top: 1px solid #f0f0f0;
+		padding-top: 12rpx;
+	}
+
+	.status-tip {
+		font-size: 24rpx;
+		color: #1890ff;
+		margin-bottom: 4rpx;
+	}
+
+	.section {
+		margin-bottom: 32rpx;
+	}
+
+	.section-title {
+		font-size: 30rpx;
+		font-weight: bold;
+		color: #262626;
+		margin-bottom: 16rpx;
+	}
+
+	/* 基础轮播容器 */
+	.swiper-wrapper-basic {
+		border-radius: 16rpx;
+		overflow: hidden;
+	}
+
+	/* 卡片轮播容器 */
+	.swiper-wrapper-card {
+		border-radius: 20rpx;
+		overflow: hidden;
+	}
+
+	.banner-card {
+		height: 100%;
+		padding: 36rpx;
+		justify-content: center;
+		border-radius: 16rpx;
+	}
+
+	.banner-num {
+		font-size: 24rpx;
+		color: rgba(255, 255, 255, 0.8);
+		margin-bottom: 8rpx;
+	}
+
+	.banner-title {
+		font-size: 36rpx;
+		font-weight: bold;
+		color: #ffffff;
+		margin-bottom: 8rpx;
+	}
+
+	.banner-desc {
+		font-size: 24rpx;
+		color: rgba(255, 255, 255, 0.9);
+	}
+
+	.card-item {
+		height: 100%;
+		padding: 30rpx;
+		justify-content: center;
+		align-items: center;
+		border-radius: 20rpx;
+	}
+
+	.card-title {
+		font-size: 32rpx;
+		font-weight: bold;
+		color: #ffffff;
+		margin-bottom: 6rpx;
+	}
+
+	.card-sub {
+		font-size: 24rpx;
+		color: rgba(255, 255, 255, 0.85);
+	}
+
+	.notice-wrapper {
+		background-color: #ffffff;
+		border-radius: 16rpx;
+		padding: 0 20rpx;
+		overflow: hidden;
+	}
+
+	.notice-item {
+		height: 100%;
+		flex-direction: row;
+		align-items: center;
+	}
+
+	.notice-tag {
+		background-color: #ff4d4f;
+		color: #ffffff;
+		font-size: 20rpx;
+		padding: 2rpx 10rpx;
+		border-radius: 6rpx;
+		margin-right: 14rpx;
+	}
+
+	.notice-text {
+		font-size: 26rpx;
+		color: #333333;
+		flex: 1;
+	}
+</style>

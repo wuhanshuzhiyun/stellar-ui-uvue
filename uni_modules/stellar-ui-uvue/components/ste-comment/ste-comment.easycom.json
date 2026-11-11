@@ -1,0 +1,48 @@
+{
+	"name": "ste-comment",
+	"description": "Comment 评论组件，用于在商品详情等页面展示评价列表、评分标签与晒图九宫格。已全面支持原生渲染。",
+	"example": "<ste-comment :comments=\"comments\" :tags=\"tags\" :total=\"10\"></ste-comment>",
+	"tutorial": "https://stellar-ui.intecloud.com.cn/?projectName=stellar-ui-uvue&menu=%E7%BB%84%E4%BB%B6&active=ste-comment",
+	"attributes": [
+		{
+			"name": "tags",
+			"description": "顶部评价聚合标签列表",
+			"type": "string[]",
+			"default": "[]"
+		},
+		{
+			"name": "total",
+			"description": "外部传入的评价统计总数，当 total 为 0 且 comments 为空时自动呈现空状态提示",
+			"type": "number",
+			"default": 0
+		},
+		{
+			"name": "comments",
+			"description": "用户评价列表数据，类型为强类型结构 CommentType[]，建议从 stellar-ui-uvue/components/ste-comment/constants.uts 引入强类型；晒图九宫格使用动态样式类控制列间距",
+			"type": "CommentType[]",
+			"default": "[]"
+		}
+	],
+	"events": [
+		{
+			"name": "click-head-right",
+			"description": "点击右上角操作文案（全部评价 / 期待你的首评）时触发",
+			"params": "text: string"
+		},
+		{
+			"name": "click-tag",
+			"description": "点击顶部聚合标签时触发",
+			"params": "tag: string, index: number"
+		},
+		{
+			"name": "click-image",
+			"description": "点击评价晒图时触发（默认同时调起全屏大图预览）",
+			"params": "image: string, index: number, images: string[]"
+		},
+		{
+			"name": "click-item",
+			"description": "点击整条评价卡片时触发",
+			"params": "item: CommentType, index: number"
+		}
+	]
+}

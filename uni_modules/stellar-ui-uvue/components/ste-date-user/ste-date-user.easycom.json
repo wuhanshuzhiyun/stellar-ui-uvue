@@ -1,0 +1,40 @@
+{
+    "name": "ste-date-user",
+    "description": "提供日期和用户信息展示卡片，支持日历/节气展示与人员头像信息展示。",
+    "example": "<ste-date-user></ste-date-user>",
+    "tutorial": "https://stellar-ui.intecloud.com.cn/?projectName=stellar-ui-uvue&menu=%E7%BB%84%E4%BB%B6&active=ste-date-user",
+    "attributes": [
+        {
+            "name": "type",
+            "description": "组件业务类型。内置了本地系统时间与网络日历双重引擎，断网或接口超时自动优雅降级，保障界面稳定呈现。",
+            "type": "String",
+            "default": "date",
+            "values": [
+                {
+                    "name": "date",
+                    "description": "日期卡片模式"
+                },
+                {
+                    "name": "user",
+                    "description": "人员卡片模式"
+                }
+            ]
+        },
+        {
+            "name": "avatar",
+            "description": "人员头像图片地址（type='user' 时生效）",
+            "type": "String",
+            "default": ""
+        },
+        {
+            "name": "nickname",
+            "description": "人员姓名或昵称（type='user' 时生效）",
+            "type": "String",
+            "default": ""
+        },
+        {
+            "name": "[slot]desc",
+            "description": "人员卡片底部自定义角色/徽标描述插槽（type='user' 时生效）"
+        }
+    ]
+}

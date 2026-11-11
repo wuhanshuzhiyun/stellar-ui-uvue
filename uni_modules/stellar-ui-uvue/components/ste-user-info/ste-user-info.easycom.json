@@ -1,0 +1,146 @@
+{
+    "name": "ste-user-info",
+    "description": "提供用户信息展示。",
+    "example": "<ste-user-info></ste-user-info>",
+    "tutorial": "https://stellar-ui.intecloud.com.cn/?projectName=stellar-ui-uvue&menu=%E7%BB%84%E4%BB%B6&active=ste-user-info",
+    "attributes": [
+        {
+            "name": "avatar",
+            "description": "头像",
+            "type": "String",
+            "default": ""
+        },
+        {
+            "name": "nickname",
+            "description": "昵称",
+            "type": "String",
+            "default": ""
+        },
+        {
+            "name": "showUserInfo",
+            "description": "是否展示用户相关",
+            "type": "Boolean",
+            "default": true
+        },
+        {
+            "name": "list",
+            "description": "业务统计数据列表（最多三个，如余额、积分等）",
+            "type": "UserInfoDataItem[]",
+            "default": []
+        },
+        {
+            "name": "codeSrc",
+            "description": "功能码图片",
+            "type": "String",
+            "default": ""
+        },
+        {
+            "name": "codeTitle",
+            "description": "功能码标题",
+            "type": "String",
+            "default": ""
+        },
+        {
+            "name": "codeTitleColor",
+            "description": "功能码标题颜色",
+            "type": "String",
+            "default": "主题色"
+        },
+        {
+            "name": "showCode",
+            "description": "是否展示功能码相关",
+            "type": "Boolean",
+            "default": true
+        },
+        {
+            "name": "loginStatus",
+            "description": "登录状态",
+            "type": "Number",
+            "default": 1,
+            "values": [
+                {
+                    "name": 0,
+                    "description": "未登录"
+                },
+                {
+                    "name": 1,
+                    "description": "登录"
+                }
+            ]
+        },
+        {
+            "name": "loginSrc",
+            "description": "未登录头像",
+            "type": "String",
+            "default": ""
+        },
+        {
+            "name": "loginTitle",
+            "description": "未登录标题",
+            "type": "String",
+            "default": ""
+        },
+        {
+            "name": "loginInfo",
+            "description": "未登录提示语",
+            "type": "String",
+            "default": ""
+        },
+        {
+            "name": "loginBtnText",
+            "description": "登录按钮文本",
+            "type": "String",
+            "default": "注册/登录"
+        },
+        {
+            "name": "loginBtnBg",
+            "description": "登录按钮背景色",
+            "type": "String",
+            "default": "主题色"
+        },
+        {
+            "name": "[event]userClick",
+            "description": "用户区域点击",
+            "params": [
+                {
+                    "name": "data",
+                    "description": "() => void"
+                }
+            ]
+        },
+        {
+            "name": "[event]dataClick",
+            "description": "数据点击",
+            "params": [
+                {
+                    "name": "index",
+                    "description": "当前点击的数据排序"
+                }
+            ]
+        },
+        {
+            "name": "[event]codeClick",
+            "description": "功能码区域点击",
+            "params": [
+                {
+                    "name": "data",
+                    "description": "() => void"
+                }
+            ]
+        },
+        {
+            "name": "[event]loginBtnClick",
+            "description": "登录按钮点击",
+            "params": [
+                {
+                    "name": "data",
+                    "description": "() => void"
+                }
+            ]
+        },
+        {
+            "name": "[slot]desc",
+            "description": "用户描述"
+        }
+    ]
+}

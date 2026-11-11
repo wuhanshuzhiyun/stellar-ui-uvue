@@ -1,0 +1,266 @@
+<template>
+	<scroll-view scroll-y="true" class="page-container">
+		<!-- 头部导航说明 -->
+		<view class="page-header">
+			<text class="page-title">Tour 指引</text>
+			<text class="page-desc">用于在页面中分步聚焦高亮特定功能区域，向用户展示操作指引说明。</text>
+		</view>
+
+		<view class="demo-content">
+			<!-- 用例 1：基础用法 -->
+			<view class="demo-card">
+				<text class="card-title">1. 基础用法</text>
+				<text class="card-desc">单步骤聚焦目标元素，展示指引气泡。</text>
+				<view class="target-row">
+					<view id="tour-btn-1" class="target-box">
+						<ste-button @click="show1 = true" :width="240">基础指引目标</ste-button>
+					</view>
+				</view>
+			</view>
+
+			<!-- 用例 2：位置偏移量 -->
+			<view class="demo-card">
+				<text class="card-title">2. 气泡位置偏移量</text>
+				<text class="card-desc">通过 offset: [20, 10] 设置气泡横向与纵向偏移距离。</text>
+				<view class="target-row">
+					<view id="tour-btn-2" class="target-box">
+						<ste-button @click="show2 = true" :width="280">偏移指引目标</ste-button>
+					</view>
+				</view>
+			</view>
+
+			<!-- 用例 3：多步骤与显示标题栏 -->
+			<view class="demo-card">
+				<text class="card-title">3. 多步骤与标题栏</text>
+				<text class="card-desc">支持连续 3 个步骤分步切换，展示标题栏与底部步数翻页。</text>
+				<view class="step-target-list">
+					<view id="step-target-1" class="step-badge-box">
+						<text class="badge-text">步骤 ①：关注模块</text>
+					</view>
+					<view id="step-target-2" class="step-badge-box">
+						<text class="badge-text">步骤 ②：点赞分享</text>
+					</view>
+					<view id="step-target-3" class="step-badge-box">
+						<text class="badge-text">步骤 ③：进入主页</text>
+					</view>
+				</view>
+				<view class="btn-group" style="margin-top: 16rpx">
+					<ste-button @click="show3 = true" :width="280">开启多步指引</ste-button>
+				</view>
+			</view>
+
+			<!-- 用例 4：不显示背景蒙层 -->
+			<view class="demo-card">
+				<text class="card-title">4. 无暗色背景蒙层</text>
+				<text class="card-desc">设置 mask: false，仅保留气泡浮层与轻微阴影。</text>
+				<view class="target-row">
+					<view id="tour-btn-4" class="target-box">
+						<ste-button @click="show4 = true" :width="280">无蒙层指引目标</ste-button>
+					</view>
+				</view>
+			</view>
+
+			<!-- 用例 5：自定义插槽内容 -->
+			<view class="demo-card">
+				<text class="card-title">5. 自定义插槽内容</text>
+				<text class="card-desc">通过默认插槽展示富文本与自定义图片内容。</text>
+				<view class="target-row">
+					<view id="tour-btn-5" class="target-box">
+						<ste-button @click="show5 = true" :width="280">自定义插槽目标</ste-button>
+					</view>
+				</view>
+			</view>
+		</view>
+
+		<!-- 指引组件 1：基础 -->
+		<ste-tour
+			v-model:show="show1"
+			:steps="steps1"
+		/>
+
+		<!-- 指引组件 2：偏移 -->
+		<ste-tour
+			v-model:show="show2"
+			:steps="steps2"
+			:offset="[20, 10]"
+		/>
+
+		<!-- 指引组件 3：多步骤带标题 -->
+		<ste-tour
+			v-model:show="show3"
+			:steps="steps3"
+			showTitleBar
+			v-model:current="current3"
+		/>
+
+		<!-- 指引组件 4：无蒙层 -->
+		<ste-tour
+			v-model:show="show4"
+			:steps="steps4"
+			:mask="false"
+		/>
+
+		<!-- 指引组件 5：插槽自定义 -->
+		<ste-tour
+			v-model:show="show5"
+			:steps="steps5"
+			:offset="[0, 10]"
+			messageBg="#ffffff"
+		>
+			<template #default>
+				<view class="slot-custom-content">
+					<text class="slot-highlight">✨ 自定义新手大礼包</text>
+					<text class="slot-desc">恭喜您解锁新用户专享特权福利，点击领取！</text>
+				</view>
+			</template>
+		</ste-tour>
+	</scroll-view>
+</template>
+
+<script setup lang="uts">
+	/**
+	 * @file tour.uvue
+	 * @description Tour 指引组件 - uni-app x / UTS 全功能演示页面
+	 */
+	import { ref } from 'vue'
+	import { TourStep } from '@/uni_modules/stellar-ui-uvue/components/ste-tour/constants.uts'
+
+	// 用例 1：基础指引
+	const show1 = ref<boolean>(false)
+	const steps1 = ref<TourStep[]>([
+		{ message: '点击这里可以体验基础功能', target: 'tour-btn-1' } as TourStep,
+	])
+
+	// 用例 2：偏移指引
+	const show2 = ref<boolean>(false)
+	const steps2 = ref<TourStep[]>([
+		{ message: '气泡位置已产生横向与纵向偏移', target: 'tour-btn-2' } as TourStep,
+	])
+
+	// 用例 3：多步骤与标题
+	const show3 = ref<boolean>(false)
+	const current3 = ref<number>(0)
+	const steps3 = ref<TourStep[]>([
+		{ title: '第一步：关注', message: '首先点击关注该作者获得最新动态更新', target: 'step-target-1' } as TourStep,
+		{ title: '第二步：点赞', message: '其次点击点赞支持作者的优质内容', target: 'step-target-2' } as TourStep,
+		{ title: '第三步：主页', message: '最后进入作者主页浏览更多精彩合集', target: 'step-target-3' } as TourStep,
+	])
+
+	// 用例 4：无蒙层
+	const show4 = ref<boolean>(false)
+	const steps4 = ref<TourStep[]>([
+		{ message: '无暗色背景遮罩，仅有气泡与高亮框', target: 'tour-btn-4' } as TourStep,
+	])
+
+	// 用例 5：插槽自定义
+	const show5 = ref<boolean>(false)
+	const steps5 = ref<TourStep[]>([
+		{ message: '恭喜您解锁新用户专享特权福利，点击领取！', target: 'tour-btn-5' } as TourStep,
+	])
+</script>
+
+<style scoped>
+.page-container {
+	flex: 1;
+	background-color: #f7f8fa;
+	padding: 24rpx;
+}
+
+.page-header {
+	margin-bottom: 24rpx;
+}
+
+.page-title {
+	font-size: 40rpx;
+	font-weight: bold;
+	color: #333333;
+	margin-bottom: 8rpx;
+}
+
+.page-desc {
+	font-size: 26rpx;
+	color: #666666;
+	line-height: 38rpx;
+}
+
+.demo-content {
+	display: flex;
+	flex-direction: column;
+	padding-bottom: 80rpx;
+}
+
+.demo-card {
+	background-color: #ffffff;
+	border-radius: 16rpx;
+	padding: 24rpx;
+	margin-bottom: 24rpx;
+	box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.03);
+}
+
+.card-title {
+	font-size: 30rpx;
+	font-weight: bold;
+	color: #1a1a1a;
+	margin-bottom: 8rpx;
+}
+
+.card-desc {
+	font-size: 24rpx;
+	color: #888888;
+	line-height: 34rpx;
+	margin-bottom: 20rpx;
+}
+
+.target-row {
+	display: flex;
+	flex-direction: row;
+}
+
+.target-box {
+	display: flex;
+	flex-direction: row;
+}
+
+.step-target-list {
+	display: flex;
+	flex-direction: column;
+}
+
+.step-badge-box {
+	background-color: #f0f7ff;
+	border: 1px solid #cce4ff;
+	border-radius: 12rpx;
+	padding: 16rpx 20rpx;
+	margin-bottom: 12rpx;
+}
+
+.badge-text {
+	font-size: 26rpx;
+	color: #007aff;
+	font-weight: 500;
+}
+
+.btn-group {
+	display: flex;
+	flex-direction: row;
+}
+
+.slot-custom-content {
+	display: flex;
+	flex-direction: column;
+	padding: 8rpx 4rpx;
+}
+
+.slot-highlight {
+	font-size: 28rpx;
+	font-weight: bold;
+	color: #ff9500;
+	margin-bottom: 8rpx;
+}
+
+.slot-desc {
+	font-size: 24rpx;
+	color: #333333;
+	line-height: 34rpx;
+}
+</style>

@@ -1,0 +1,30 @@
+/**
+ * stellar-ui-uvue npm 包主入口（纯 UTS）
+ *
+ * 设计约束：
+ * 1. 不 import 任何 .uvue 组件 —— 避免 esbuild/Node 预构建时无法解析 .uvue 扩展名。
+ *    组件请通过 easycom 自动引入，或从 './components/*' 子路径按需引入。
+ * 2. 本文件由手工维护；`index.ts` / `types/*.d.ts` 是 scripts/components-type.js
+ *    的生成物，每次编译会被覆盖，不要在此处引用它们的导出。
+ */
+
+// 通用工具与颜色 store
+export { utils, System, Color, useColorStore } from './utils/index.uts'
+
+// 全局配置（字号缩放、主题色）
+export {
+	normalizeFontSize,
+	normalizeFontSizeNum,
+	getFontScale,
+	setFontScale,
+	onFontSizeChange,
+	useFontSize,
+	setThemeColor,
+	getThemeColor,
+	setConfig
+} from './config/index.uts'
+
+// 命令式 API（toast / message-box / tooltip）
+export { useToast } from './components/ste-toast/use-toast.uts'
+export { useMessageBox } from './components/ste-message-box/use-message-box.uts'
+export { useTooltip } from './components/ste-tooltip/use-tooltip.uts'

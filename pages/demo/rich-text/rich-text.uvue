@@ -1,0 +1,104 @@
+<template>
+	<scroll-view scroll-y="true" class="page">
+		<view class="header">
+			<text class="title">RichText 富文本</text>
+		</view>
+
+		<!-- 基础用法 -->
+		<view class="demo-item">
+			<text class="demo-title">基础用法</text>
+			<ste-rich-text :text="basicText"></ste-rich-text>
+		</view>
+
+		<!-- 带图片 -->
+		<view class="demo-item">
+			<text class="demo-title">带图片</text>
+			<ste-rich-text :text="imageText"></ste-rich-text>
+		</view>
+
+		<!-- 带样式标签 -->
+		<view class="demo-item">
+			<text class="demo-title">带样式标签</text>
+			<ste-rich-text :text="styledText"></ste-rich-text>
+		</view>
+
+		<!-- 文本可选 -->
+		<view class="demo-item">
+			<text class="demo-title">文本可选（长按可选择）</text>
+			<ste-rich-text :text="basicText" :user-select="true"></ste-rich-text>
+		</view>
+
+		<!-- 空格处理 -->
+		<view class="demo-item">
+			<text class="demo-title">空格处理（ensp）</text>
+			<ste-rich-text :text="spaceText" space="ensp"></ste-rich-text>
+		</view>
+
+		<view class="demo-item">
+			<text class="demo-title">空格处理（emsp）</text>
+			<ste-rich-text :text="spaceText" space="emsp"></ste-rich-text>
+		</view>
+
+		<view class="demo-item">
+			<text class="demo-title">空格处理（nbsp）</text>
+			<ste-rich-text :text="spaceText" space="nbsp"></ste-rich-text>
+		</view>
+
+		<!-- 复合内容 -->
+		<view class="demo-item">
+			<text class="demo-title">复合内容</text>
+			<ste-rich-text :text="complexText"></ste-rich-text>
+		</view>
+
+		<!-- 特殊字符 -->
+		<view class="demo-item">
+			<text class="demo-title">特殊字符（&middot; &mdash;）</text>
+			<ste-rich-text :text="specialText"></ste-rich-text>
+		</view>
+	</scroll-view>
+</template>
+
+<script setup lang="uts">
+	const basicText = ref('<p>这是一段富文本内容，用于展示 ste-rich-text 组件的基础用法。</p>')
+
+	const imageText = ref('<p>下方是一张图片：</p><img src="https://picsum.photos/300/200?random=10" style="width:100%;"/><p>图片上方和下方都有文字说明。</p>')
+
+	const styledText = ref('<p style="color:#0090FF;font-size:18px;font-weight:bold;">蓝色加粗文字</p><p style="color:#ee0a24;font-size:14px;">红色普通文字</p><p style="color:#07c160;font-size:16px;text-decoration:underline;">绿色下划线文字</p>')
+
+	const spaceText = ref('<p>这是  一段  有多个  空格的  文本</p>')
+
+	const complexText = ref('<div><h3 style="color:#333;">标题文字</h3><p>这是段落内容，包含<strong>加粗</strong>和<em>斜体</em>文字。</p><ul><li>列表项一</li><li>列表项二</li><li>列表项三</li></ul></div>')
+
+	const specialText = ref('<p>特殊字符：&middot; 圆点 &middot; 破折号 &mdash; 结束</p>')
+</script>
+
+<style>
+	.page {
+		padding: 20rpx;
+		flex: 1
+	}
+
+	.header {
+		margin-bottom: 20rpx;
+	}
+
+	.title {
+		font-size: 36rpx;
+		font-weight: bold;
+	}
+
+	.demo-item {
+		background-color: #ffffff;
+		border-radius: 12rpx;
+		padding: 24rpx;
+		margin-bottom: 20rpx;
+		flex-direction: column;
+	}
+
+	.demo-title {
+		font-size: 28rpx;
+		font-weight: bold;
+		margin-bottom: 16rpx;
+		color: #333333;
+	}
+</style>

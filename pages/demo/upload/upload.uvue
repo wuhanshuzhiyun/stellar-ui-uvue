@@ -1,0 +1,176 @@
+<template>
+	<scroll-view scroll-y="true" class="page">
+		<view class="header">
+			<text class="title">Upload 上传</text>
+			<text class="desc">用于将本地的图片或视频上传</text>
+		</view>
+
+		<!-- 基础用法 -->
+		<view class="demo-item">
+			<text class="demo-item-title">基础用法</text>
+			<view class="demo-row">
+				<ste-upload :model-value="list1" @update:model-value="onUpdate1" @read="onRead"></ste-upload>
+			</view>
+			<text class="result">已选 {{ list1.length }} 个文件</text>
+		</view>
+
+		<!-- 多选模式 -->
+		<view class="demo-item">
+			<text class="demo-item-title">多选模式</text>
+			<text class="demo-desc">multiple=true</text>
+			<view class="demo-row">
+				<ste-upload :model-value="list2" @update:model-value="onUpdate2" :multiple="true"
+					@read="onRead"></ste-upload>
+			</view>
+			<text class="result">已选 {{ list2.length }} 个文件</text>
+		</view>
+
+		<!-- 限制数量 -->
+		<view class="demo-item">
+			<text class="demo-item-title">限制数量</text>
+			<text class="demo-desc">maxCount=3, multiple=true</text>
+			<view class="demo-row">
+				<ste-upload :model-value="list3" @update:model-value="onUpdate3" :multiple="true" :max-count="3"
+					@read="onRead"></ste-upload>
+			</view>
+			<text class="result">已选 {{ list3.length }} / 3 个文件</text>
+		</view>
+
+		<!-- 限制大小 -->
+		<view class="demo-item">
+			<text class="demo-item-title">限制大小</text>
+			<text class="demo-desc">maxSize=500 (KB)</text>
+			<view class="demo-row">
+				<ste-upload :model-value="list4" @update:model-value="onUpdate4" :max-size="500"
+					@oversize="onOversize"></ste-upload>
+			</view>
+			<text class="result">已选 {{ list4.length }} 个文件</text>
+		</view>
+
+		<!-- 自定义尺寸 -->
+		<view class="demo-item">
+			<text class="demo-item-title">自定义尺寸</text>
+			<text class="demo-desc">previewWidth=150, previewHeight=150</text>
+			<view class="demo-row">
+				<ste-upload :model-value="list5" @update:model-value="onUpdate5" :preview-width="150"
+					:preview-height="150"></ste-upload>
+			</view>
+		</view>
+
+		<!-- 禁用状态 -->
+		<view class="demo-item">
+			<text class="demo-item-title">禁用状态</text>
+			<view class="demo-row">
+				<ste-upload :model-value="list6" @update:model-value="onUpdate6" :disabled="true"></ste-upload>
+			</view>
+		</view>
+	</scroll-view>
+</template>
+
+<script setup lang="uts">
+	import { ref } from 'vue'
+
+	type UploadFileType = {
+		url : string,
+		type ?: string,
+		size ?: number,
+		name ?: string,
+		status ?: string,
+		path ?: string,
+		thumbPath ?: string,
+		duration ?: number,
+		height ?: number,
+		width ?: number
+	}
+
+	const list1 = ref<UploadFileType[]>([] as UploadFileType[])
+	const list2 = ref<UploadFileType[]>([] as UploadFileType[])
+	const list3 = ref<UploadFileType[]>([] as UploadFileType[])
+	const list4 = ref<UploadFileType[]>([] as UploadFileType[])
+	const list5 = ref<UploadFileType[]>([] as UploadFileType[])
+	const list6 = ref<UploadFileType[]>([] as UploadFileType[])
+
+	function onUpdate1(val : UploadFileType[]) {
+		list1.value = val
+	}
+	function onUpdate2(val : UploadFileType[]) {
+		list2.value = val
+	}
+	function onUpdate3(val : UploadFileType[]) {
+		list3.value = val
+	}
+	function onUpdate4(val : UploadFileType[]) {
+		list4.value = val
+	}
+	function onUpdate5(val : UploadFileType[]) {
+		list5.value = val
+	}
+	function onUpdate6(val : UploadFileType[]) {
+		list6.value = val
+	}
+
+	function onRead(fileList : UploadFileType[]) {
+		uni.showToast({ title: '已选择 ' + fileList.length + ' 个文件', icon: 'none' })
+	}
+
+	function onOversize(item : UploadFileType, fileList : UploadFileType[]) {
+		uni.showToast({ title: '文件大小超出限制', icon: 'none' })
+	}
+</script>
+
+<style>
+	.page {
+		padding: 20rpx;
+		flex: 1
+	}
+
+	.header {
+		margin-bottom: 20rpx;
+	}
+
+	.title {
+		font-size: 36rpx;
+		font-weight: bold;
+	}
+
+	.desc {
+		font-size: 26rpx;
+		color: #999;
+		margin-top: 8rpx;
+	}
+
+	.content {
+		flex-direction: column;
+	}
+
+	.demo-item {
+		padding: 24rpx;
+		margin-bottom: 24rpx;
+		background-color: #ffffff;
+		border-radius: 16rpx;
+	}
+
+	.demo-item-title {
+		font-size: 28rpx;
+		font-weight: bold;
+		margin-bottom: 12rpx;
+	}
+
+	.demo-desc {
+		font-size: 24rpx;
+		color: #999;
+		margin-bottom: 16rpx;
+	}
+
+	.demo-row {
+		flex-direction: row;
+		flex-wrap: wrap;
+		margin-bottom: 12rpx;
+	}
+
+	.result {
+		font-size: 24rpx;
+		color: #666;
+		margin-top: 8rpx;
+	}
+</style>

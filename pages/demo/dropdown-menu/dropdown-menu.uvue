@@ -1,0 +1,259 @@
+<template>
+	<scroll-view direction="vertical" class="page">
+		<!-- 顶部标题与描述 -->
+		<view class="header">
+			<text class="title">DropdownMenu 下拉菜单</text>
+			<text class="desc">用于向下或向上展开筛选选项卡，支持单选/多选、列表与胶囊按钮形态及精准定位动画。</text>
+		</view>
+
+		<!-- 1. 基础单选列表模式 -->
+		<view class="section">
+			<text class="section-title">1. 基础用法 (v-model 联动)</text>
+			<view class="card">
+				<text class="card-desc">当前选中值: {{ menuValue1 }}</text>
+				<view class="menu-wrap">
+					<ste-dropdown-menu v-model="menuValue1">
+						<ste-dropdown-menu-item value="1" title="全部商品" />
+						<ste-dropdown-menu-item value="2" title="新款上市" />
+						<ste-dropdown-menu-item value="3" title="活动特惠" />
+						<ste-dropdown-menu-item value="4" title="热销推荐" />
+					</ste-dropdown-menu>
+				</view>
+			</view>
+		</view>
+
+		<!-- 2. 自定义顶部偏移量 (offsetTop) - 放置于屏幕中上部，保证下方有充裕空间展现偏移与浮层 -->
+		<view class="section">
+			<text class="section-title">2. 顶部偏移量 (offsetTop 动态调试)</text>
+			<view class="card">
+				<view class="offset-switch-row">
+					<text class="card-desc">先展开菜单再切换偏移量，可实时观察下拉内容与触发栏底部的悬空间距：</text>
+					<view class="offset-btn-group">
+						<view
+							v-for="(item, idx) in offsetOptions"
+							:key="idx"
+							class="offset-btn"
+							:class="{ 'offset-btn-active': currentOffset == item }"
+							@click="currentOffset = item"
+						>
+							<text class="offset-btn-text" :class="{ 'offset-btn-text-active': currentOffset == item }">{{ item }}</text>
+						</view>
+					</view>
+				</view>
+				<text class="card-desc">当前偏移: {{ currentOffset }} (选中值: {{ offsetValue }})</text>
+				<view class="menu-wrap">
+					<ste-dropdown-menu
+						v-model="offsetValue"
+						:offsetTop="currentOffset"
+					>
+						<ste-dropdown-menu-item value="o1" title="智能推荐" />
+						<ste-dropdown-menu-item value="o2" title="好评优先" />
+						<ste-dropdown-menu-item value="o3" title="最新发布" />
+						<ste-dropdown-menu-item value="o4" title="价格从低到高" />
+					</ste-dropdown-menu>
+				</view>
+			</view>
+		</view>
+
+		<!-- 3. 胶囊按钮排版模式 (type="round") -->
+		<view class="section">
+			<text class="section-title">3. 胶囊按钮模式 (type="round")</text>
+			<view class="card">
+				<text class="card-desc">当前选中分类: {{ roundValue }}</text>
+				<view class="menu-wrap">
+					<ste-dropdown-menu
+						title="快捷筛选"
+						type="round"
+						v-model="roundValue"
+					>
+						<ste-dropdown-menu-item value="r1" title="数码3C" />
+						<ste-dropdown-menu-item value="r2" title="家用电器" />
+						<ste-dropdown-menu-item value="r3" title="服饰鞋包" />
+						<ste-dropdown-menu-item value="r4" title="美妆个护" />
+						<ste-dropdown-menu-item value="r5" title="食品饮料" />
+						<ste-dropdown-menu-item value="r6" title="母婴玩具" />
+					</ste-dropdown-menu>
+				</view>
+			</view>
+		</view>
+
+		<!-- 4. 多选限制 (max="2") -->
+		<view class="section">
+			<text class="section-title">4. 多选模式 (最多选 2 项)</text>
+			<view class="card">
+				<text class="card-desc">当前已选列表: {{ multiValues.join(', ') }}</text>
+				<view class="menu-wrap">
+					<ste-dropdown-menu
+						title="多选服务 (限2项)"
+						type="round"
+						:max="2"
+						v-model="multiValues"
+					>
+						<ste-dropdown-menu-item value="m1" title="顺丰包邮" />
+						<ste-dropdown-menu-item value="m2" title="极速退款" />
+						<ste-dropdown-menu-item value="m3" title="正品溯源" />
+						<ste-dropdown-menu-item value="m4" title="破损包退" />
+						<ste-dropdown-menu-item value="m5" title="赠运费险" />
+						<ste-dropdown-menu-item value="m6" title="延保服务" />
+					</ste-dropdown-menu>
+				</view>
+			</view>
+		</view>
+
+		<!-- 5. 禁用项与自定义主题色 -->
+		<view class="section">
+			<text class="section-title">5. 禁用选项与自定义颜色</text>
+			<view class="card">
+				<text class="card-desc">当前选中值: {{ disabledMenuValue }}</text>
+				<view class="menu-wrap">
+					<ste-dropdown-menu
+						v-model="disabledMenuValue"
+						activeColor="#00c250"
+					>
+						<ste-dropdown-menu-item value="d1" title="标准配送 (正常)" />
+						<ste-dropdown-menu-item value="d2" title="夜间配送 (已约满)" :disabled="true" />
+						<ste-dropdown-menu-item value="d3" title="定时达 (正常)" />
+					</ste-dropdown-menu>
+				</view>
+			</view>
+		</view>
+
+		<!-- 6. 向上弹出模式 (direction="up") - 放置于页面底部，向上展开空间最充裕 -->
+		<view class="section">
+			<text class="section-title">6. 向上弹出 (direction="up")</text>
+			<view class="card">
+				<text class="card-desc">当前选中排序: {{ upValue }}</text>
+				<view class="menu-wrap">
+					<ste-dropdown-menu
+						v-model="upValue"
+						direction="up"
+					>
+						<ste-dropdown-menu-item value="u1" title="综合综合排序" />
+						<ste-dropdown-menu-item value="u2" title="按价格升序" />
+						<ste-dropdown-menu-item value="u3" title="按销量降序" />
+					</ste-dropdown-menu>
+				</view>
+			</view>
+		</view>
+	</scroll-view>
+</template>
+
+<script setup lang="uts">
+	/**
+	 * @file pages/demo/dropdown-menu/dropdown-menu.uvue
+	 * @description DropdownMenu 下拉菜单 Demo 演示页面
+	 * 涵盖基础单选列表、动态顶部偏移量、胶囊按钮网格模式、多选限制、自定义配色与禁用项、向上弹出等全场景用例。
+	 */
+
+	/** 基础单选绑定值 (初始为空，展示“请选择”) */
+	const menuValue1 = ref<string>('')
+
+	/** 胶囊按钮排版绑定值 */
+	const roundValue = ref<string>('r2')
+
+	/** 多选排版绑定值列表 */
+	const multiValues = ref<string[]>(['m1', 'm3'])
+
+	/** 包含禁用项的菜单绑定值 */
+	const disabledMenuValue = ref<string>('d1')
+
+	/** 向上弹出菜单绑定值 */
+	const upValue = ref<string>('u1')
+
+	/** 自定义顶部偏移量演示绑定值 */
+	const offsetValue = ref<string>('o1')
+
+	/** 动态顶部偏移量候选测试项 */
+	const offsetOptions : string[] = ['0rpx', '40rpx', '80rpx', '120rpx']
+
+	/** 当前激活的顶部偏移量，默认 80rpx */
+	const currentOffset = ref<string>('80rpx')
+</script>
+
+<style>
+	.page {
+		flex: 1;
+		padding: 30rpx;
+		background-color: #f7f8fa;
+	}
+
+	.header {
+		margin-bottom: 30rpx;
+	}
+
+	.title {
+		font-size: 40rpx;
+		font-weight: bold;
+		color: #1f2329;
+		margin-bottom: 12rpx;
+	}
+
+	.desc {
+		font-size: 26rpx;
+		color: #8f959e;
+		line-height: 38rpx;
+	}
+
+	.section {
+		margin-bottom: 40rpx;
+	}
+
+	.section-title {
+		font-size: 30rpx;
+		font-weight: bold;
+		color: #333333;
+		margin-bottom: 16rpx;
+	}
+
+	.card {
+		background-color: #ffffff;
+		border-radius: 16rpx;
+		padding: 24rpx;
+	}
+
+	.card-desc {
+		font-size: 24rpx;
+		color: #666666;
+		margin-bottom: 16rpx;
+	}
+
+	.menu-wrap {
+		border-radius: 12rpx;
+		background-color: #f9f9fb;
+		border: 1rpx solid #eeeeee;
+	}
+
+	.offset-switch-row {
+		margin-bottom: 20rpx;
+	}
+
+	.offset-btn-group {
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
+	}
+
+	.offset-btn {
+		padding: 10rpx 20rpx;
+		margin-right: 16rpx;
+		margin-bottom: 12rpx;
+		border-radius: 8rpx;
+		background-color: #f0f2f5;
+		border: 1rpx solid #e4e7ed;
+	}
+
+	.offset-btn-active {
+		background-color: #e8f4ff;
+		border: 1rpx solid #0090FF;
+	}
+
+	.offset-btn-text {
+		font-size: 24rpx;
+		color: #606266;
+	}
+
+	.offset-btn-text-active {
+		color: #0090FF;
+		font-weight: bold;
+	}
+</style>

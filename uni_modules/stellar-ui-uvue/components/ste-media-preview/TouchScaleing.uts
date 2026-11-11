@@ -1,0 +1,549 @@
+/**
+ * @file TouchScaleing.uts
+ * @description 媒体预览手势交互计算引擎 - 中心轴心严格物理定点仿射模型 (Center-Origin Physical Affine Zooming)
+ * @author Stellar UI uvue Team
+ *
+ * 核心数学模型与设计原理：
+ * 1. 顺应原生渲染引擎天然的中心轴心 (center center)：
+ *    - Android 原生 RenderNode/View、iOS UIView 以及各端 CSS 渲染体系，默认的变换原点天然恒为元素几何中心 (centerX, centerY)；
+ *    - 元素在屏幕任意点 P 的映射方程为：
+ *      P_{screen} = C + S \cdot (P_{element} - C) + T
+ *    - 当双指落点中点为 M_{start} 时，其下咬合的原始图像点满足：
+ *      P_{anchor} - C = (M_{start} - C - T_{base}) / S_{base}
+ *    - 当当前帧缩放为 S、双指中点移动至 M_{curr} 时，要求该点严格跟随：
+ *      M_{curr} = C + S \cdot (P_{anchor} - C) + T
+ *    - 令 k = S / S_{base}，解得平移补偿方程：
+ *      T = k \cdot T_{base} + \Delta M + (1 - k) \cdot (M_{start} - C)
+ *    - 特征：双指在屏幕正中原地缩放时，M_{start} = C 且 \Delta M = 0，解得平移量严格为 0，零偏移、零跳动；双指在边缘缩放时，自动提供精准的反向牵引补偿。
+ *
+ * 2. 状态机互斥锁（Pinch Lock）：
+ *    - 双指捏合一旦触发，锁定 isPinching 状态，手势期间偶发单指丢点帧绝不降级重置基准，彻底消除画面跳变漂移。
+ */
+
+/**
+ * 媒体预览手势计算引擎类
+ * 负责手势识别、双指定点物理仿射缩放、单指平滑拖拽漫游及状态回弹
+ */
+export class TouchScaleing {
+	// ==================== 宿主视图几何中心 (物理视口像素) ====================
+	/** 宿主视图几何中心 X 坐标 */
+	private centerX : number = 187.5
+	/** 宿主视图几何中心 Y 坐标 */
+	private centerY : number = 333.5
+
+	// ==================== 容器与可见内容几何 (CSS 逻辑像素) ====================
+	/** 变换容器宽度 (CSS px) */
+	private boxWidth : number = 0.0
+	/** 变换容器高度 (CSS px) */
+	private boxHeight : number = 0.0
+	/** 可见内容宽度 (aspectFit 后的实际图片宽度，CSS px)；为 0 时按容器尺寸处理 */
+	private contentWidth : number = 0.0
+	/** 可见内容高度 (CSS px) */
+	private contentHeight : number = 0.0
+
+	/**
+	 * 触摸坐标 → CSS 逻辑像素 的换算系数
+	 * 部分平台（如某些 Android 运行时）touch 事件返回的是物理像素，
+	 * 而 boundingClientRect / windowInfo 返回 CSS 逻辑像素，直接混算会让定点补偿量放大 dpr 倍，
+	 * 表现为「双指放大后图片突然飞向左上角，像绕右下角放大」。
+	 */
+	private coordScale : number = 1.0
+
+	// ==================== 双指 Pinch 锚定与增量状态 ====================
+	/** 当前是否处于双指缩放交互中 (互斥状态锁) */
+	private isPinching : boolean = false
+	/**
+	 * 双指初始中点的原始坐标（未吸附）
+	 * 拖拽位移增量以它为唯一基准，保证手势首帧（k=1）位移严格为 0，不会出现按下即位移。
+	 */
+	private rawStartMidX : number = 0.0
+	/** 双指初始中点的原始 Y 坐标（未吸附） */
+	private rawStartMidY : number = 0.0
+	/** 双指捏合手势初始欧氏距离 (像素) */
+	private startDist : number = 0.0
+	/** 上一帧双指欧氏距离 (像素) */
+	private lastDist : number = 0.0
+	/** 上一帧双指几何中点 X 坐标 (视口像素) */
+	private lastMidX : number = 0.0
+	/** 上一帧双指几何中点 Y 坐标 (视口像素) */
+	private lastMidY : number = 0.0
+
+	/** 双指手势启动时的基准缩放倍率 */
+	private baseScale : number = 1.0
+	/** 双指手势启动时的基准 X 轴位移 (像素) */
+	private baseTranslateX : number = 0.0
+	/** 双指手势启动时的基准 Y 轴位移 (像素) */
+	private baseTranslateY : number = 0.0
+
+	// ==================== 单指拖拽跟踪状态 ====================
+	/** 上一帧单指触控点 X 坐标 (视口像素) */
+	private lastDragX : number = 0.0
+	/** 上一帧单指触控点 Y 坐标 (视口像素) */
+	private lastDragY : number = 0.0
+
+	// ==================== 实时变换状态输出 ====================
+	/** 当前是否处于有效变换激活状态 (放大或平移) */
+	isScale : boolean = false
+
+	/** 当前实时缩放比例 (基准值为 1.0) */
+	scale : number = 1.0
+
+	/** 当前实时 X 轴位移量 (像素 px) */
+	translateX : number = 0.0
+	/** 当前实时 Y 轴位移量 (像素 px) */
+	translateY : number = 0.0
+
+
+	/** CSS 过渡动画时长 (手势中 0s 保证 0 延迟跟手，松手/双击复位时 0.25s 平滑回弹) */
+
+	/** CSS 过渡动画时间函数 */
+
+	constructor() {
+		this.updateCenterFromWindow()
+	}
+
+	/**
+	 * 从系统窗口信息同步初始化宿主视口几何中心
+	 * 零异步延迟，直接从底层的 WindowInfo 获取安全视口尺寸
+	 */
+	updateCenterFromWindow() {
+		try {
+			const info = uni.getWindowInfo()
+			const winWidth = info.windowWidth
+			const winHeight = info.windowHeight
+			if (winWidth > 0 && winHeight > 0) {
+				const footerPx = uni.rpx2px(120)
+				this.centerX = winWidth / 2.0
+				this.centerY = (winHeight - footerPx) / 2.0
+			}
+		} catch (e) {}
+	}
+
+	/**
+	 * 显式设置宿主视图真实几何中心坐标 (由外部 boundingClientRect 精准校准)
+	 * @param cx 屏幕/视口中心点 X 坐标 (px)
+	 * @param cy 屏幕/视口中心点 Y 坐标 (px)
+	 */
+	setCenter(cx : number, cy : number) {
+		if (cx > 0.0 && cy > 0.0) {
+			this.centerX = cx
+			this.centerY = cy
+		}
+	}
+
+	/**
+	 * 设置容器与可见内容尺寸 (CSS 逻辑像素)
+	 * 用于坐标空间校准与位移夹紧，图片/视频切换时需重新调用
+	 * @param boxW 变换容器宽度
+	 * @param boxH 变换容器高度
+	 * @param contentW 可见内容宽度 (0 表示按容器处理)
+	 * @param contentH 可见内容高度 (0 表示按容器处理)
+	 */
+	setBoxSize(boxW : number, boxH : number, contentW : number, contentH : number) {
+		this.boxWidth = boxW > 0.0 ? boxW : 0.0
+		this.boxHeight = boxH > 0.0 ? boxH : 0.0
+		this.contentWidth = contentW > 0.0 ? contentW : 0.0
+		this.contentHeight = contentH > 0.0 ? contentH : 0.0
+	}
+
+	/**
+	 * 原始触控点 X 坐标（未经坐标空间折算）
+	 * @param t 原生 Touch 对象
+	 */
+	private rawCoordX(t : Touch) : number {
+		if (t.clientX != 0.0 || t.clientY != 0.0) {
+			return t.clientX
+		}
+		return t.pageX
+	}
+
+	/**
+	 * 原始触控点 Y 坐标（未经坐标空间折算）
+	 * @param t 原生 Touch 对象
+	 */
+	private rawCoordY(t : Touch) : number {
+		if (t.clientX != 0.0 || t.clientY != 0.0) {
+			return t.clientY
+		}
+		return t.pageY
+	}
+
+	/**
+	 * 安全提取触控点的视口 X 坐标 (优先 clientX，杜绝页面滚动干扰)
+	 * @param t 原生 Touch 对象
+	 * @returns X 视口像素坐标 (CSS 逻辑像素)
+	 */
+	private getCoordX(t : Touch) : number {
+		return this.rawCoordX(t) * this.coordScale
+	}
+
+	/**
+	 * 安全提取触控点的视口 Y 坐标 (优先 clientY，杜绝页面滚动干扰)
+	 * @param t 原生 Touch 对象
+	 * @returns Y 视口像素坐标 (CSS 逻辑像素)
+	 */
+	private getCoordY(t : Touch) : number {
+		return this.rawCoordY(t) * this.coordScale
+	}
+
+	/**
+	 * 坐标空间自校准
+	 * 若原始触摸坐标明显落在容器合理范围之外，判定该平台返回的是物理像素，
+	 * 按 pixelRatio 折算为 CSS 逻辑像素；折算后仍不合理则维持原样，避免误判。
+	 * @param e 原生 TouchEvent
+	 */
+	private calibrateCoordScale(e : TouchEvent) {
+		const touches = e.touches
+		if (touches == null || touches.length == 0) return
+		if (this.boxWidth <= 0.0 || this.boxHeight <= 0.0) return
+		// 一旦确认该平台触摸坐标为物理像素，保持结论不再回退，
+		// 否则后续手势若恰好落在角落区域会被重新判成 CSS 像素，偏移又会复现
+		if (this.coordScale != 1.0) return
+
+		let px = 0.0
+		let py = 0.0
+		if (touches.length >= 2) {
+			px = (this.rawCoordX(touches[0]) + this.rawCoordX(touches[1])) / 2.0
+			py = (this.rawCoordY(touches[0]) + this.rawCoordY(touches[1])) / 2.0
+		} else {
+			px = this.rawCoordX(touches[0])
+			py = this.rawCoordY(touches[0])
+		}
+
+		// 容器半宽/半高放宽到 0.75 倍，容忍手指落在容器边缘外侧
+		const limitX = this.boxWidth * 0.75
+		const limitY = this.boxHeight * 0.75
+		if (Math.abs(px - this.centerX) <= limitX && Math.abs(py - this.centerY) <= limitY) {
+			this.coordScale = 1.0
+			return
+		}
+
+		let pixelRatio = 0.0
+		try {
+			const winInfo = uni.getWindowInfo()
+			const pr = winInfo.pixelRatio
+			if (pr != null && pr > 0) {
+				pixelRatio = pr
+			}
+		} catch (err) {}
+		if (pixelRatio > 1.0) {
+			const sx = px / pixelRatio
+			const sy = py / pixelRatio
+			if (Math.abs(sx - this.centerX) <= limitX && Math.abs(sy - this.centerY) <= limitY) {
+				this.coordScale = 1.0 / pixelRatio
+				console.log('[ste-media-preview] 触摸坐标空间校准: coordScale=' + this.coordScale + ', pixelRatio=' + pixelRatio)
+				return
+			}
+		}
+
+		// 两种假设都不成立时保持原值，避免把正常坐标误折算
+		this.coordScale = 1.0
+	}
+
+	/**
+	 * 锚点吸附到可见内容范围（X 轴）
+	 * 横图在竖屏上只占中间一条，手指常常落在图片外的黑边上；
+	 * 若直接用黑边位置作锚点，缩放会让图片整块朝反方向窜出，视觉上就像「绕右下角放大」。
+	 */
+	private clampAnchorX(x : number) : number {
+		const halfW = (this.contentWidth > 0.0 ? this.contentWidth : this.boxWidth) / 2.0
+		if (halfW <= 0.0) return x
+		return Math.min(this.centerX + halfW, Math.max(this.centerX - halfW, x))
+	}
+
+	/**
+	 * 锚点吸附到可见内容范围（Y 轴）
+	 */
+	private clampAnchorY(y : number) : number {
+		const halfH = (this.contentHeight > 0.0 ? this.contentHeight : this.boxHeight) / 2.0
+		if (halfH <= 0.0) return y
+		return Math.min(this.centerY + halfH, Math.max(this.centerY - halfH, y))
+	}
+
+	/**
+	 * 位移夹紧：保证内容始终留在容器内（内容小于容器时可滑到边缘，大于容器时不留空白）
+	 * 既要防止缩放瞬间内容整体飞出视口，也要避免把定点放大强行拽回中心
+	 */
+	private clampTranslate() {
+		if (this.boxWidth <= 0.0 || this.boxHeight <= 0.0) return
+		const cw = (this.contentWidth > 0.0 ? this.contentWidth : this.boxWidth) * this.scale
+		const ch = (this.contentHeight > 0.0 ? this.contentHeight : this.boxHeight) * this.scale
+		const maxTx = Math.abs(cw - this.boxWidth) / 2.0
+		const maxTy = Math.abs(ch - this.boxHeight) / 2.0
+		this.translateX = Math.min(maxTx, Math.max(-maxTx, this.translateX))
+		this.translateY = Math.min(maxTy, Math.max(-maxTy, this.translateY))
+	}
+
+	/**
+	 * 在检测到双指落下的瞬间，建立以双指初始中点为锚点的基准
+	 * @param x0 触控点 1 视口 X 坐标
+	 * @param y0 触控点 1 视口 Y 坐标
+	 * @param x1 触控点 2 视口 X 坐标
+	 * @param y1 触控点 2 视口 Y 坐标
+	 */
+	private startPinch(x0 : number, y0 : number, x1 : number, y1 : number) {
+		this.isPinching = true
+
+		const dx = x1 - x0
+		const dy = y1 - y0
+		const dist = Math.sqrt(dx * dx + dy * dy)
+		// 严密防御双指距离过近导致除零
+		this.startDist = dist > 10.0 ? dist : 10.0
+		this.lastDist = this.startDist
+
+		// 双指原始几何中点：既是拖拽位移基准，也是死区比较基准
+		const rawMidX = (x0 + x1) / 2.0
+		const rawMidY = (y0 + y1) / 2.0
+		this.rawStartMidX = rawMidX
+		this.rawStartMidY = rawMidY
+		this.lastMidX = rawMidX
+		this.lastMidY = rawMidY
+
+		// 固化捏合手势启动瞬间的缩放与位移基准值
+		this.baseScale = this.scale
+		this.baseTranslateX = this.translateX
+		this.baseTranslateY = this.translateY
+	}
+
+	/**
+	 * 高性能触摸按下处理器 (touchstart)
+	 * @param e 原生 TouchEvent
+	 */
+	touchStartEvent(e : TouchEvent) {
+		// 每次手势开始前校准坐标空间（部分平台 touch 坐标为物理像素）
+		this.calibrateCoordScale(e)
+		const touches = e.touches
+		if (touches != null && touches.length >= 2) {
+			const t0 = touches[0]
+			const t1 = touches[1]
+			const x0 = this.getCoordX(t0)
+			const y0 = this.getCoordY(t0)
+			const x1 = this.getCoordX(t1)
+			const y1 = this.getCoordY(t1)
+			this.startPinch(x0, y0, x1, y1)
+		} else if (touches != null && touches.length == 1) {
+			const t0 = touches[0]
+			this.lastDragX = this.getCoordX(t0)
+			this.lastDragY = this.getCoordY(t0)
+		}
+	}
+
+	/**
+	 * 高性能触摸移动处理器 (touchmove) - 中心轴心严密物理定点缩放与平滑漫游
+	 * @param e 原生 TouchEvent
+	 * @returns 是否消费了手势 (false 表示放行给 Swiper 翻页)
+	 */
+	touchMoveEvent(e : TouchEvent) : boolean {
+		const touches = e.touches
+		if (touches == null || touches.length == 0) return false
+
+		// 场景 A：当前处于双指缩放流程中（互斥锁锁定）
+		if (this.isPinching) {
+			if (touches.length >= 2) {
+				const t0 = touches[0]
+				const t1 = touches[1]
+				const x0 = this.getCoordX(t0)
+				const y0 = this.getCoordY(t0)
+				const x1 = this.getCoordX(t1)
+				const y1 = this.getCoordY(t1)
+
+				const dx = x1 - x0
+				const dy = y1 - y0
+				const currentDist = Math.sqrt(dx * dx + dy * dy)
+				const currentMidX = (x0 + x1) / 2.0
+				const currentMidY = (y0 + y1) / 2.0
+
+				// 硬件采样微噪死区过滤 (消除手指导电微动造成的画面微颤)
+				const distDiff = Math.abs(currentDist - this.lastDist)
+				const midMoveX = Math.abs(currentMidX - this.lastMidX)
+				const midMoveY = Math.abs(currentMidY - this.lastMidY)
+				if (distDiff < 0.3 && midMoveX < 0.3 && midMoveY < 0.3) {
+					return true
+				}
+
+				// 计算缩放比并限幅 (0.8x 到 4.5x)
+				const rawRatio = currentDist / this.startDist
+				const nextScale = this.baseScale * rawRatio
+				const clampedScale = Math.max(0.8, Math.min(4.5, nextScale))
+				this.scale = clampedScale
+
+				// 实际生效的缩放系数相对于初始基准的倍率 k = S / S_base
+				const k = clampedScale / this.baseScale
+
+				// 双指中点相对于手势开始时的整体平移位移 (拖拽分量)
+				const deltaMidX = currentMidX - this.rawStartMidX
+				const deltaMidY = currentMidY - this.rawStartMidY
+
+				// 🔥 中心缩放模型（不再做手指定点补偿）：
+				// T = k * baseTranslate + deltaMid
+				// 含义：缩放严格绕「容器几何中心」进行，只有双指整体移动才产生位移。
+				//
+				// 为什么放弃定点缩放：
+				// 容器是 aspectFit，横图在竖屏上只占中间一条，上下黑边极大，
+				// 而捏合时双指中点通常落在偏下位置（或直接落在黑边里）。
+				// 定点模型下锚点在图片下沿 -> 图片只能向上生长，
+				// 用户每次捏合都看到「图片向上偏移」；
+				// 若把锚点吸附到可见内容范围，只是把偏移方向固定成向上，并未消除。
+				// 中心缩放让缩放在数学上不产生任何位移（k 只改变尺寸），
+				// 位置改动完全交给双指中点位移与单指拖拽，行为可预期。
+				this.translateX = k * this.baseTranslateX + deltaMidX
+				this.translateY = k * this.baseTranslateY + deltaMidY
+				// 位移夹紧：内容小于容器时保持居中，避免缩放瞬间飞出视口
+				this.clampTranslate()
+
+				this.lastDist = currentDist
+				this.lastMidX = currentMidX
+				this.lastMidY = currentMidY
+
+				this.isScale = true
+				return true
+			}
+			// 双指过程中即使某一帧硬件丢点只有 1 指，也锁定当前状态，绝不重新调用 startPinch 重置基准！
+			return true
+		}
+
+		// 场景 B：尚未处于双指缩放时，检测到多指立即初始化 Pinch
+		if (touches.length >= 2) {
+			this.calibrateCoordScale(e)
+			const t0 = touches[0]
+			const t1 = touches[1]
+			const x0 = this.getCoordX(t0)
+			const y0 = this.getCoordY(t0)
+			const x1 = this.getCoordX(t1)
+			const y1 = this.getCoordY(t1)
+			this.startPinch(x0, y0, x1, y1)
+			return true
+		}
+
+		// 场景 C：单指手势
+		if (touches.length == 1) {
+			const t0 = touches[0]
+			const curX = this.getCoordX(t0)
+			const curY = this.getCoordY(t0)
+
+			// 在放大状态下允许单指平滑拖拽漫游
+			if (this.isScale) {
+				const deltaX = curX - this.lastDragX
+				const deltaY = curY - this.lastDragY
+				this.translateX += deltaX
+				this.translateY += deltaY
+				this.clampTranslate()
+				this.lastDragX = curX
+				this.lastDragY = curY
+				return true
+			}
+
+			// 在常态 (1.0x) 下，返回 false 放行给 Swiper 左右翻页！
+			return false
+		}
+
+		return false
+	}
+
+	/**
+	 * 高性能触摸结束处理器 (touchend)
+	 * @param e 原生 TouchEvent
+	 * @returns 是否所有触控点已离开屏幕
+	 */
+	touchEndEvent(e : TouchEvent) : boolean {
+		const touches = e.touches
+		// 场景 1：仍有 1 根手指留在屏幕上（双指变单指）
+		if (touches != null && touches.length == 1) {
+			this.isPinching = false
+			const t0 = touches[0]
+			this.lastDragX = this.getCoordX(t0)
+			this.lastDragY = this.getCoordY(t0)
+			return false
+		}
+
+		// 场景 2：所有手指已完全离开屏幕，执行松手回弹与状态结算
+		this.isPinching = false
+		this.startDist = 0.0
+		this.lastDist = 0.0
+		this.rawStartMidX = 0.0
+		this.rawStartMidY = 0.0
+		this.lastMidX = 0.0
+		this.lastMidY = 0.0
+
+		// 缩小过度或接近原尺寸 (scale < 1.05x) -> 启动平滑回弹复位至 1.0x 常态
+		if (this.scale < 1.05) {
+			this.scale = 1.0
+			this.translateX = 0.0
+			this.translateY = 0.0
+			this.isScale = false
+		} else {
+			// 放大超出 4.0x -> 平滑回弹至 4.0x
+			if (this.scale > 4.0) {
+				const ratio = 4.0 / this.scale
+				this.scale = 4.0
+				this.translateX = this.translateX * ratio
+				this.translateY = this.translateY * ratio
+			}
+			this.isScale = true
+		}
+
+		// 松手后统一夹紧，保证内容不会停在视口外
+		this.clampTranslate()
+
+		return true
+	}
+
+	/**
+	 * 双击定点聚焦放大 / 复位 (基于中心轴心模型)
+	 * @param tapX 双击触碰点的页面/视口 X 坐标
+	 * @param tapY 双击触碰点的页面/视口 Y 坐标
+	 */
+	onDoubleTap(tapX : number, tapY : number) {
+
+		// 点击坐标与触摸坐标同源，同样需要坐标空间折算，并吸附到可见内容范围
+		const px = this.clampAnchorX(tapX * this.coordScale)
+		const py = this.clampAnchorY(tapY * this.coordScale)
+
+		if (this.scale > 1.05) {
+			// 当前处于放大态 -> 立即平滑复位
+			this.scale = 1.0
+			this.translateX = 0.0
+			this.translateY = 0.0
+			this.isScale = false
+		} else {
+			// 当前处于常态 -> 以双击点击位置为中心精准放大至 2.5x
+			const targetScale = 2.5
+			this.scale = targetScale
+			// 定点放大平移补偿: T = (1 - S_target) * (tapPoint - center)
+			this.translateX = (1.0 - targetScale) * (px - this.centerX)
+			this.translateY = (1.0 - targetScale) * (py - this.centerY)
+			this.isScale = true
+		}
+		this.clampTranslate()
+	}
+
+	/**
+	 * 极速生成 CSS Transform 字符串 (Translate -> Scale 组合)
+	 * @returns transform CSS 样式属性值
+	 */
+	getTransformString() : string {
+		return `translate(${this.translateX}px, ${this.translateY}px) scale(${this.scale})`
+	}
+
+	/**
+	 * 重置所有手势变换数据至初始默认状态
+	 */
+	reset() {
+		this.isPinching = false
+		this.startDist = 0.0
+		this.lastDist = 0.0
+		this.rawStartMidX = 0.0
+		this.rawStartMidY = 0.0
+		this.lastMidX = 0.0
+		this.lastMidY = 0.0
+		this.lastDragX = 0.0
+		this.lastDragY = 0.0
+		this.baseScale = 1.0
+		this.baseTranslateX = 0.0
+		this.baseTranslateY = 0.0
+		this.isScale = false
+		this.scale = 1.0
+		this.translateX = 0.0
+		this.translateY = 0.0
+	}
+}

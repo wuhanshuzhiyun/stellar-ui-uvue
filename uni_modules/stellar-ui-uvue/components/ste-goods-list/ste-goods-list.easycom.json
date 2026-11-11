@@ -1,0 +1,40 @@
+{
+    "name": "ste-goods-list",
+    "description": "商品信息清单组件",
+    "example": "<ste-goods-list></ste-goods-list>",
+    "tutorial": "https://stellar-ui.intecloud.com.cn/?projectName=stellar-ui-uvue&menu=%E7%BB%84%E4%BB%B6&active=ste-goods-list",
+    "attributes": [
+        {
+            "name": "title",
+            "description": "标题",
+            "type": "string"
+        },
+        {
+            "name": "hideTitleIcon",
+            "description": "隐藏标题ICON",
+            "type": "boolean",
+            "default": false
+        },
+        {
+            "name": "titleIcon",
+            "description": "标题icon",
+            "type": "string"
+        },
+        {
+            "name": "titleStyle",
+            "description": "标题样式",
+            "type": "Object",
+            "default": "{}"
+        },
+        {
+            "name": "data",
+            "description": "数据列表",
+            "type": "{label:string,value:string}[]",
+            "default": "[]"
+        },
+        {
+            "name": "[slot]method",
+            "description": "标题栏右侧操作插槽"
+        }
+    ]
+}

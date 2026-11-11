@@ -1,0 +1,227 @@
+<template>
+	<scroll-view scroll-y="true" class="page-root">
+		<view class="header">
+			<text class="title">Radio 单选框</text>
+		</view>
+
+		<!-- 基础用法 -->
+		<view class="demo-item">
+			<text class="demo-title">基础用法</text>
+			<ste-radio-group v-model="value1" direction="row">
+				<ste-radio name="apple">苹果</ste-radio>
+				<ste-radio name="banana">香蕉</ste-radio>
+				<ste-radio name="cherry">樱桃</ste-radio>
+			</ste-radio-group>
+			<text class="demo-result-text">选中: {{ value1 }}</text>
+		</view>
+
+		<!-- 水平排列 -->
+		<view class="demo-item">
+			<text class="demo-title">水平排列</text>
+			<ste-radio-group v-model="value2" direction="row">
+				<ste-radio name="a">选项A</ste-radio>
+				<ste-radio name="b">选项B</ste-radio>
+				<ste-radio name="c">选项C</ste-radio>
+			</ste-radio-group>
+			<text class="demo-result-text">选中: {{ value2 }}</text>
+		</view>
+
+		<!-- 垂直排列 -->
+		<view class="demo-item">
+			<text class="demo-title">垂直排列</text>
+			<ste-radio-group v-model="value3" direction="column">
+				<ste-radio name="a">选项A</ste-radio>
+				<ste-radio name="b">选项B</ste-radio>
+				<ste-radio name="c">选项C</ste-radio>
+			</ste-radio-group>
+			<text class="demo-result-text">选中: {{ value3 }}</text>
+		</view>
+
+		<!-- 禁用 -->
+		<view class="demo-item">
+			<text class="demo-title">禁用</text>
+			<ste-radio-group v-model="value4" direction="row">
+				<ste-radio name="a">选项A</ste-radio>
+				<ste-radio name="b" disabled>选项B（禁用）</ste-radio>
+				<ste-radio name="c">选项C</ste-radio>
+			</ste-radio-group>
+			<text class="demo-result-text">选中: {{ value4 }}</text>
+		</view>
+
+		<!-- 只读（组级） -->
+		<view class="demo-item">
+			<text class="demo-title">只读（readonly 写在 group 上）</text>
+			<ste-radio-group v-model="value5" direction="row" readonly>
+				<ste-radio name="a">选项A</ste-radio>
+				<ste-radio name="b">选项B</ste-radio>
+				<ste-radio name="c">选项C</ste-radio>
+			</ste-radio-group>
+			<text class="demo-result-text">选中: {{ value5 }}</text>
+			<text class="demo-result-text">只读属于整组：点任意一项都不会改变值（当前值仍是 b），样式不置灰</text>
+		</view>
+
+		<!-- 自定义形状 -->
+		<view class="demo-item">
+			<text class="demo-title">自定义形状（方形）</text>
+			<ste-radio-group v-model="value6" direction="row" shape="square">
+				<ste-radio name="a">选项A</ste-radio>
+				<ste-radio name="b">选项B</ste-radio>
+			</ste-radio-group>
+			<text class="demo-result-text">选中: {{ value6 }}</text>
+		</view>
+
+		<!-- 自定义图标大小 -->
+		<view class="demo-item">
+			<text class="demo-title">自定义图标大小（48rpx）</text>
+			<ste-radio-group v-model="value7" direction="row" iconSize="48">
+				<ste-radio name="a">选项A</ste-radio>
+				<ste-radio name="b">选项B</ste-radio>
+			</ste-radio-group>
+			<text class="demo-result-text">选中: {{ value7 }}</text>
+		</view>
+
+		<!-- 自定义选中颜色 -->
+		<view class="demo-item">
+			<text class="demo-title">自定义选中颜色（单个选项）</text>
+			<ste-radio-group v-model="value8" direction="row">
+				<ste-radio name="a" checkedColor="#07c160">绿色</ste-radio>
+				<ste-radio name="b" checkedColor="#ee0a24">红色</ste-radio>
+				<ste-radio name="c" checkedColor="#ff976a">橙色</ste-radio>
+			</ste-radio-group>
+			<text class="demo-result-text">选中: {{ value8 }}</text>
+		</view>
+
+		<view class="demo-item">
+			<text class="demo-title">自定义选中颜色（整组统一）</text>
+			<ste-radio-group v-model="value9" direction="row" checkedColor="#07c160">
+				<ste-radio name="a">选项A</ste-radio>
+				<ste-radio name="b">选项B</ste-radio>
+				<ste-radio name="c">选项C</ste-radio>
+			</ste-radio-group>
+			<text class="demo-result-text">选中: {{ value9 }}</text>
+		</view>
+
+		<!-- 文本位置 -->
+		<view class="demo-item">
+			<text class="demo-title">文本位置（left）</text>
+			<ste-radio-group v-model="value11" direction="row">
+				<ste-radio name="a" textPosition="left">文本在左</ste-radio>
+				<ste-radio name="b">文本在右</ste-radio>
+			</ste-radio-group>
+			<text class="demo-result-text">选中: {{ value11 }}</text>
+		</view>
+
+		<!-- 自定义文本大小 -->
+		<view class="demo-item">
+			<text class="demo-title">自定义文本大小（32rpx）</text>
+			<ste-radio-group v-model="value12" direction="row" textSize="32">
+				<ste-radio name="a">大字体</ste-radio>
+				<ste-radio name="b">大字体</ste-radio>
+			</ste-radio-group>
+			<text class="demo-result-text">选中: {{ value12 }}</text>
+		</view>
+
+		<!-- 回调事件 -->
+		<view class="demo-item">
+			<text class="demo-title">回调事件</text>
+			<ste-radio-group v-model="value13" direction="row" @change="onChange13">
+				<ste-radio name="a" @click="onClick13">选项A</ste-radio>
+				<ste-radio name="b">选项B</ste-radio>
+			</ste-radio-group>
+			<text class="demo-result-text">change 次数: {{ changeCount }} | click 次数: {{ clickCount }}</text>
+		</view>
+
+		<!-- 组禁用 -->
+		<view class="demo-item">
+			<text class="demo-title">组禁用</text>
+			<ste-radio-group v-model="value14" direction="row" disabled>
+				<ste-radio name="a">选项A</ste-radio>
+				<ste-radio name="b">选项B</ste-radio>
+			</ste-radio-group>
+			<text class="demo-result-text">选中: {{ value14 }}</text>
+		</view>
+
+		<!-- 自定义边距 -->
+		<view class="demo-item">
+			<text class="demo-title">自定义边距</text>
+			<ste-radio-group v-model="value16" direction="row">
+				<ste-radio name="a" marginLeft="20" marginRight="20">带边距A</ste-radio>
+				<ste-radio name="b">无边距B</ste-radio>
+			</ste-radio-group>
+			<text class="demo-result-text">选中: {{ value16 }}</text>
+		</view>
+
+		<!-- 单独使用 -->
+		<view class="demo-item">
+			<text class="demo-title">单独使用（不在 group 中）</text>
+			<ste-radio v-model="value17" name="yes">是否同意</ste-radio>
+			<text class="demo-result-text">选中: {{ value17 }}</text>
+		</view>
+	</scroll-view>
+</template>
+
+<script setup lang="uts">
+	const value1 = ref('apple')
+	const value2 = ref('a')
+	const value3 = ref('a')
+	const value4 = ref('a')
+	const value5 = ref('b')
+	const value6 = ref('')
+	const value7 = ref('')
+	const value8 = ref('')
+	const value9 = ref('')
+	const value11 = ref('')
+	const value12 = ref('')
+	const value13 = ref('')
+	const value14 = ref('a')
+	const value16 = ref('')
+	const value17 = ref('')
+
+	const changeCount = ref(0)
+	const clickCount = ref(0)
+
+	const onChange13 = (value : string) => {
+		changeCount.value = changeCount.value + 1
+	}
+
+	const onClick13 = (value : string) => {
+		clickCount.value = clickCount.value + 1
+	}
+</script>
+
+<style>
+.page-root {
+	padding: 20rpx;
+	flex: 1;
+}
+
+.header {
+	margin-bottom: 20rpx;
+}
+
+.title {
+	font-size: 36rpx;
+	font-weight: bold;
+}
+
+.demo-item {
+	background-color: #ffffff;
+	border-radius: 12rpx;
+	padding: 24rpx;
+	margin-bottom: 20rpx;
+	flex-direction: column;
+}
+
+.demo-title {
+	font-size: 28rpx;
+	font-weight: bold;
+	margin-bottom: 16rpx;
+	color: #333333;
+}
+
+.demo-result-text {
+	font-size: 26rpx;
+	color: #666666;
+	margin-top: 12rpx;
+}
+</style>

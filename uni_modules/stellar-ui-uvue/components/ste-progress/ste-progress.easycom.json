@@ -1,0 +1,110 @@
+{
+    "name": "ste-progress",
+    "description": "进度条组件，支持线性渐变、线条粗细、文本对齐、阈值控制与分段阶梯展示",
+    "example": "<ste-progress :percentage=\"40\"/>",
+    "tutorial": "https://stellar-ui.intecloud.com.cn/?projectName=stellar-ui-uvue&menu=%E7%BB%84%E4%BB%B6&active=ste-progress",
+    "attributes": [
+        {
+            "name": "percentage",
+            "description": "进度百分比数值（0 ~ 100）",
+            "type": "number",
+            "default": 0
+        },
+        {
+            "name": "activeBg",
+            "description": "激活状态下的背景色（支持纯色、RGBA 或 linear-gradient 渐变值）。使用动态内联样式直接渲染，全面兼容 Hex、RGB/RGBA 与 linear-gradient 线性渐变",
+            "type": "string",
+            "default": ""
+        },
+        {
+            "name": "inactiveBg",
+            "description": "非激活底轨背景色",
+            "type": "string",
+            "default": "#eeeeee"
+        },
+        {
+            "name": "strokeWidth",
+            "description": "进度条高度粗细（支持 rpx/px 或纯数字，默认 24）",
+            "type": "string | number",
+            "default": 24
+        },
+        {
+            "name": "width",
+            "description": "进度条整体宽度（支持 rpx/px/%，默认 100%）",
+            "type": "string | number",
+            "default": "100%"
+        },
+        {
+            "name": "duration",
+            "description": "进度动画过渡时长（秒）。 依赖 CSS 变量驱动 transition；内置高帧率响应式补间动画引擎（Tween Engine，基于 16ms 时间戳驱动），确保百分比宽度与数字翻滚保持 60FPS 丝滑平滑过渡",
+            "type": "number",
+            "default": 0.3
+        },
+        {
+            "name": "disabled",
+            "description": "是否禁用状态（置灰呈现）",
+            "type": "boolean",
+            "default": false
+        },
+        {
+            "name": "pivotText",
+            "description": "自定义内部展示文字（为空时默认展示 `${percentage}%`）",
+            "type": "string",
+            "default": ""
+        },
+        {
+            "name": "textColor",
+            "description": "内部文字颜色",
+            "type": "string",
+            "default": "#ffffff"
+        },
+        {
+            "name": "textAlign",
+            "description": "文字水平对齐方式",
+            "type": "string",
+            "values": [
+                {
+                    "name": "left",
+                    "description": "居左对齐"
+                },
+                {
+                    "name": "center",
+                    "description": "居中对齐"
+                },
+                {
+                    "name": "right",
+                    "description": "居右对齐（默认）"
+                }
+            ],
+            "default": "right"
+        },
+        {
+            "name": "textSize",
+            "description": "文字字号（支持 rpx/px 或纯数字）",
+            "type": "string | number",
+            "default": 16
+        },
+        {
+            "name": "displayTextThreshold",
+            "description": "显示文字的最小进度阈值（小于该值隐藏文字，避免过窄溢出）",
+            "type": "number",
+            "default": 0
+        },
+        {
+            "name": "showPivot",
+            "description": "是否显示进度条内部文字内容（默认 true）。扩展属性，设为 false 时无论进度多少均不渲染内部文本，方便极窄进度条或纯装饰条场景",
+            "type": "boolean",
+            "default": true
+        },
+        {
+            "name": "stageData",
+            "description": "分段阶梯配置数据对象，存在时优先进入分段里程碑展示模式，类型为强类型 UTSJSONObject（键为阶段目标百分比字符串，值为配置项）",
+            "type": "object",
+            "default": null
+        },
+        {
+            "name": "[slot]default",
+            "description": "激活进度条内部自定义插槽内容"
+        }
+    ]
+}

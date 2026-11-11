@@ -1,0 +1,95 @@
+# Animate 动画
+
+给子元素添加动画效果
+
+---
+
+## 代码演示
+
+## 基础使用
+
+```html
+<template>
+    <ste-animate type="shakeX" loop>
+        <ste-button>shakeX-横向</ste-button>
+    </ste-animate>
+    <ste-animate type="shakeY" loop>
+        <ste-button>shakeY-竖向</ste-button>
+    </ste-animate>
+    <ste-animate type="ripple" loop>
+        <ste-button>ripple-心跳</ste-button>
+    </ste-animate>
+    <ste-animate type="breath" loop>
+        <ste-button>breath-呼吸灯</ste-button>
+    </ste-animate>
+    <ste-animate type="twinkle" loop>
+        <ste-button>twinkle-水波</ste-button>
+    </ste-animate>
+    <ste-animate type="flicker" loop>
+        <ste-button>flicker-擦亮</ste-button>
+    </ste-animate>
+    <ste-animate type="jump" loop>
+        <ste-button>jump-跳跃</ste-button>
+    </ste-animate>
+    <ste-animate type="float" loop>
+        <ste-button>float-漂浮</ste-button>
+    </ste-animate>
+</template>
+```
+
+## 点击触发
+
+设置`action`为`click`
+
+```html
+<template>
+    <ste-animate type="slide-right" action="click">
+        <ste-button :stopPropagation="false">由右向左划入</ste-button>
+    </ste-animate>
+    <ste-animate type="slide-left" action="click">
+        <ste-button :stopPropagation="false">由左向右划入</ste-button>
+    </ste-animate>
+    <ste-animate type="slide-top" action="click">
+        <ste-button :stopPropagation="false">由上向下划入</ste-button>
+    </ste-animate>
+    <ste-animate type="slide-bottom" action="click">
+        <ste-button :stopPropagation="false">由下向上划入</ste-button>
+    </ste-animate>
+</template>
+```
+
+## 属性触发
+
+可通过属性`show`来自定义触发动画执行
+
+```html
+<script lang="ts" setup>
+    import { ref } from 'vue';
+    const show = ref(false);
+
+    function click() {
+        show.value = false;
+        setTimeout(() => {
+            show.value = true;
+        }, 50);
+    }
+</script>
+<template>
+    <view>
+        <ste-animate type="shakeY" :show="show">
+            <ste-button :stopPropagation="false">动画</ste-button>
+        </ste-animate>
+    </view>
+    <view>
+        <ste-button @click="click">触发</ste-button>
+    </view>
+</template>
+```
+
+---
+
+<!-- props -->
+
+---
+
+{{xuyajun}}

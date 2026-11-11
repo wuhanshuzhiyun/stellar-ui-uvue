@@ -1,0 +1,378 @@
+<template>
+	<view class="page-root">
+		<!-- 页面真实顶部固定导航栏（演示 fixed 与 safeAreaInsetTop） -->
+		<ste-navbar
+			title="Navbar 导航栏演示"
+			:titleAlignment="2"
+			:fixed="true"
+			:placeholder="true"
+			backgroundColor="#ffffff"
+			@backClick="onPageNavbarBack"
+		>
+			<template #right>
+				<view class="nav-right-btn" @click="onShareClick">
+					<ste-icon code="&#xe677;" :size="32" color="#333333" />
+				</view>
+			</template>
+		</ste-navbar>
+
+		<scroll-view scroll-y="true" class="page-container">
+			<!-- 头部导航与功能简介 -->
+			<view class="page-header">
+				<text class="page-title">Navbar 页面导航栏</text>
+				<text class="page-desc">常用于页面顶部提供导航与返回功能，支持状态栏安全区自适应、居左/居中排版、返回键定制及丰富插槽扩展。</text>
+			</view>
+
+			<view class="demo-content">
+				<!-- 用例 1：标题对齐方式 -->
+				<view class="demo-card">
+					<text class="card-title">1. 标题排版与对齐方式</text>
+					<text class="card-desc">支持居左对齐（titleAlignment=1，默认）与居中对齐（titleAlignment=2）。</text>
+
+					<!-- 1.1 居左标题 -->
+					<view class="nav-preview-box mb-16">
+						<ste-navbar
+							title="居左标题展示"
+							:titleAlignment="1"
+							:safeAreaInsetTop="false"
+							:fixed="false"
+							backgroundColor="#f9fafb"
+							@backClick="onDemoBack('居左标题')"
+						/>
+					</view>
+
+					<!-- 1.2 居中标题 -->
+					<view class="nav-preview-box mb-16">
+						<ste-navbar
+							title="居中主标题"
+							:titleAlignment="2"
+							:safeAreaInsetTop="false"
+							:fixed="false"
+							backgroundColor="#f9fafb"
+							@backClick="onDemoBack('居中标题')"
+						/>
+					</view>
+
+					<!-- 1.3 自定义标题颜色 -->
+					<view class="nav-preview-box">
+						<ste-navbar
+							title="星瀚先锋科技"
+							titleColor="#0090ff"
+							:titleAlignment="2"
+							:safeAreaInsetTop="false"
+							:fixed="false"
+							backgroundColor="#f0f7ff"
+							@backClick="onDemoBack('科技蓝标题')"
+						/>
+					</view>
+				</view>
+
+				<!-- 用例 2：返回按钮定制 -->
+				<view class="demo-card">
+					<text class="card-title">2. 返回按钮个性化定制</text>
+					<text class="card-desc">支持隐藏返回按钮、胶囊背景填充、边框色、自定义返回图标与透明度调节。</text>
+
+					<!-- 2.1 隐藏返回键 -->
+					<view class="nav-preview-box mb-16">
+						<ste-navbar
+							title="隐藏返回键导航"
+							:autoBack="false"
+							:titleAlignment="1"
+							:safeAreaInsetTop="false"
+							:fixed="false"
+							backgroundColor="#f9fafb"
+						/>
+					</view>
+
+					<!-- 2.2 胶囊边框高亮样式 -->
+					<view class="nav-preview-box mb-16">
+						<ste-navbar
+							title="胶囊高亮返回键"
+							:titleAlignment="2"
+							backColor="#0090ff"
+							backBackgroundColor="#e6f4ff"
+							backBorderColor="#91caff"
+							:safeAreaInsetTop="false"
+							:fixed="false"
+							backgroundColor="#f9fafb"
+							@backClick="onDemoBack('胶囊高亮')"
+						/>
+					</view>
+
+					<!-- 2.3 半透明返回键 -->
+					<view class="nav-preview-box">
+						<ste-navbar
+							title="半透明返回按钮"
+							:titleAlignment="2"
+							:backOpacity="0.4"
+							:safeAreaInsetTop="false"
+							:fixed="false"
+							backgroundColor="#f9fafb"
+							@backClick="onDemoBack('半透明返回键')"
+						/>
+					</view>
+				</view>
+
+				<!-- 用例 3：背景颜色与主题风格 -->
+				<view class="demo-card">
+					<text class="card-title">3. 背景色与主题风格</text>
+					<text class="card-desc">支持设置任意背景色，并自适应匹配亮色/暗色标题与返回图标。</text>
+
+					<!-- 3.1 品牌主色背景 -->
+					<view class="nav-preview-box mb-16">
+						<ste-navbar
+							title="品牌蓝导航"
+							titleColor="#ffffff"
+							backColor="#ffffff"
+							:titleAlignment="2"
+							:safeAreaInsetTop="false"
+							:fixed="false"
+							backgroundColor="#0090ff"
+							@backClick="onDemoBack('品牌蓝导航')"
+						/>
+					</view>
+
+					<!-- 3.2 暗夜深色沉浸式 -->
+					<view class="nav-preview-box">
+						<ste-navbar
+							title="暗夜极客模式"
+							titleColor="#ffffff"
+							backColor="#ffffff"
+							:titleAlignment="2"
+							:safeAreaInsetTop="false"
+							:fixed="false"
+							backgroundColor="#1f2937"
+							@backClick="onDemoBack('暗夜导航')"
+						/>
+					</view>
+				</view>
+
+				<!-- 用例 4：插槽扩展（搜索栏与操作按钮） -->
+				<view class="demo-card">
+					<text class="card-title">4. 插槽内容扩展</text>
+					<text class="card-desc">可通过 #default 插槽嵌入搜索框或业务组件，通过 #right 拓展功能按钮。</text>
+					<view class="nav-preview-box">
+						<ste-navbar
+							:safeAreaInsetTop="false"
+							:fixed="false"
+							backgroundColor="#ffffff"
+							@backClick="onDemoBack('插槽导航')"
+						>
+							<!-- 中间主体插槽：模拟搜索框 -->
+							<template #default>
+								<view class="search-input-mock">
+									<ste-icon code="&#xe67a;" :size="24" color="#999999" />
+									<text class="search-placeholder-text">搜索感兴趣的内容...</text>
+								</view>
+							</template>
+							<!-- 右侧操作区插槽 -->
+							<template #right>
+								<view class="nav-right-actions">
+									<view class="action-btn" @click="onRightAction('扫一扫')">
+										<ste-icon code="&#xe675;" :size="30" color="#333333" />
+									</view>
+									<view class="action-btn ml-12" @click="onRightAction('更多')">
+										<ste-icon code="&#xe67b;" :size="30" color="#333333" />
+									</view>
+								</view>
+							</template>
+						</ste-navbar>
+					</view>
+				</view>
+
+				<!-- 用例 5：返回事件拦截 (stopNavigateBack) -->
+				<view class="demo-card">
+					<text class="card-title">5. 返回事件拦截 (stopNavigateBack=true)</text>
+					<text class="card-desc">开启拦截后点击返回按钮不会触发默认返回上一页，由开发者自行处理业务逻辑（如二次确认）。</text>
+					<view class="nav-preview-box">
+						<ste-navbar
+							title="返回需二次确认"
+							:titleAlignment="2"
+							:stopNavigateBack="true"
+							:safeAreaInsetTop="false"
+							:fixed="false"
+							backgroundColor="#fff7ed"
+							titleColor="#c2410c"
+							backColor="#c2410c"
+							@backClick="onInterceptBack"
+						/>
+					</view>
+				</view>
+
+				<!-- 操作反馈日志 -->
+				<view class="demo-card">
+					<text class="card-title">操作状态反馈</text>
+					<view class="log-box">
+						<text class="log-text">{{ logText }}</text>
+					</view>
+				</view>
+			</view>
+		</scroll-view>
+	</view>
+</template>
+
+<script setup lang="uts">
+	/**
+	 * @file navbar.uvue
+	 * @description Navbar 页面顶部导航栏 - uni-app x / UTS 演示页面
+	 */
+	import { ref } from 'vue'
+
+	// 操作反馈日志
+	const logText = ref('等待交互操作中...')
+
+	// ==================== 页面导航栏回调 ====================
+	function onPageNavbarBack() {
+		logText.value = '触发了页面主导航栏返回事件'
+	}
+
+	function onShareClick() {
+		logText.value = '点击了主导航栏右侧分享按钮'
+	}
+
+	// ==================== 演示卡片事件回调 ====================
+	function onDemoBack(tag : string) {
+		logText.value = `已触发【${tag}】返回按钮点击事件 (backClick)`
+	}
+
+	function onRightAction(action : string) {
+		logText.value = `点击了插槽右侧操作项：【${action}】`
+	}
+
+	function onInterceptBack() {
+		logText.value = '触发了【返回拦截】！已阻止默认返回，您可在此执行表单保存或确认弹窗'
+	}
+</script>
+
+<style scoped>
+	/* 页面最外层 */
+	.page-root {
+		flex: 1;
+		background-color: #f7f8fa;
+	}
+
+	/* 主导航栏右侧按钮 */
+	.nav-right-btn {
+		width: 60rpx;
+		height: 44px;
+		justify-content: center;
+		align-items: center;
+		margin-right: 12rpx;
+	}
+
+	/* 滚动容器 */
+	.page-container {
+		flex: 1;
+	}
+
+	/* 顶部头部说明 */
+	.page-header {
+		padding: 32rpx 32rpx 20rpx;
+		background-color: #ffffff;
+		margin-bottom: 24rpx;
+	}
+
+	.page-title {
+		font-size: 40rpx;
+		font-weight: bold;
+		color: #1a1a1a;
+		margin-bottom: 12rpx;
+	}
+
+	.page-desc {
+		font-size: 26rpx;
+		color: #8c8c8c;
+		line-height: 38rpx;
+	}
+
+	/* 演示卡片列表区 */
+	.demo-content {
+		padding: 0 24rpx 48rpx;
+	}
+
+	.demo-card {
+		background-color: #ffffff;
+		border-radius: 16rpx;
+		padding: 32rpx;
+		margin-bottom: 24rpx;
+	}
+
+	.card-title {
+		font-size: 30rpx;
+		font-weight: 600;
+		color: #333333;
+		margin-bottom: 8rpx;
+	}
+
+	.card-desc {
+		font-size: 24rpx;
+		color: #999999;
+		line-height: 34rpx;
+		margin-bottom: 20rpx;
+	}
+
+	/* 导航栏卡片预览盒 */
+	.nav-preview-box {
+		border-radius: 12rpx;
+		overflow: hidden;
+		border-width: 1px;
+		border-style: solid;
+		border-color: #e5e7eb;
+	}
+
+	.mb-16 {
+		margin-bottom: 16rpx;
+	}
+
+	/* 模拟搜索框插槽 */
+	.search-input-mock {
+		flex: 1;
+		height: 64rpx;
+		background-color: #f3f4f6;
+		border-radius: 32rpx;
+		flex-direction: row;
+		align-items: center;
+		padding-left: 20rpx;
+		padding-right: 20rpx;
+		margin-right: 16rpx;
+	}
+
+	.search-placeholder-text {
+		font-size: 24rpx;
+		color: #9ca3af;
+		margin-left: 8rpx;
+	}
+
+	/* 右侧操作按钮组 */
+	.nav-right-actions {
+		flex-direction: row;
+		align-items: center;
+	}
+
+	.action-btn {
+		width: 48rpx;
+		height: 44px;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.ml-12 {
+		margin-left: 12rpx;
+	}
+
+	/* 操作日志盒子 */
+	.log-box {
+		background-color: #f9f9f9;
+		border-radius: 8rpx;
+		padding: 20rpx;
+		border-left-width: 6rpx;
+		border-left-style: solid;
+		border-left-color: #0090ff;
+	}
+
+	.log-text {
+		font-size: 24rpx;
+		color: #555555;
+		line-height: 36rpx;
+	}
+</style>

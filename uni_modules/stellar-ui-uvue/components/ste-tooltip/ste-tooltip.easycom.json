@@ -1,0 +1,31 @@
+{
+    "name": "ste-tooltip",
+    "description": "用于扩展文字信息",
+    "example": "<ste-tooltip></ste-tooltip>",
+    "tutorial": "https://stellar-ui.intecloud.com.cn/?projectName=stellar-ui-uvue&menu=%E7%BB%84%E4%BB%B6&active=ste-tooltip",
+    "attributes": [
+        {
+            "name": "maskClose",
+            "description": "是否允许点击气泡外的空白区域关闭气泡。关闭后只能通过 hideTooltip() 关闭；注意开启时遮罩会铺满全屏，气泡显示期间页面无法滚动",
+            "type": "boolean",
+            "default": true
+        },
+        {
+            "name": "[method]showTooltip",
+            "description": "显示文字气泡提示。可通过 useTooltip() 组合式函数或 ref 实例调用",
+            "params": [
+                {
+                    "name": "options",
+                    "type": "TooltipOptions",
+                    "description": "提示配置对象：包含 text(提示文本)、selector(目标元素选择器)、instance(组件实例)、placement(方向 top/bottom)、maxWidth(最大宽度)、duration(自动关闭毫秒数，0 表示不自动关闭)"
+                }
+            ],
+            "returnValue": "void"
+        },
+        {
+            "name": "[method]hideTooltip",
+            "description": "关闭并隐藏当前显示的文字气泡提示",
+            "returnValue": "void"
+        }
+    ]
+}

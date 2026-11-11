@@ -1,0 +1,219 @@
+<template>
+	<scroll-view scroll-y="true" class="page-root">
+		<!-- 顶部导航标题区 -->
+		<view class="demo-header">
+			<text class="demo-title">DateUser 人员信息与日期</text>
+			<text class="demo-subtitle">提供日期日历卡片与人员头像信息卡片展示，支持离线本地计算兜底与自定义角色描述插槽</text>
+		</view>
+
+		<!-- 示例 1：基础日期日历卡片 -->
+		<view class="demo-card">
+			<text class="card-title">1. 日期展示模式</text>
+			<text class="card-desc">自动获取当天公历日期、年月与星期，网络可用时同步农历节气</text>
+			<view class="card-content">
+				<ste-date-user type="date"></ste-date-user>
+			</view>
+		</view>
+
+		<!-- 示例 2：人员信息展示（带角色插槽） -->
+		<view class="demo-card">
+			<text class="card-title">2. 人员信息模式</text>
+			<text class="card-desc">展示用户头像、姓名，并通过 desc 插槽自定义角色标识与图标</text>
+			<view class="card-content">
+				<ste-date-user
+					type="user"
+					avatar="https://image.whzb.com/chain/StellarUI/图片.jpg"
+					nickname="张小凡"
+				>
+					<template #desc>
+						<view class="role-badge manager-badge">
+							<text class="role-text manager-text">店长</text>
+							<ste-icon code="&#xe6c7;" color="#0275ff" :size="24"></ste-icon>
+						</view>
+					</template>
+				</ste-date-user>
+			</view>
+		</view>
+
+		<!-- 示例 3：多角色卡片展示 -->
+		<view class="demo-card">
+			<text class="card-title">3. 不同人员角色卡片</text>
+			<text class="card-desc">不同职责角色与长姓名单行省略截断展示</text>
+			<view class="card-content gap-vertical">
+				<!-- 技术专家 -->
+				<ste-date-user
+					class="margin-bottom-item"
+					type="user"
+					avatar="https://image.whzb.com/chain/StellarUI/头像/张园因.png"
+					nickname="李雷 (高级研发工程师)"
+				>
+					<template #desc>
+						<view class="role-badge tech-badge">
+							<text class="role-text tech-text">技术主管</text>
+						</view>
+					</template>
+				</ste-date-user>
+
+				<!-- 默认无头像兜底与实习生角色 -->
+				<ste-date-user
+					type="user"
+					avatar=""
+					nickname="韩梅梅"
+				>
+					<template #desc>
+						<view class="role-badge intern-badge">
+							<text class="role-text intern-text">管培生</text>
+						</view>
+					</template>
+				</ste-date-user>
+			</view>
+		</view>
+
+		<!-- 示例 4：业务看板组合排列 -->
+		<view class="demo-card">
+			<text class="card-title">4. 看板组合并排展示</text>
+			<text class="card-desc">模拟工作台或考勤打卡看板中，日期与当值人员并排排布</text>
+			<view class="card-content grid-row">
+				<!-- 当日卡片 -->
+				<ste-date-user type="date"></ste-date-user>
+				<!-- 当值人员 -->
+				<ste-date-user
+					type="user"
+					avatar="https://image.whzb.com/chain/StellarUI/图片.jpg"
+					nickname="王经理"
+				>
+					<template #desc>
+						<view class="role-badge duty-badge">
+							<text class="role-text duty-text">今日值班</text>
+						</view>
+					</template>
+				</ste-date-user>
+			</view>
+		</view>
+	</scroll-view>
+</template>
+
+<script setup lang="uts">
+/**
+ * @file date-user.uvue
+ * @description ste-date-user 人员信息以及日期组件 原生演示页面
+ */
+</script>
+
+<style lang="scss" scoped>
+.page-root {
+	flex: 1;
+	background-color: #f7f8fa;
+	padding: 24rpx;
+}
+
+.demo-header {
+	margin-bottom: 24rpx;
+
+	.demo-title {
+		font-size: 38rpx;
+		font-weight: bold;
+		color: #1a1a1a;
+	}
+
+	.demo-subtitle {
+		margin-top: 8rpx;
+		font-size: 24rpx;
+		color: #8a8a8a;
+		line-height: 36rpx;
+	}
+}
+
+.demo-card {
+	background-color: #ffffff;
+	border-radius: 16rpx;
+	padding: 24rpx;
+	margin-bottom: 24rpx;
+
+	.card-title {
+		font-size: 30rpx;
+		font-weight: 600;
+		color: #333333;
+		margin-bottom: 6rpx;
+	}
+
+	.card-desc {
+		font-size: 24rpx;
+		color: #999999;
+		margin-bottom: 20rpx;
+		line-height: 34rpx;
+	}
+
+	.card-content {
+		display: flex;
+		flex-direction: column;
+		background-color: #f2f3f5;
+		padding: 24rpx;
+		border-radius: 12rpx;
+	}
+
+	.gap-vertical {
+		display: flex;
+		flex-direction: column;
+
+		.margin-bottom-item {
+			margin-bottom: 20rpx;
+		}
+	}
+
+	.grid-row {
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+		align-items: center;
+		flex-wrap: wrap;
+
+		.grid-item {
+			margin-bottom: 16rpx;
+		}
+	}
+}
+
+/* 角色徽标标签 */
+.role-badge {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	padding: 2rpx 10rpx;
+	border-radius: 6rpx;
+	height: 36rpx;
+
+	.role-text {
+		font-size: 22rpx;
+		margin-right: 6rpx;
+	}
+}
+
+.manager-badge {
+	background-color: #ebf4ff;
+	.manager-text {
+		color: #0275ff;
+	}
+}
+
+.tech-badge {
+	background-color: #e8ffea;
+	.tech-text {
+		color: #00b578;
+	}
+}
+
+.intern-badge {
+	background-color: #fff7e6;
+	.intern-text {
+		color: #fa8c16;
+	}
+}
+
+.duty-badge {
+	background-color: #f9f0ff;
+	.duty-text {
+		color: #722ed1;
+	}
+}
+</style>

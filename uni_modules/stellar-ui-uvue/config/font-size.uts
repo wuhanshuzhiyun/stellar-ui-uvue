@@ -1,0 +1,173 @@
+// config/font-size.uts - uni-app x 版本
+// 全局字体大小配置：rpx → px 换算 + 运行时缩放（响应式）
+//
+// ============================ 设计说明（改前必读） ============================
+// 1. uni-app x 的 App 端「样式不继承」：即使声明 CSS 变量，根节点也不会把它级联给子 <text>，
+//    全局字号必须由每个 <text> 显式设置。因此本模块在 JS 层完成换算，
+//    组件在自己的 computed 里调用 normalizeFontSize() 并内联到 style —— 这是本库唯一的全局字号通道。
+//    （历史版本的 --font-size-N CSS 变量方案已移除：全库 0 处 var() 引用，纯死代码。）
+// 2. scale 用 ref 承载：组件 computed 内读取 normalizeFontSize 时会自动追踪，
+//    setFontScale() 后所有引用处立即重渲染，运行时改字号即刻生效。
+// 3. _loadConfig 是惰性的（首次访问时读 storage）。它只写普通字段、绝不写 ref ——
+//    因为首次访问通常发生在组件 computed 求值期间，届时写 ref 会触发「computed 内修改状态」告警。
+//    所以 scale 的初始值走普通字段 _config.scale，运行时修改才走 _scaleRef。
+// 4. App-Android 不支持 woff/woff2；本模块与字体无关，仅做尺寸换算。
+// ============================================================================
+
+import { ref } from 'vue'
+import { getWindowWidth } from '../utils/utils.uts'
+
+const storageKey = 'stellar-font-size-config'
+
+type FontSizeConfig = {
+	scale : number,
+}
+
+let _config : FontSizeConfig = {
+	scale: 1,
+}
+
+let _cachedConfig : FontSizeConfig | null = null
+
+/**
+ * 运行时缩放倍率（响应式）
+ * null 表示本次会话尚未被运行时修改，此时使用 _config.scale（storage 中的初始值）。
+ */
+const _scaleRef = ref<number | null>(null)
+
+type ChangeCallback = () => void
+let _changes : ChangeCallback[] = []
+
+// 初始化标记
+let _initialized = false
+
+/** 当前生效的缩放倍率 */
+function _effectiveScale() : number {
+	const v = _scaleRef.value
+	return v != null ? v : _config.scale
+}
+
+function _loadConfig() {
+	if (_cachedConfig != null) {
+		_config = _cachedConfig!
+		return
+	}
+	let scale = 1.0
+	try {
+		const stored = uni.getStorageSync(storageKey)
+		if (stored != null) {
+			if (typeof stored === 'string') {
+				const str = stored as string
+				if (str.length > 0 && str.charAt(0) === '{') {
+					try {
+						const parsed = JSON.parse(str) as UTSJSONObject
+						const sScale = parsed['scale']
+						if (sScale != null) scale = (sScale as number)
+					} catch (e) {
+						// 降级使用默认值
+					}
+				}
+			} else if (typeof stored === 'object') {
+				const s = stored as UTSJSONObject
+				const sScale = s['scale']
+				if (sScale != null) scale = (sScale as number)
+			}
+		}
+	} catch (e) {
+		// 降级使用默认值
+	}
+	_config = { scale: scale > 0 ? scale : 1.0 }
+	_cachedConfig = _config
+}
+
+function _saveConfig() {
+	const obj : UTSJSONObject = {
+		scale: _effectiveScale(),
+	}
+	uni.setStorageSync(storageKey, JSON.stringify(obj))
+}
+
+function _rpx2px(rpx : number) : string {
+	let vw = getWindowWidth()
+	if (vw <= 0) {
+		vw = 375
+	}
+	const px = ((vw * rpx * _effectiveScale()) / 750)
+	const fixed = Math.round(px * 10000) / 10000
+	if (fixed <= 0) {
+		// 降级：直接返回 rpx 值（Android 设备最小宽度 320，24rpx ≈ 10px）
+		return `${rpx / 750 * 375}px`
+	}
+	return `${fixed}px`
+}
+
+function _rpx2pxNum(rpx : number) : number {
+	let vw = getWindowWidth()
+	if (vw <= 0) {
+		vw = 375
+	}
+	const result = Math.round(((vw * rpx * _effectiveScale()) / 750) * 10000) / 10000
+	return result > 0 ? result : (rpx / 750 * 375)
+}
+
+function _notifyChange() {
+	_saveConfig()
+	// 触发变更回调
+	for (let i = 0; i < _changes.length; i++) {
+		_changes[i]()
+	}
+}
+
+function _ensureInit() {
+	if (_initialized == false) {
+		_loadConfig()
+		_initialized = true
+	}
+}
+
+// === 直接导出的独立函数，UTS 编译器可靠解析 ===
+
+/** rpx → px 字符串（含全局缩放，可在 style 中直接使用） */
+export function normalizeFontSize(rpx : number) : string {
+	_ensureInit()
+	return _rpx2px(rpx)
+}
+
+/** rpx → px 数值（含全局缩放，用于内联 style 对象的数值属性） */
+export function normalizeFontSizeNum(rpx : number) : number {
+	_ensureInit()
+	return _rpx2pxNum(rpx)
+}
+
+/** 当前生效的缩放倍率 */
+export function getFontScale() : number {
+	_ensureInit()
+	return _effectiveScale()
+}
+
+/**
+ * 设置全局缩放倍率（响应式）
+ * 调用后所有在 computed 中使用 normalizeFontSize / normalizeFontSizeNum 的组件立即重渲染。
+ */
+export function setFontScale(scale : number) {
+	_ensureInit()
+	if (scale <= 0) return
+	_scaleRef.value = scale
+	_notifyChange()
+}
+
+export function onFontSizeChange(fn : () => void) {
+	_changes.push(fn)
+}
+
+// 保留 useFontSize 兼容（但内部也改为直接调用导出函数）
+export function useFontSize() {
+	_ensureInit()
+	return {
+		getScale: () => getFontScale(),
+		setScale: (scale : number) => setFontScale(scale),
+		normalizeFontSize: (rpx : number) => normalizeFontSize(rpx),
+		normalizeFontSizeNum: (rpx : number) => normalizeFontSizeNum(rpx),
+		onChange: (fn : () => void) => onFontSizeChange(fn),
+	}
+}

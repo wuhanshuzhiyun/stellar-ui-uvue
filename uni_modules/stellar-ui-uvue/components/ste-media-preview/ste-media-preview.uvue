@@ -1,0 +1,769 @@
+<template>
+	<!-- 全屏媒体预览根容器 -->
+	<view class="ste-media-preview-root" :style="rootStyle" v-if="dataShow">
+		<view
+			class="media-preview-content"
+			@touchstart="onTouchstart"
+			@touchmove="onTouchmove"
+			@touchend="onTouchend"
+			@touchcancel="onTouchend"
+		>
+			<!-- Swiper 容器常驻，避免由于 DOM 销毁重建导致的图片重载与白屏卡顿 -->
+			<swiper
+				class="swiper"
+				:autoplay="props.autoplay > 0"
+				:interval="props.autoplay"
+				:circular="props.loop"
+				:current="dataIndex"
+				:disable-touch="isScale"
+				@change="onChange"
+			>
+				<!-- key 采用「下标 + 地址」组合：既保证唯一（相册可能存在重复图片，纯 URL 作 key 会冲突导致节点复用出错、叠影），
+			     又能在列表内容不变时保持稳定，避免图片被反复重建 -->
+				<swiper-item v-for="(item, index) in cmpUrls" :key="index + '-' + itemUrl(index)">
+					<!-- 变换下沉到「媒体叶子节点」：view 包装层不再参与变换。
+					     原因：包装层是 flex 容器且带不透明底色，对它做 transform 会让原生端每帧
+					     重算子树与底色绘制；而 image 的布局尺寸不变（仍为 100%），
+					     aspectFit 也不会因为变换而重算采样，闪烁因此消除。 -->
+					<view
+						class="preview-item"
+						@click.stop="onClick"
+						@longpress="onLongpress"
+					>
+						<video
+							class="video"
+							v-if="isItemVideo(index)"
+							:src="itemUrl(index)"
+							:style="getItemStyle(index)"
+							@click.stop="noop"
+						/>
+						<!-- #ifdef MP-WEIXIN -->
+						<image
+							v-else
+							class="image"
+							:show-menu-by-longpress="dataShowmenu"
+							:src="itemUrl(index)"
+							mode="aspectFit"
+							:style="getItemStyle(index)"
+						/>
+						<!-- #endif -->
+						<!-- #ifndef MP-WEIXIN -->
+						<image
+							v-else
+							class="image"
+							:src="itemUrl(index)"
+							mode="aspectFit"
+							:style="getItemStyle(index)"
+						/>
+						<!-- #endif -->
+					</view>
+				</swiper-item>
+			</swiper>
+
+			<!-- 自定义底部扩展插槽 -->
+			<view class="media-preview-slot" @touchstart.stop="noop" @touchmove.stop="noop" @touchend.stop="noop">
+				<slot></slot>
+			</view>
+		</view>
+
+		<!-- 底部控制栏 -->
+		<view class="media-preview-footer" @touchstart.stop="noop" @touchmove.stop="noop" @touchend.stop="noop">
+			<view class="footer-index">
+				<!-- 原生 App 编译规范：显式添加 footer-index-text 类名以支持样式定制 -->
+				<text v-if="showIndex && cmpUrls.length > 0" class="footer-index-text" :style="indexTextStyle">{{ dataIndex + 1 }}/{{ cmpUrls.length }}</text>
+			</view>
+			<view class="footer-close" @click="onClose">
+				<ste-icon name="close" :size="60" code="&#xe6a0;" color="#fff" />
+			</view>
+		</view>
+	</view>
+</template>
+
+<script setup lang="uts">
+	/**
+	 * @file ste-media-preview.uvue
+	 * @description 全屏多媒体预览组件 - 基于中心轴心严密物理定点仿射模型 (uni-app x 原生高性能版)
+	 * @author Stellar UI uvue Team
+	 *
+	 * 核心架构设计：
+	 * 1. 零 DOM 销毁重构：Swiper 容器与视图节点全生命周期常驻，通过 :disable-touch="isScale" 在缩放态锁死翻页，消除切换闪烁；
+	 * 2. 中心轴心物理定点：顺应原生 RenderNode/View 天然的中心轴心 (center center)，严格保证双指落点正下方像素纹丝不动；
+	 * 3. 动效与手势分层：手势交互中 transition: none 保证 120fps 极速跟手，松手/双击复位启动平滑物理缓动；
+	 * 4. 消除手势期异步开销：手势期采用微秒级同步视口更新，绝不在 touchstart 高频事件中触发异步 SelectorQuery。
+	 */
+
+	import { ref, computed, watch, getCurrentInstance, nextTick, onMounted, onUnmounted } from 'vue'
+	import { getMediaFileType } from '../../utils/utils.uts'
+	import { TouchScaleing } from './TouchScaleing.uts'
+	import { normalizeFontSize } from '../../config/index.uts'
+
+	defineOptions({ name: 'ste-media-preview' })
+
+	// ==================== 属性与类型定义 (Props) ====================
+	type MediaPreviewProps = {
+		/** 是否显示全屏预览浮层 */
+		show : boolean,
+		/** 预览媒体资源地址列表 */
+		urls : string[],
+		/** 轮播自动播放间隔（毫秒，0 表示不自动播放） */
+		autoplay : number,
+		/** 是否采用衔接滑动循环轮播 */
+		loop : boolean,
+		/** 当前激活媒体项索引 */
+		index ?: number,
+		/** 是否在底部显示当前页码指示器 */
+		showIndex : boolean,
+		/** 是否开启双指缩放及单指拖拽手势 */
+		scale : boolean,
+		/** 是否允许长按图片弹出系统操作菜单 */
+		showmenu : boolean,
+		/** 浮层自定义 z-index 层级 */
+		zIndex : number,
+	}
+
+	const props = withDefaults(defineProps<MediaPreviewProps>(), {
+		show : false,
+		urls : () : string[] => [] as string[],
+		autoplay : 0,
+		loop : false,
+		showIndex : true,
+		scale : false,
+		showmenu : true,
+		zIndex : 997,
+	})
+
+	// ==================== 事件派发定义 (Emits) ====================
+	const emit = defineEmits([
+		'beforeClose',
+		'update:show',
+		'close',
+		'update:index',
+		'change',
+		'longpress'
+	])
+
+	// ==================== 核心响应式状态 (State) ====================
+	const instance = getCurrentInstance()
+	const dataIndex = ref<number>(0)
+	const dataShow = ref<boolean>(false)
+	const dataShowmenu = ref<boolean>(false)
+	const isScale = ref<boolean>(false)
+
+	/**
+	 * 变换字符串：**刻意使用普通变量而非 ref**
+	 * 模板只读取 activeStyle，它仅作为构建 activeStyle 的输入；
+	 * 若声明成 ref，手势每帧会给响应式系统叠一次无效写入，
+	 * 原生端可能在同一帧内排入多次样式下发，产生重影。
+	 */
+	let activeTransform : string = 'translate(0px, 0px) scale(1)'
+	/**
+	 * 缓动代号：每次启动或取消都自增
+	 * 已排队的帧凭代号自我作废，因此取消动画无需 clearTimeout，也不需要任何自引用。
+	 */
+	let animToken : number = 0
+	/** 缓动起点/终点与计时状态（模块级，供排队的帧读取） */
+	let animFromScale : number = 1.0
+	let animFromX : number = 0.0
+	let animFromY : number = 0.0
+	let animToScale : number = 1.0
+	let animToX : number = 0.0
+	let animToY : number = 0.0
+	let animStartTime : number = 0
+	let animDuration : number = 0
+
+	/** 物理定点手势计算引擎实例 */
+	const touchInstance = new TouchScaleing()
+
+	// ==================== 容器与可见内容尺寸 ====================
+	/** 变换容器尺寸 (CSS 逻辑像素)，用于位移夹紧与触摸坐标空间校准 */
+	let boxWidth = 0.0
+	let boxHeight = 0.0
+	/** 图片原始尺寸缓存：url -> { w, h } */
+	const naturalSizeCache : UTSJSONObject = {}
+
+	/** 空函数，阻止事件冒泡穿透 */
+	const noop = () => {}
+
+	// ==================== 计算属性 (Computed) ====================
+	/**
+	 * 过滤媒体列表中非音频的有效资源项
+	 */
+	const cmpUrls = computed(() : UTSJSONObject[] => {
+		const result : UTSJSONObject[] = []
+		for (let i = 0; i < props.urls.length; i++) {
+			const url = props.urls[i]
+			const type = getMediaFileType(url)
+			if (type != 'audio') {
+				result.push({
+					url: url,
+					type: type,
+				} as UTSJSONObject)
+			}
+		}
+		return result
+	})
+
+	/**
+	 * 当前激活项的变换样式（唯一实例）
+	 * 关键：手势每帧只重建「当前项」这一个 style 对象，且只写入 transform 一个属性。
+	 * 旧写法用数组式 :style="[cond ? obj : {}]"，每帧都会为所有 item 新建对象，
+	 * 并在每帧重复应用 transform-origin / transition-*，导致原生层反复重建绘制层，
+	 * 表现为缩放时疯狂闪烁、拖出残影。
+	 */
+	const activeStyle = ref<UTSJSONObject>({})
+	/** 非激活项共用的空样式对象（复用同一实例，避免每帧产生新对象） */
+	const EMPTY_STYLE : UTSJSONObject = {}
+
+	/**
+	 * 根容器样式（z-index 稳定引用）
+	 * 关键：模板里若写 :style="{ zIndex: props.zIndex }"，每次组件重渲染都会新建对象，
+	 * 原生端会重新解析并下发样式，同样会干扰缩放期绘制层。改为缓存对象，仅在 zIndex 变化时重建。
+	 */
+	const rootStyle = computed(() : UTSJSONObject => {
+		const style : UTSJSONObject = {}
+		style['zIndex'] = props.zIndex
+		return style
+	})
+
+	/** 页码指示器文字样式（字号跟随全局字号设置，稳定引用避免重渲染抖动） */
+	const indexTextStyle = computed(() : UTSJSONObject => {
+		const style : UTSJSONObject = {}
+		style['fontSize'] = normalizeFontSize(28)
+		return style
+	})
+
+	/**
+	 * 构建变换样式
+	 * 关键：**不写任何 transition-* 属性**。
+	 * 原生端的 CSS transition 与「每帧直写 transform」是两个独立的执行者，
+	 * 松手缓动还没结束时手指再次按下，两者会同时修改同一节点的变换，
+	 * 表现为重叠的虚影与小幅闪烁。
+	 * 现在改为：变换只有一个执行者（本文件的 applyTransform），
+	 * 回弹与双击缓动由 animateTransform 用定时器逐帧算出来，逻辑完全自持。
+	 * @param transform 变换字符串
+	 */
+	function buildTransformStyle(transform : string) : UTSJSONObject {
+		const style : UTSJSONObject = {}
+		style['transform'] = transform
+		return style
+	}
+
+	/** 同步当前激活项样式（每帧唯一的一次样式下发） */
+	function syncTransformStyle() {
+		activeStyle.value = buildTransformStyle(activeTransform)
+	}
+
+	/** 取消进行中的缓动（排队中的帧凭代号自动作废，无需清理定时器） */
+	function stopAnim() {
+		animToken++
+	}
+
+	/**
+	 * 立即应用一组变换值（唯一写入口）
+	 * @param s 缩放倍率
+	 * @param tx X 位移
+	 * @param ty Y 位移
+	 */
+	function applyTransform(s : number, tx : number, ty : number) {
+		touchInstance.scale = s
+		touchInstance.translateX = tx
+		touchInstance.translateY = ty
+		activeTransform = touchInstance.getTransformString()
+		syncTransformStyle()
+	}
+
+	/**
+	 * 逐帧缓动到目标变换（替代原生 CSS transition）
+	 *
+	 * 实现约束（UTS 硬限制，务必保留当前写法）：
+	 * 1. `setTimeout(fn, ms)` 传函数名属于「值位置」引用，UTS 编译期解析不到，会报「找不到名称」；
+	 *    必须写成 `setTimeout(() => { ... }, ms)`，即箭头内包一层调用/逻辑。
+	 * 2. 因此不再用递归函数驱动，改为**一次性预排全部帧**，每帧凭 `token` 判断自己是否已过期。
+	 *    取消动画只需让 `animToken` 自增，无需 clearTimeout。
+	 * @param fromScale 起始缩放
+	 * @param fromX 起始 X 位移
+	 * @param fromY 起始 Y 位移
+	 * @param toScale 目标缩放
+	 * @param toX 目标 X 位移
+	 * @param toY 目标 Y 位移
+	 * @param duration 总时长(ms)
+	 */
+	function animateTransform(
+		fromScale : number, fromX : number, fromY : number,
+		toScale : number, toX : number, toY : number,
+		duration : number
+	) {
+		stopAnim()
+		if (duration <= 0) {
+			applyTransform(toScale, toX, toY)
+			return
+		}
+		animFromScale = fromScale
+		animFromX = fromX
+		animFromY = fromY
+		animToScale = toScale
+		animToX = toX
+		animToY = toY
+		animDuration = duration
+		animStartTime = Date.now()
+
+		// 本次动画的代号：任何后续 stopAnim/animateTransform 都会让它失效
+		const token = animToken
+		const frames = Math.ceil(duration / 16.0)
+		for (let i = 1; i <= frames; i++) {
+			setTimeout(() => {
+				// 已被新的手势或动画接管，直接丢弃这一帧
+				if (token != animToken) return
+				let t = (Date.now() - animStartTime) / animDuration
+				if (t > 1.0) t = 1.0
+				// easeOutCubic：起步快、收尾稳，接近原生 spring 的观感
+				const e = 1.0 - Math.pow(1.0 - t, 3.0)
+				applyTransform(
+					animFromScale + (animToScale - animFromScale) * e,
+					animFromX + (animToX - animFromX) * e,
+					animFromY + (animToY - animFromY) * e
+				)
+			}, i * 16)
+		}
+	}
+
+	/**
+	 * 获取 item 的内联样式
+	 * @param index 列表下标
+	 */
+	function getItemStyle(index : number) : UTSJSONObject {
+		if (index != dataIndex.value) return EMPTY_STYLE
+		return activeStyle.value
+	}
+
+	/**
+	 * 获取指定索引的媒体资源 URL
+	 * @param index 索引下标
+	 */
+	function itemUrl(index : number) : string {
+		const urls = cmpUrls.value
+		if (index >= 0 && index < urls.length) {
+			const item = urls[index]
+			return (item['url'] as string) ?? ''
+		}
+		return ''
+	}
+
+	/**
+	 * 判断指定索引是否为单视频预览
+	 * @param index 索引下标
+	 */
+	function isItemVideo(index : number) : boolean {
+		const urls = cmpUrls.value
+		if (index >= 0 && index < urls.length) {
+			const item = urls[index]
+			const type = (item['type'] as string) ?? 'image'
+			return type == 'video' && urls.length <= 1
+		}
+		return false
+	}
+
+	// ==================== 容器 / 可见内容尺寸 ====================
+	/**
+	 * 按图片原始宽高同步「可见内容尺寸」（aspectFit 后的实际显示尺寸）
+	 * @param nw 原始宽
+	 * @param nh 原始高
+	 */
+	function applyFitSize(nw : number, nh : number) {
+		if (nw <= 0.0 || nh <= 0.0) {
+			touchInstance.setBoxSize(boxWidth, boxHeight, boxWidth, boxHeight)
+			return
+		}
+		const fit = Math.min(boxWidth / nw, boxHeight / nh)
+		touchInstance.setBoxSize(boxWidth, boxHeight, nw * fit, nh * fit)
+	}
+
+	/**
+	 * 计算并同步当前媒体的「可见内容尺寸」
+	 * 可见内容通常远小于变换容器（横图在竖屏上只占中间一条），
+	 * 若按容器尺寸夹紧会让缩放后的内容直接飞出视口，因此需要按真实比例换算。
+	 */
+	function applyContentSize() {
+		if (boxWidth <= 0.0 || boxHeight <= 0.0) return
+		const urls = cmpUrls.value
+		const idx = dataIndex.value
+		if (idx < 0 || idx >= urls.length) {
+			touchInstance.setBoxSize(boxWidth, boxHeight, boxWidth, boxHeight)
+			return
+		}
+		const item = urls[idx]
+		const url = (item['url'] as string) ?? ''
+		const type = (item['type'] as string) ?? 'image'
+
+		// 视频按容器铺满处理（视频默认 contain，取不到原始尺寸时按铺满兜底）
+		if (type == 'video' || url == '') {
+			touchInstance.setBoxSize(boxWidth, boxHeight, boxWidth, boxHeight)
+			return
+		}
+
+		const cached = naturalSizeCache[url]
+		if (cached != null) {
+			const c = cached as UTSJSONObject
+			const nwRaw = c['w']
+			const nhRaw = c['h']
+			const nw = nwRaw != null ? (nwRaw as number) : 0.0
+			const nh = nhRaw != null ? (nhRaw as number) : 0.0
+			if (nw > 0.0 && nh > 0.0) {
+				applyFitSize(nw, nh)
+				return
+			}
+		}
+
+		// 尺寸未知时先按铺满兜底，异步取到原始尺寸后再修正
+		touchInstance.setBoxSize(boxWidth, boxHeight, boxWidth, boxHeight)
+		try {
+			uni.getImageInfo({
+				src: url,
+				success: (res) => {
+					const w = res.width
+					const h = res.height
+					if (w > 0.0 && h > 0.0) {
+						const size : UTSJSONObject = {}
+						size['w'] = w
+						size['h'] = h
+						naturalSizeCache[url] = size
+						// 仅在仍为当前激活项时应用，避免异步结果串到别的图
+						if (itemUrl(dataIndex.value) == url) {
+							applyFitSize(w, h)
+						}
+					}
+				},
+			})
+		} catch (err) {}
+	}
+
+	// ==================== 物理真实视口中心测量 ====================
+	/**
+	 * 获取屏幕窗口与内容区域真实几何中心并同步给手势计算引擎
+	 * 仅在浮层显示时异步校准一次绝对矩形，手势交互期间严禁频繁异步查询
+	 */
+	function measurePhysicalCenter() {
+		// 1. 同步首选系统窗口物理中心兜底
+		touchInstance.updateCenterFromWindow()
+
+		// 2. 尝试通过 boundingClientRect 精准实测内容容器在屏幕中的绝对几何矩形
+		try {
+			const query = uni.createSelectorQuery().in(instance?.proxy)
+			query.select('.media-preview-content').boundingClientRect((res : any) => {
+				if (res != null) {
+					const rect = res as NodeInfo
+					if (rect.width != null && rect.height != null && (rect.width as number) > 0.0) {
+						const left = rect.left ?? 0.0
+						const top = rect.top ?? 0.0
+						const width = rect.width as number
+						const height = rect.height as number
+						touchInstance.setCenter(left + width / 2.0, top + height / 2.0)
+						// 记录容器尺寸，供位移夹紧与坐标系校准使用
+						boxWidth = width
+						boxHeight = height
+						applyContentSize()
+					}
+				}
+			}).exec()
+		} catch (e) {}
+	}
+
+	// ==================== 核心方法 (Methods) ====================
+	/**
+	 * 原始 urls 下标 → 过滤音频后的 cmpUrls 下标
+	 * cmpUrls 会剔除 audio 项，直接用原始下标定位会错位
+	 */
+	function mapRawIndexToFiltered(rawIndex : number) : number {
+		let mapped = 0
+		const max = rawIndex < props.urls.length ? rawIndex : props.urls.length
+		for (let i = 0; i < max; i++) {
+			if (getMediaFileType(props.urls[i]) != 'audio') {
+				mapped++
+			}
+		}
+		const count = cmpUrls.value.length
+		if (mapped >= count) {
+			mapped = count > 0 ? count - 1 : 0
+		}
+		return mapped
+	}
+
+	/**
+	 * 重置当前缩放与漫游位移至初始状态
+	 */
+	function resetScal() {
+		stopAnim()
+		touchInstance.reset()
+		isScale.value = false
+		activeTransform = 'translate(0px, 0px) scale(1)'
+		syncTransformStyle()
+	}
+
+	/**
+	 * 关闭媒体预览浮层
+	 */
+	function onClose() {
+		emit('beforeClose')
+		dataShow.value = false
+		emit('update:show', false)
+		emit('close')
+		resetScal()
+	}
+
+	/**
+	 * 触摸按下事件处理器 (touchstart)
+	 * @param e 原生 TouchEvent
+	 */
+	function onTouchstart(e : TouchEvent) {
+		if (!props.scale) return
+		// 手指落下立刻掐断进行中的回弹缓动，保证手势期间变换只有手势这一个执行者
+		stopAnim()
+		// 注意：不再每次 touchstart 都用窗口启发式重置中心，
+		// 实测的容器中心更准确；坐标空间换算由引擎在 touchStartEvent 内自校准
+		// 检测到多指触控瞬间，立刻锁定 isScale，强制关闭 Swiper 滚动翻页拦截
+		if (e.touches != null && e.touches.length >= 2) {
+			isScale.value = true
+		}
+		touchInstance.touchStartEvent(e)
+		if (dataShowmenu.value && e.touches != null && e.touches.length >= 2) {
+			dataShowmenu.value = false
+		}
+	}
+
+	/**
+	 * 触摸移动事件处理器 (touchmove)
+	 * @param e 原生 TouchEvent
+	 */
+	function onTouchmove(e : TouchEvent) {
+		if (!props.scale) return
+		const bool = touchInstance.touchMoveEvent(e)
+		if (!bool) {
+			// 未处于缩放态且为单指滑动时，返回 false 放行给 Swiper 翻页
+			return
+		}
+		if (dataShowmenu.value) dataShowmenu.value = false
+		activeTransform = touchInstance.getTransformString()
+		syncTransformStyle()
+		// 只升不降：手势期间禁止把 isScale 回写为 false，
+		// 否则 multi-touch 首帧引擎尚未置位，会让 swiper 的 disable-touch 每帧 true/false 抖动，
+		// 导致原生 swiper 反复重配 -> 缩放时疯狂闪烁、拖出残影
+		if (touchInstance.isScale) {
+			isScale.value = true
+		}
+	}
+
+	/**
+	 * 触摸离开事件处理器 (touchend)
+	 * @param e 原生 TouchEvent
+	 */
+	function onTouchend(e : TouchEvent) {
+		if (!props.scale) return
+		if (dataShowmenu.value != props.showmenu) dataShowmenu.value = props.showmenu
+		// 先记录松手瞬间的状态，再让引擎算出结算值，最后用逐帧缓动过渡过去
+		const fromScale = touchInstance.scale
+		const fromX = touchInstance.translateX
+		const fromY = touchInstance.translateY
+		touchInstance.touchEndEvent(e)
+		animateTransform(fromScale, fromX, fromY,
+			touchInstance.scale, touchInstance.translateX, touchInstance.translateY, 220)
+		isScale.value = touchInstance.isScale
+	}
+
+	/**
+	 * 轮播切换事件处理器 (change)
+	 * @param e 轮播事件对象
+	 */
+	function onChange(e : SwiperChangeEvent) {
+		const current = e.detail.current
+		dataIndex.value = current
+		emit('update:index', current)
+		emit('change', current)
+		resetScal()
+		// 切图后可见内容尺寸变化，需同步给手势引擎用于位移夹紧
+		applyContentSize()
+	}
+
+	/**
+	 * 长按事件处理器 (longpress)
+	 */
+	function onLongpress() {
+		// 缩放中或非 1.0x 常态下严禁触发长按，避免弹窗打断手势
+		if (isScale.value || touchInstance.isScale) return
+		emit('longpress', dataIndex.value)
+	}
+
+	// ==================== 双击定点放大 / 复位逻辑 ====================
+	let clickNum = 0
+	let clickTimer : number = 0
+
+	/**
+	 * 点击事件处理器 - 识别 300ms 内双击并触发定点放大/还原
+	 * @param e 点击事件对象（uni-app x 强类型 MouseEvent）
+	 */
+	function onClick(e : MouseEvent) {
+		if (!props.scale) return
+		if (clickTimer != 0) {
+			clearTimeout(clickTimer)
+			clickTimer = 0
+		}
+		clickNum++
+
+		// 同步首选屏幕中心兜底
+		let tapX = 187.5
+		let tapY = 333.5
+		try {
+			const winInfo = uni.getWindowInfo()
+			tapX = winInfo.windowWidth / 2.0
+			tapY = winInfo.windowHeight / 2.0
+		} catch (err) {}
+
+		// 直接读取强类型 MouseEvent 坐标
+		// （APP 端事件实例无法按 UTSJSONObject key 取值，旧写法恒回退屏幕中心，导致双击定点失准）
+		if (e.clientX > 0.0 || e.clientY > 0.0) {
+			tapX = e.clientX
+			tapY = e.clientY
+		}
+
+		if (clickNum > 1) {
+			clickNum = 0
+			const fromScale = touchInstance.scale
+			const fromX = touchInstance.translateX
+			const fromY = touchInstance.translateY
+			touchInstance.onDoubleTap(tapX, tapY)
+			animateTransform(fromScale, fromX, fromY,
+				touchInstance.scale, touchInstance.translateX, touchInstance.translateY, 250)
+			isScale.value = touchInstance.isScale
+			return
+		}
+		clickTimer = setTimeout(() => {
+			clickNum = 0
+			clickTimer = 0
+		}, 300)
+	}
+
+	// ==================== 响应式侦听 (Watchers) ====================
+	watch(() : boolean => props.show, (v : boolean) => {
+		if (v) {
+			const idx = props.index
+			if (idx != null) {
+				// index 是原始 urls 下标，需映射到过滤音频后的 cmpUrls 下标
+				dataIndex.value = mapRawIndexToFiltered(idx)
+			}
+			nextTick(() => {
+				measurePhysicalCenter()
+				// 容器尺寸在弹层渲染后才可测量，这里再兜底同步一次可见内容尺寸
+				applyContentSize()
+			})
+		}
+		dataShow.value = v
+		if (!v) {
+			resetScal()
+		}
+	}, { immediate: true })
+
+	watch(() : boolean => props.showmenu, (v : boolean) => {
+		dataShowmenu.value = v
+	}, { immediate: true })
+
+	onMounted(() => {
+		measurePhysicalCenter()
+	})
+
+	// 卸载时掐断缓动定时器，避免回调打到已销毁的实例上
+	onUnmounted(() => {
+		stopAnim()
+	})
+</script>
+
+<style>
+	.ste-media-preview-root {
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		width: 100%;
+		height: 100%;
+		background-color: #000000;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.media-preview-content {
+		width: 100%;
+		flex: 1;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		position: relative;
+	}
+
+	.preview-item {
+		width: 100%;
+		height: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		/* 采用天然的中心轴心 (center center)，保证跨端原生与 CSS 表现完全统一 */
+		transform-origin: center center;
+		/* 不透明底色：避免缩放时透明图层合成产生残影 */
+		background-color: #000000;
+	}
+
+	.swiper {
+		width: 100%;
+		height: 100%;
+	}
+
+	.image {
+		width: 100%;
+		height: 100%;
+		/* 变换施加在图片自身，轴心取元素几何中心，与容器中心重合 */
+		transform-origin: center center;
+	}
+
+	.video {
+		width: 100%;
+		height: 100%;
+		transform-origin: center center;
+	}
+
+	.media-preview-slot {
+		position: absolute;
+		bottom: 30rpx;
+		left: 0;
+		right: 0;
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
+	}
+
+	.media-preview-footer {
+		width: 100%;
+		height: 120rpx;
+		padding-left: 30rpx;
+		padding-right: 30rpx;
+		padding-bottom: 30rpx;
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: space-between;
+	}
+
+	.footer-index {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+	}
+
+	/* 页码指示器文本样式 - uni-app x 必须使用单类名选择器 */
+	.footer-index-text {
+		color: #ffffff;
+	}
+
+	.footer-close {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+	}
+</style>

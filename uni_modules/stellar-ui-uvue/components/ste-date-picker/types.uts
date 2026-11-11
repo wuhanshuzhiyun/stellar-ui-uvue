@@ -1,0 +1,13 @@
+/**
+ * ste-date-picker 日期选择器公开类型定义
+ *
+ * @description 供业务侧在 filter / formatter 回调中标注列类型使用，
+ * 组件内部也从此文件引入，保证「文档示例」与「运行时定义」同源。
+ */
+
+/**
+ * 日期列类型
+ *
+ * 注意：历史拼写为 CloumnType（非 ColumnType），为兼容既有 API 保留原名。
+ */
+export type CloumnType = 'year' | 'month' | 'day' | 'hour' | 'minute' | 'second'

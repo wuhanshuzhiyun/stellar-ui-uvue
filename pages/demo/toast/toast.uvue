@@ -1,0 +1,422 @@
+<template>
+	<scroll-view scroll-y="true" class="page-container">
+		<!-- 页面全局 ste-toast 节点 -->
+		<ste-toast ref="toastRef" />
+
+		<!-- 头部导航说明 -->
+		<view class="page-header">
+			<text class="page-title">Toast 轻提示</text>
+			<text class="page-desc">在页面居中弹出黑色半透明提示框，用于消息通知、操作结果及加载中状态。</text>
+		</view>
+
+		<view class="demo-content">
+			<!-- 用例 1：基础用法 -->
+			<view class="demo-card">
+				<text class="card-title">1. 基础用法</text>
+				<text class="card-desc">普通文本轻提示，默认展示成功图标，停留 1500ms 后自动关闭。</text>
+				<view class="btn-group">
+					<view class="btn-item">
+						<ste-button @click="handleBasicToast" :width="240">基础提示</ste-button>
+					</view>
+				</view>
+			</view>
+
+			<!-- 用例 2：多行与长文本 -->
+			<view class="demo-card">
+				<text class="card-title">2. 长文本与多行提示</text>
+				<text class="card-desc">自动根据文字内容撑开并折行，最大宽度 520rpx。</text>
+				<view class="btn-group">
+					<view class="btn-item">
+						<ste-button @click="handleLongTextToast" :width="320">展示超长文本提示</ste-button>
+					</view>
+				</view>
+			</view>
+
+			<!-- 用例 3：手动换行符 -->
+			<view class="demo-card">
+				<text class="card-title">3. 手动换行 (\n)</text>
+				<text class="card-desc">支持在标题文本中使用 \n 实现多行分段展示。</text>
+				<view class="btn-group">
+					<view class="btn-item">
+						<ste-button @click="handleLineBreakToast" :width="320">手动换行提示</ste-button>
+					</view>
+				</view>
+			</view>
+
+			<!-- 用例 4：预设提示类型 -->
+			<view class="demo-card">
+				<text class="card-title">4. 提示类型 (Icon)</text>
+				<text class="card-desc">内置 success、error、loading、none 四种类型。</text>
+				<view class="btn-grid">
+					<view class="btn-item">
+						<ste-button @click="handleSuccessToast" :width="180">成功</ste-button>
+					</view>
+					<view class="btn-item">
+						<ste-button @click="handleErrorToast" :width="180">失败</ste-button>
+					</view>
+					<view class="btn-item">
+						<ste-button @click="handleLoadingToast" :width="180">加载中</ste-button>
+					</view>
+					<view class="btn-item">
+						<ste-button @click="handleNoneToast" :width="180">纯文字(none)</ste-button>
+					</view>
+				</view>
+			</view>
+
+			<!-- 用例 5：加载中与手动关闭 -->
+			<view class="demo-card">
+				<text class="card-title">5. 加载中与手动控制</text>
+				<text class="card-desc">loading 类型不会自动消失，可通过 hideToast() 手动关闭。</text>
+				<view class="btn-grid">
+					<view class="btn-item">
+						<ste-button @click="handleLoadingManual" :width="240">开启加载</ste-button>
+					</view>
+					<view class="btn-item">
+						<ste-button @click="handleHideManual" :width="240" mode="error">关闭提示</ste-button>
+					</view>
+				</view>
+			</view>
+
+			<!-- 用例 6：自定义图片图标 -->
+			<view class="demo-card">
+				<text class="card-title">6. 自定义图片 (Image)</text>
+				<text class="card-desc">传入自定义网络或本地图片，优先级高于内置 icon。</text>
+				<view class="btn-group">
+					<view class="btn-item">
+						<ste-button @click="handleCustomImageToast" :width="320">自定义图标图片</ste-button>
+					</view>
+				</view>
+			</view>
+
+			<!-- 用例 7：防触摸穿透遮罩层 -->
+			<view class="demo-card">
+				<text class="card-title">7. 遮罩层 (Mask)</text>
+				<text class="card-desc">开启 mask: true 显示全屏透明遮罩，防止提示期间误触页面。</text>
+				<view class="btn-group">
+					<view class="btn-item">
+						<ste-button @click="handleMaskToast" :width="320">开启遮罩 (持续 2.5s)</ste-button>
+					</view>
+				</view>
+			</view>
+
+			<!-- 用例 8：自定义停留时长 -->
+			<view class="demo-card">
+				<text class="card-title">8. 自定义停留时长 (Duration)</text>
+				<text class="card-desc">设置 duration 延长或缩短展示时间。</text>
+				<view class="btn-grid">
+					<view class="btn-item">
+						<ste-button @click="handleShortToast" :width="240">短暂 (800ms)</ste-button>
+					</view>
+					<view class="btn-item">
+						<ste-button @click="handleLongDurationToast" :width="240">较长 (3500ms)</ste-button>
+					</view>
+				</view>
+			</view>
+
+			<!-- 用例 9：Ref 实例方式调用 -->
+			<view class="demo-card">
+				<text class="card-title">9. Ref 实例调用</text>
+				<text class="card-desc">通过绑定 ref 获取组件实例，调用 showToast 实例方法。</text>
+				<view class="btn-group">
+					<view class="btn-item">
+						<ste-button @click="handleRefToast" :width="320">通过 Ref 触发</ste-button>
+					</view>
+				</view>
+			</view>
+
+			<!-- 用例 10：回调事件与队列提示 -->
+			<view class="demo-card">
+				<text class="card-title">10. 回调事件与连续队列 (Order)</text>
+				<text class="card-desc">支持 success、complete、close 回调，以及连续触发时 order 排队播放。</text>
+				<view class="btn-grid">
+					<view class="btn-item">
+						<ste-button @click="handleCallbackToast" :width="240">回调监听测试</ste-button>
+					</view>
+					<view class="btn-item">
+						<ste-button @click="handleQueueToast" :width="240">连续队列播放(3条)</ste-button>
+					</view>
+				</view>
+				<!-- 日志记录面板 -->
+				<view class="log-box">
+					<text class="log-title">事件反馈日志：</text>
+					<text class="log-content">{{ eventLogText }}</text>
+				</view>
+			</view>
+		</view>
+	</scroll-view>
+</template>
+
+<script setup lang="uts">
+	/**
+	 * @file toast.uvue
+	 * @description Toast 轻提示组件 - uni-app x / UTS 全功能演示页面
+	 */
+	import { ref } from 'vue'
+	import { useToast } from '@/uni_modules/stellar-ui-uvue/components/ste-toast/use-toast.uts'
+	import { ToastOptions } from '@/uni_modules/stellar-ui-uvue/components/ste-toast/constants.uts'
+
+	// 组合式函数初始化
+	const toast = useToast()
+
+	// Ref 引用实例定义
+	const toastRef = ref<SteToastComponentPublicInstance | null>(null)
+
+	// 事件日志文本
+	const eventLogText = ref<string>('等待操作...')
+
+	// ==================== 1. 基础用法 ====================
+	function handleBasicToast() {
+		toast.showToast({
+			title: '操作成功',
+			icon: 'success',
+		} as ToastOptions)
+	}
+
+	// ==================== 2. 长文本 ====================
+	function handleLongTextToast() {
+		toast.showToast({
+			title: '这是一段较长的提示信息，用来测试卡片自适应宽度以及多行自动折行展示效果。',
+			icon: 'none',
+			duration: 2500,
+		} as ToastOptions)
+	}
+
+	// ==================== 3. 手动换行 ====================
+	function handleLineBreakToast() {
+		toast.showToast({
+			title: '第一行：上传中...\n第二行：请耐心等待',
+			icon: 'loading',
+		} as ToastOptions)
+		setTimeout(() => {
+			toast.hideToast()
+		}, 2000)
+	}
+
+	// ==================== 4. 预设类型 ====================
+	function handleSuccessToast() {
+		toast.showToast({
+			title: '提交成功',
+			icon: 'success',
+		} as ToastOptions)
+	}
+
+	function handleErrorToast() {
+		toast.showToast({
+			title: '网络连接失败',
+			icon: 'error',
+		} as ToastOptions)
+	}
+
+	function handleLoadingToast() {
+		toast.showToast({
+			title: '数据加载中 (2s后自动完成)...',
+			icon: 'loading',
+		} as ToastOptions)
+		setTimeout(() => {
+			toast.hideToast()
+		}, 2000)
+	}
+
+	function handleNoneToast() {
+		toast.showToast({
+			title: '纯文本提示信息',
+			icon: 'none',
+		} as ToastOptions)
+	}
+
+	// ==================== 5. 手动开启与关闭 ====================
+	function handleLoadingManual() {
+		toast.showToast({
+			title: '正在处理中 (需手动关闭)',
+			icon: 'loading',
+		} as ToastOptions)
+	}
+
+	function handleHideManual() {
+		toast.hideToast()
+	}
+
+	// ==================== 6. 自定义图片 ====================
+	function handleCustomImageToast() {
+		toast.showToast({
+			title: '自定义图片图标',
+			image: 'https://image.whzb.com/chain/StellarUI/组件图标/loading.png',
+			duration: 2000,
+		} as ToastOptions)
+	}
+
+	// ==================== 7. 遮罩层 ====================
+	function handleMaskToast() {
+		toast.showToast({
+			title: '已开启防穿透遮罩 (2.5秒后自动关闭)',
+			icon: 'loading',
+			mask: true,
+		} as ToastOptions)
+		setTimeout(() => {
+			toast.hideToast()
+		}, 2500)
+	}
+
+	// ==================== 8. 自定义停留时长 ====================
+	function handleShortToast() {
+		toast.showToast({
+			title: '快显提示 (800ms)',
+			icon: 'success',
+			duration: 800,
+		} as ToastOptions)
+	}
+
+	function handleLongDurationToast() {
+		toast.showToast({
+			title: '长停留提示 (3500ms)',
+			icon: 'success',
+			duration: 3500,
+		} as ToastOptions)
+	}
+
+	// ==================== 9. Ref 实例调用 ====================
+	function handleRefToast() {
+		if (toastRef.value != null) {
+			toastRef.value?.showToast({
+				title: '通过 Ref 实例成功触发',
+				icon: 'success',
+			} as ToastOptions)
+		}
+	}
+
+	// ==================== 10. 回调监听与连续队列 ====================
+	function handleCallbackToast() {
+		eventLogText.value = '触发展示...'
+		toast.showToast({
+			title: '回调事件监听',
+			icon: 'success',
+			duration: 1500,
+			success: () => {
+				eventLogText.value = '【回调】提示打开成功'
+			},
+			complete: () => {
+				eventLogText.value += ' -> 【回调】处理完成'
+			},
+			close: () => {
+				eventLogText.value += ' -> 【回调】提示已完全关闭'
+			},
+		} as ToastOptions)
+	}
+
+	function handleQueueToast() {
+		eventLogText.value = '开始推入 3 条连续队列提示...'
+		toast.showToast({
+			title: '队列 1/3 (提交中)',
+			icon: 'success',
+			duration: 1200,
+			order: true,
+		} as ToastOptions)
+
+		toast.showToast({
+			title: '队列 2/3 (处理中)',
+			icon: 'none',
+			duration: 1200,
+			order: true,
+		} as ToastOptions)
+
+		toast.showToast({
+			title: '队列 3/3 (已完成)',
+			icon: 'success',
+			duration: 1200,
+			order: true,
+			close: () => {
+				eventLogText.value = '3 条队列提示全部播放完成！'
+			},
+		} as ToastOptions)
+	}
+</script>
+
+<style scoped>
+.page-container {
+	flex: 1;
+	background-color: #f7f8fa;
+	padding: 24rpx;
+}
+
+.page-header {
+	margin-bottom: 24rpx;
+}
+
+.page-title {
+	font-size: 40rpx;
+	font-weight: bold;
+	color: #333333;
+	margin-bottom: 8rpx;
+}
+
+.page-desc {
+	font-size: 26rpx;
+	color: #666666;
+	line-height: 38rpx;
+}
+
+.demo-content {
+	display: flex;
+	flex-direction: column;
+	padding-bottom: 80rpx;
+}
+
+.demo-card {
+	background-color: #ffffff;
+	border-radius: 16rpx;
+	padding: 24rpx;
+	margin-bottom: 24rpx;
+	box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.03);
+}
+
+.card-title {
+	font-size: 30rpx;
+	font-weight: bold;
+	color: #1a1a1a;
+	margin-bottom: 8rpx;
+}
+
+.card-desc {
+	font-size: 24rpx;
+	color: #888888;
+	line-height: 34rpx;
+	margin-bottom: 20rpx;
+}
+
+.btn-group {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+}
+
+.btn-grid {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+}
+
+.btn-item {
+	margin-right: 16rpx;
+	margin-bottom: 16rpx;
+}
+
+.log-box {
+	margin-top: 10rpx;
+	background-color: #f0f2f5;
+	border-radius: 10rpx;
+	padding: 16rpx 20rpx;
+}
+
+.log-title {
+	font-size: 24rpx;
+	font-weight: bold;
+	color: #555555;
+	margin-bottom: 6rpx;
+}
+
+.log-content {
+	font-size: 24rpx;
+	color: #007aff;
+	line-height: 34rpx;
+}
+</style>

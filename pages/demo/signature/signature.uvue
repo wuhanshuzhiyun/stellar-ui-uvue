@@ -1,0 +1,235 @@
+<template>
+	<scroll-view :scroll-y="scrollable" class="page">
+		<view class="header">
+			<text class="title">Signature 签名</text>
+			<text class="subtitle">基础功能版本（UVue）</text>
+		</view>
+
+		<view class="content">
+			<!-- 基础签名 -->
+			<view class="demo-item">
+				<text class="demo-label">基础签名</text>
+				<view class="signature-box">
+					<ste-signature :action="action1" width="100%" height="300" @start="onStart" @signing="onSigning"
+						@end="onEnd" @save="onSave1" @error="onError"></ste-signature>
+				</view>
+				<view class="btn-group">
+					<view class="btn btn-default" @click="clear1">
+						<text class="btn-text">清空</text>
+					</view>
+					<view class="btn btn-default" @click="back1">
+						<text class="btn-text">回退</text>
+					</view>
+					<view class="btn btn-primary" @click="save1">
+						<text class="btn-text btn-text-primary">保存</text>
+					</view>
+				</view>
+				<image v-if="imageUrl1 != ''" class="preview-image" :src="imageUrl1" mode="aspectFit"></image>
+			</view>
+
+			<!-- 自定义线条 -->
+			<view class="demo-item">
+				<text class="demo-label">自定义线条（红色、粗线）</text>
+				<view class="signature-box">
+					<ste-signature :action="action2" width="100%" height="300" :line-width="6" stroke-color="#FF0000"
+						background="#FFF8F0" @save="onSave2" @error="onError"></ste-signature>
+				</view>
+				<view class="btn-group">
+					<view class="btn btn-default" @click="clear2">
+						<text class="btn-text">清空</text>
+					</view>
+					<view class="btn btn-primary" @click="save2">
+						<text class="btn-text btn-text-primary">保存</text>
+					</view>
+				</view>
+				<image v-if="imageUrl2 != ''" class="preview-image" :src="imageUrl2" mode="aspectFit"></image>
+			</view>
+
+			<!-- 输出原图 -->
+			<view class="demo-item">
+				<text class="demo-label">output 导出（UVue 仅支持 up）</text>
+				<view class="signature-box">
+					<ste-signature :action="action3" width="100%" height="300" background="#F0F9FF" @save="onSave3"
+						@error="onError"></ste-signature>
+				</view>
+				<view class="btn-group">
+					<view class="btn btn-default" @click="clear3">
+						<text class="btn-text">清空</text>
+					</view>
+					<view class="btn btn-primary" @click="output3">
+						<text class="btn-text btn-text-primary">导出</text>
+					</view>
+				</view>
+				<image v-if="imageUrl3 != ''" class="preview-image" :src="imageUrl3" mode="aspectFit"></image>
+			</view>
+		</view>
+	</scroll-view>
+</template>
+
+<script setup lang="uts">
+	import { ref } from 'vue'
+
+	const imageUrl1 = ref('')
+	const imageUrl2 = ref('')
+	const imageUrl3 = ref('')
+	const scrollable = ref(true)
+
+	const action1 = ref('')
+	const action2 = ref('')
+	const action3 = ref('')
+
+	function onStart() {
+		console.log('签名开始')
+		scrollable.value = false
+	}
+
+	function onSigning() {
+		console.log('签名中')
+	}
+
+	function onEnd() {
+		console.log('签名结束')
+		scrollable.value = true
+	}
+
+	function clear1() {
+		action1.value = 'clear'
+		imageUrl1.value = ''
+		setTimeout(() : void => { action1.value = '' }, 100)
+	}
+
+	function back1() {
+		action1.value = 'back'
+		setTimeout(() : void => { action1.value = '' }, 100)
+	}
+
+	function save1() {
+		action1.value = 'save'
+		setTimeout(() : void => { action1.value = '' }, 100)
+	}
+
+	function clear2() {
+		action2.value = 'clear'
+		imageUrl2.value = ''
+		setTimeout(() : void => { action2.value = '' }, 100)
+	}
+
+	function save2() {
+		action2.value = 'save'
+		setTimeout(() : void => { action2.value = '' }, 100)
+	}
+
+	function clear3() {
+		action3.value = 'clear'
+		imageUrl3.value = ''
+		setTimeout(() : void => { action3.value = '' }, 100)
+	}
+
+	function output3() {
+		action3.value = 'output'
+		setTimeout(() : void => { action3.value = '' }, 100)
+	}
+
+	function onSave1(path : string) {
+		imageUrl1.value = path
+		console.log('保存成功：', path)
+	}
+
+	function onSave2(path : string) {
+		imageUrl2.value = path
+		console.log('保存成功：', path)
+	}
+
+	function onSave3(path : string) {
+		imageUrl3.value = path
+		console.log('导出成功：', path)
+	}
+
+	function onError(err : string) {
+		console.error('操作失败：', err)
+		uni.showToast({ title: err, icon: 'none' })
+	}
+</script>
+
+<style>
+	.page {
+		padding: 20rpx;
+		flex: 1
+	}
+
+	.header {
+		margin-bottom: 40rpx;
+	}
+
+	.title {
+		font-size: 40rpx;
+		font-weight: bold;
+		margin-bottom: 10rpx;
+	}
+
+	.subtitle {
+		font-size: 24rpx;
+		color: #999999;
+	}
+
+	.content {
+		flex-direction: column;
+	}
+
+	.demo-item {
+		margin-bottom: 40rpx;
+	}
+
+	.demo-label {
+		font-size: 28rpx;
+		color: #333333;
+		margin-bottom: 16rpx;
+		font-weight: 500;
+	}
+
+	.signature-box {
+		border-width: 1px;
+		border-style: dashed;
+		border-color: #cccccc;
+		border-radius: 8rpx;
+		overflow: hidden;
+	}
+
+	.btn-group {
+		flex-direction: row;
+		margin-top: 16rpx;
+	}
+
+	.btn {
+		padding-left: 24rpx;
+		padding-right: 24rpx;
+		padding-top: 12rpx;
+		padding-bottom: 12rpx;
+		border-radius: 8rpx;
+		margin-right: 16rpx;
+	}
+
+	.btn-text {
+		font-size: 28rpx;
+		color: #666666;
+	}
+
+	.btn-default {
+		background-color: #f5f5f5;
+	}
+
+	.btn-primary {
+		background-color: #0090FF;
+	}
+
+	.btn-text-primary {
+		color: #ffffff;
+	}
+
+	.preview-image {
+		width: 100%;
+		height: 300rpx;
+		margin-top: 16rpx;
+		background-color: #f8f8f8;
+	}
+</style>

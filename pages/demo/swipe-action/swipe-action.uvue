@@ -1,0 +1,323 @@
+<template>
+	<scroll-view direction="vertical" class="page">
+		<!-- 顶部标题 -->
+		<view class="header">
+			<text class="title">SwipeAction 滑动单元格</text>
+			<text class="desc">常用于列表项左滑/右滑呼出操作菜单，支持阈值吸附、双向滑动、快捷指示按钮与单元格组互斥。</text>
+		</view>
+
+		<!-- 1. 基础右滑删除 -->
+		<view class="section">
+			<text class="section-title">1. 基础右滑操作 (默认 mode="right")</text>
+			<view class="demo-card">
+				<ste-swipe-action @open="onOpen" @close="onClose">
+					<view class="cell-content">
+						<text class="cell-title">订单编号：SO20260827001</text>
+						<text class="cell-desc">向左滑动手指可呼出右侧操作菜单</text>
+					</view>
+					<template v-slot:right>
+						<view class="action-btn btn-danger" @click="handleAction('删除')">
+							<text class="btn-text">删除</text>
+						</view>
+					</template>
+				</ste-swipe-action>
+			</view>
+		</view>
+
+		<!-- 2. 双向滑动 (左右均可滑动) -->
+		<view class="section">
+			<text class="section-title">2. 左右双向滑动 (mode="all")</text>
+			<view class="demo-card">
+				<ste-swipe-action mode="all" @open="onOpen" @close="onClose">
+					<template v-slot:left>
+						<view class="action-btn btn-primary" @click="handleAction('标为已读')">
+							<text class="btn-text">已读</text>
+						</view>
+						<view class="action-btn btn-warning" @click="handleAction('置顶消息')">
+							<text class="btn-text">置顶</text>
+						</view>
+					</template>
+					<view class="cell-content">
+						<text class="cell-title">系统通知：版本更新提醒</text>
+						<text class="cell-desc">右滑呼出已读/置顶，左滑呼出删除</text>
+					</view>
+					<template v-slot:right>
+						<view class="action-btn btn-danger" @click="handleAction('删除')">
+							<text class="btn-text">删除</text>
+						</view>
+					</template>
+				</ste-swipe-action>
+			</view>
+		</view>
+
+		<!-- 3. 边缘指示箭头按钮 -->
+		<view class="section">
+			<text class="section-title">3. 边缘指示箭头按钮 (点击快捷切换)</text>
+			<view class="demo-card">
+				<ste-swipe-action mode="all" :leftIcon="true" :rightIcon="true">
+					<template v-slot:left>
+						<view class="action-btn btn-primary" @click="handleAction('收藏')">
+							<text class="btn-text">收藏</text>
+						</view>
+					</template>
+					<view class="cell-content">
+						<text class="cell-title">待办事项：UI 自动化测试验收</text>
+						<text class="cell-desc">点击左右两侧半圆箭头亦可快捷展开</text>
+					</view>
+					<template v-slot:right>
+						<view class="action-btn btn-danger" @click="handleAction('删除')">
+							<text class="btn-text">删除</text>
+						</view>
+					</template>
+				</ste-swipe-action>
+			</view>
+		</view>
+
+		<!-- 4. 通过 Ref 方法控制打开/关闭 -->
+		<view class="section">
+			<text class="section-title">4. 外部按钮通过 Ref 控制打开/关闭</text>
+			<view class="demo-card">
+				<ste-swipe-action ref="swipeRef" mode="all">
+					<template v-slot:left>
+						<view class="action-btn btn-primary"><text class="btn-text">左侧</text></view>
+					</template>
+					<view class="cell-content">
+						<text class="cell-title">受控单元格对象</text>
+						<text class="cell-desc">点击下方按钮触发 open('right') / close()</text>
+					</view>
+					<template v-slot:right>
+						<view class="action-btn btn-danger"><text class="btn-text">右侧</text></view>
+					</template>
+				</ste-swipe-action>
+				<view class="control-btn-row">
+					<ste-button @click="openSingle('left')">打开左侧</ste-button>
+					<ste-button style="margin-left: 16rpx;" @click="openSingle('right')">打开右侧</ste-button>
+					<ste-button style="margin-left: 16rpx;" @click="closeSingle">关闭</ste-button>
+				</view>
+			</view>
+		</view>
+
+		<!-- 5. 单元格组与互斥排他 (autoClose) -->
+		<view class="section">
+			<text class="section-title">5. 单元格组与互斥自动关闭 (autoClose=true)</text>
+			<view class="demo-card no-padding">
+				<ste-swipe-action-group ref="groupRef" :autoClose="true" @open="onGroupOpen" @close="onGroupClose">
+					<ste-swipe-action>
+						<view class="cell-content border-bottom">
+							<text class="cell-title">商品 1：无线降噪耳机</text>
+							<text class="cell-desc">展开当前项会自动关闭其他项</text>
+						</view>
+						<template v-slot:right>
+							<view class="action-btn btn-danger" @click="handleAction('删除商品1')">
+								<text class="btn-text">删除</text>
+							</view>
+						</template>
+					</ste-swipe-action>
+
+					<ste-swipe-action>
+						<view class="cell-content border-bottom">
+							<text class="cell-title">商品 2：机械键盘 87 键</text>
+							<text class="cell-desc">展开当前项会自动关闭其他项</text>
+						</view>
+						<template v-slot:right>
+							<view class="action-btn btn-danger" @click="handleAction('删除商品2')">
+								<text class="btn-text">删除</text>
+							</view>
+						</template>
+					</ste-swipe-action>
+
+					<ste-swipe-action>
+						<view class="cell-content">
+							<text class="cell-title">商品 3：电竞人体工学椅</text>
+							<text class="cell-desc">展开当前项会自动关闭其他项</text>
+						</view>
+						<template v-slot:right>
+							<view class="action-btn btn-danger" @click="handleAction('删除商品3')">
+								<text class="btn-text">删除</text>
+							</view>
+						</template>
+					</ste-swipe-action>
+				</ste-swipe-action-group>
+			</view>
+			<view class="control-btn-row">
+				<ste-button @click="openGroupItem(0)">展开第1项</ste-button>
+				<ste-button style="margin-left: 16rpx;" @click="openGroupItem(1)">展开第2项</ste-button>
+				<ste-button style="margin-left: 16rpx;" @click="closeAllGroup">关闭全部</ste-button>
+			</view>
+		</view>
+
+		<!-- 底部留白 -->
+		<view class="footer-space"></view>
+	</scroll-view>
+</template>
+
+<script setup lang="uts">
+	/**
+	 * @file swipe-action.uvue
+	 * @description SwipeAction 滑动单元格全场景交互式演示 Demo
+	 */
+	import { ref } from 'vue'
+
+	const swipeRef = ref<SteSwipeActionComponentPublicInstance | null>(null)
+	const groupRef = ref<SteSwipeActionGroupComponentPublicInstance | null>(null)
+
+	function onOpen(direction: string) {
+		uni.showToast({
+			title: '已打开：' + direction,
+			icon: 'none',
+		})
+	}
+
+	function onClose() {
+		uni.showToast({
+			title: '已关闭',
+			icon: 'none',
+		})
+	}
+
+	function onGroupOpen(direction: string, index: number) {
+		uni.showToast({
+			title: '组内打开第 ' + (index + 1).toString() + ' 项：' + direction,
+			icon: 'none',
+		})
+	}
+
+	function onGroupClose(index: number) {
+		uni.showToast({
+			title: '组内关闭第 ' + (index + 1).toString() + ' 项',
+			icon: 'none',
+		})
+	}
+
+	function handleAction(name: string) {
+		uni.showToast({
+			title: '执行操作：' + name,
+			icon: 'none',
+		})
+	}
+
+	function openSingle(direction: string) {
+		swipeRef.value?.open(direction)
+	}
+
+	function closeSingle() {
+		swipeRef.value?.close()
+	}
+
+	function openGroupItem(index: number) {
+		groupRef.value?.open('right', index)
+	}
+
+	function closeAllGroup() {
+		groupRef.value?.closeAll()
+	}
+</script>
+
+<style>
+.page {
+	padding: 24rpx;
+	background-color: #f7f8fa;
+	flex: 1;
+}
+
+.header {
+	margin-bottom: 30rpx;
+}
+
+.title {
+	font-size: 38rpx;
+	font-weight: bold;
+	color: #1f2329;
+}
+
+.desc {
+	font-size: 26rpx;
+	color: #8f959e;
+	margin-top: 10rpx;
+	line-height: 1.5;
+}
+
+.section {
+	margin-bottom: 36rpx;
+}
+
+.section-title {
+	font-size: 30rpx;
+	font-weight: bold;
+	color: #1f2329;
+	margin-bottom: 16rpx;
+}
+
+.demo-card {
+	background-color: #ffffff;
+	border-radius: 16rpx;
+	overflow: hidden;
+	box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.03);
+}
+
+.no-padding {
+	padding: 0;
+}
+
+.cell-content {
+	padding: 28rpx 32rpx;
+	background-color: #ffffff;
+	display: flex;
+	flex-direction: column;
+}
+
+.border-bottom {
+	border-bottom: 1px solid #f2f3f5;
+}
+
+.cell-title {
+	font-size: 30rpx;
+	font-weight: 500;
+	color: #1f2329;
+}
+
+.cell-desc {
+	font-size: 24rpx;
+	color: #8f959e;
+	margin-top: 8rpx;
+}
+
+.action-btn {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+	width: 140rpx;
+	height: 100%;
+}
+
+.btn-primary {
+	background-color: #0090ff;
+}
+
+.btn-warning {
+	background-color: #ff9900;
+}
+
+.btn-danger {
+	background-color: #fa5151;
+}
+
+.btn-text {
+	color: #ffffff;
+	font-size: 28rpx;
+	font-weight: 500;
+}
+
+.control-btn-row {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: flex-start;
+	padding: 20rpx 24rpx;
+}
+
+.footer-space {
+	height: 80rpx;
+}
+</style>

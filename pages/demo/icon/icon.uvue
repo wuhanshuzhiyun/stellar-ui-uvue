@@ -1,0 +1,258 @@
+<template>
+	<scroll-view direction="vertical" class="page">
+		<view class="description">
+			<text class="cmp-name">Icon 图标</text>
+			<text class="cmp-desc">基于字体的图标集，包含了大多数常见场景的图标。</text>
+		</view>
+
+		<!-- 用法示例 -->
+		<view class="tab-content">
+			<view class="demo-item">
+				<text class="demo-title">基础用法</text>
+				<view class="item-block">
+					<ste-icon code="&#xe689;" size="60"></ste-icon>
+				</view>
+			</view>
+
+			<view class="demo-item">
+				<text class="demo-title">图标颜色</text>
+				<view class="item-block">
+					<ste-icon code="&#xe684;" color="#1989fa" size="60" marginRight="30"></ste-icon>
+					<ste-icon code="&#xe684;" color="#ee0a24" size="60"></ste-icon>
+				</view>
+			</view>
+
+			<view class="demo-item">
+				<text class="demo-title">图标大小</text>
+				<view class="item-block">
+					<ste-icon code="&#xe671;" marginRight="30"></ste-icon>
+					<ste-icon code="&#xe671;" marginRight="30" size="50"></ste-icon>
+					<ste-icon code="&#xe671;" marginRight="30" size="70"></ste-icon>
+				</view>
+			</view>
+
+			<view class="demo-item">
+				<text class="demo-title">图标是否加粗</text>
+				<view class="item-block">
+					<ste-icon code="&#xe673;" marginRight="30"></ste-icon>
+					<ste-icon code="&#xe673;" bold></ste-icon>
+				</view>
+			</view>
+
+			<view class="demo-item">
+				<text class="demo-title">图标边框</text>
+				<view class="item-block">
+					<ste-icon code="&#xe689;" size="60" showBorder marginRight="30"></ste-icon>
+					<ste-icon code="&#xe684;" size="60" showBorder></ste-icon>
+				</view>
+			</view>
+		</view>
+	</scroll-view>
+</template>
+
+<script setup lang="uts">
+	import { ref } from 'vue'
+
+	defineOptions({ name: 'demo-icon' })
+
+	type Glyph = {
+		font_class : string,
+		font_family : string,
+		font_size : number,
+		font_weight : string,
+		name : string,
+		unicode : string,
+		unicode_decimal : number
+	}
+
+	const tabIndex = ref(0)
+	const isShowUnicode = ref(false)
+	const glyphs = ref<Glyph[]>([])
+	const iconUrl = 'https://at.alicdn.com/t/c/font_4457057_yv7ztjy747.json?spm=a313x.manage_type_myprojects.i1.13.539c3a81Bn8IBV&file=font_4457057_yv7ztjy747.json'
+
+	function safeStr(g : UTSJSONObject, key : string) : string {
+		const v = g[key]
+		if (v == null) return ''
+		return v as string
+	}
+
+	function safeNum(g : UTSJSONObject, key : string) : number {
+		const v = g[key]
+		if (v == null) return 0
+		return v as number
+	}
+
+	const fetchGlyphs = () => {
+		uni.request({
+			url: iconUrl,
+			success: (res) => {
+				const data = res.data
+				if (data == null) return
+				const obj = data as UTSJSONObject
+				const list = obj['glyphs']
+				if (list == null) return
+				const arr = list as Array<UTSJSONObject>
+				const result : Glyph[] = []
+				for (let i = 0; i < arr.length; i++) {
+					const g = arr[i]
+					const unicodeVal = safeStr(g, 'unicode')
+					result.push({
+						font_class: safeStr(g, 'font_class'),
+						font_family: safeStr(g, 'font_family'),
+						font_size: safeNum(g, 'font_size'),
+						font_weight: safeStr(g, 'font_weight'),
+						name: safeStr(g, 'name'),
+						unicode: '&#x' + unicodeVal + ';',
+						unicode_decimal: safeNum(g, 'unicode_decimal')
+					})
+				}
+				glyphs.value = result
+			},
+			fail: (err) => {
+				console.error('请求图标数据失败:', err)
+			}
+		})
+	}
+
+	const onTabClick = (index : number) => {
+		tabIndex.value = index
+		if (index == 1 && glyphs.value.length == 0) {
+			fetchGlyphs()
+		}
+	}
+
+	const copy = (data : string) => {
+		uni.setClipboardData({
+			data: data,
+			showToast: false,
+			success: () => {
+				uni.showToast({
+					icon: 'none',
+					title: 'code：' + data + ' 已复制到剪切板',
+				})
+			},
+		})
+	}
+</script>
+
+<style>
+	.page {
+		padding: 20rpx;
+		background-color: #f5f5f5;
+		flex: 1;
+	}
+
+	.description {
+		margin-bottom: 20rpx;
+	}
+
+	.cmp-name {
+		font-size: 36rpx;
+		font-weight: bold;
+		color: #333333;
+	}
+
+	.cmp-desc {
+		font-size: 26rpx;
+		color: #8f9ca2;
+		margin-top: 8rpx;
+	}
+
+	.tabs {
+		flex-direction: row;
+		justify-content: center;
+		align-items: center;
+		height: 80rpx;
+		border-bottom-width: 1px;
+		border-bottom-color: #eeeeee;
+		border-bottom-style: solid;
+		margin-bottom: 20rpx;
+	}
+
+	.tab-title {
+		flex: 1;
+		align-items: center;
+		justify-content: center;
+		height: 80rpx;
+	}
+
+	.tab-text {
+		font-size: 30rpx;
+		color: #666666;
+	}
+
+	.tab-text-active {
+		font-weight: bold;
+		color: #333333;
+	}
+
+	.tab-content {
+		flex: 1;
+	}
+
+	.demo-item {
+		margin-bottom: 30rpx;
+		background-color: #ffffff;
+		border-radius: 16rpx;
+		padding: 24rpx;
+	}
+
+	.demo-title {
+		font-size: 26rpx;
+		color: #8f9ca2;
+		margin-bottom: 20rpx;
+	}
+
+	.item-block {
+		flex-direction: row;
+		flex-wrap: wrap;
+		justify-content: flex-start;
+		align-items: center;
+	}
+
+	.icon-condition {
+		width: 100%;
+		flex-direction: row;
+		align-items: center;
+		margin-bottom: 20rpx;
+	}
+
+	.icon-condition-text {
+		font-size: 26rpx;
+		color: #6699ff;
+		margin-left: 10rpx;
+		flex: 1;
+	}
+
+	.icon-item {
+		width: 25%;
+		align-items: center;
+		margin-bottom: 30rpx;
+	}
+
+	.icon-content {
+		justify-content: center;
+		align-items: center;
+		padding-bottom: 20rpx;
+	}
+
+	.icon-name {
+		font-size: 26rpx;
+		color: #333333;
+		text-align: center;
+	}
+
+	.icon-unicode {
+		font-size: 24rpx;
+		text-align: center;
+		color: #f07c82;
+		margin-top: 4rpx;
+	}
+
+	.icon-class {
+		font-size: 24rpx;
+		text-align: center;
+		color: #999999;
+		margin-top: 4rpx;
+	}
+</style>

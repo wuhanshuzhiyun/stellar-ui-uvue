@@ -1,0 +1,80 @@
+{
+    "name": "ste-area-chart",
+    "description": "AreaChart 面积图组件，在折线图基础上向下延伸填充半透明渐变区域，强化量级累计与趋势对比。支持平滑曲线填充、入场补间动画与触控十字吸附准星。(UTS/UVUE)。",
+    "example": "<ste-area-chart :categories=\"categories\" :series=\"series\" height=\"420\"></ste-area-chart>",
+    "tutorial": "https://stellar-ui.intecloud.com.cn/?projectName=stellar-ui-uvue&menu=%E7%BB%84%E4%BB%B6&active=ste-area-chart",
+    "attributes": [
+        {
+            "name": "width",
+            "description": "图表宽度，支持数字或带单位字符串（如 750、'100%'、'400rpx'）。默认 750 会自动适配为当前设备屏幕宽度，纯数字默认按 rpx 比例转换",
+            "type": "number | string",
+            "default": "750"
+        },
+        {
+            "name": "height",
+            "description": "图表高度，支持数字（rpx）或带单位字符串。纯数字默认解析为 rpx",
+            "type": "number | string",
+            "default": "400"
+        },
+        {
+            "name": "categories",
+            "description": "X轴分类维度标签数组。为 string[] 字符串数组",
+            "type": "array",
+            "default": []
+        },
+        {
+            "name": "series",
+            "description": "图表数据序列列表，类型为强类型 UTSJSONObject[] / ChartSeriesItem[]（每项支持 name、data: number[]、color、legendShape、show 等）",
+            "type": "array",
+            "default": []
+        },
+        {
+            "name": "color",
+            "description": "主题调色板颜色数组，16进制或RGB颜色格式",
+            "type": "array",
+            "default": ["#165DFF", "#14C9C9", "#F7BA1E", "#3491FA", "#722ED1", "#9FDB1D"]
+        },
+        {
+            "name": "animation",
+            "description": "是否开启入场过渡补间动画。由轻量高帧率 easeOutQuad 补间动画引擎驱动面积区间展开",
+            "type": "boolean",
+            "default": true
+        },
+        {
+            "name": "duration",
+            "description": "动画过渡持续时长（单位：毫秒）。类型为 number，默认 600ms",
+            "type": "number",
+            "default": 600
+        },
+        {
+            "name": "dataLabel",
+            "description": "是否显示数据拐点上方的数据数值标注",
+            "type": "boolean",
+            "default": true
+        },
+        {
+            "name": "showLegend",
+            "description": "是否显示底部图例。内置通用图例自动排版换行与点击置灰切换",
+            "type": "boolean",
+            "default": true
+        },
+        {
+            "name": "canvas2d",
+            "description": "canvas2d 模式。基于 W3C 标准 Canvas 2D 原生上下文与硬件加速渲染，无需单独配置",
+            "type": "boolean",
+            "default": true
+        },
+        {
+            "name": "pixelRatio",
+            "description": "设备像素比。引擎内置通过 uni.getWindowInfo().pixelRatio 自适应高分屏缩放抗锯齿，无需手动传入",
+            "type": "number",
+            "default": 1
+        },
+        {
+            "name": "extra",
+            "description": "扩展配置项。支持 extra.area: { type: 'curve' | 'straight', width?: number, opacity?: number } 配置渐变透明度与曲线",
+            "type": "object",
+            "default": {}
+        }
+    ]
+}

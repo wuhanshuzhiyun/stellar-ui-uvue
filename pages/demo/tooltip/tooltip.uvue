@@ -1,0 +1,312 @@
+<template>
+	<view class="page-root">
+		<scroll-view scroll-y="true" class="page-container">
+			<!-- 头部导航与功能简介 -->
+			<view class="page-header">
+				<text class="page-title">Tooltip 文字提示</text>
+				<text class="page-desc">在目标元素旁弹出气泡文字提示，支持智能防溢出定位、自适应折行与小三角指示箭头。</text>
+			</view>
+
+			<view class="demo-content">
+				<!-- 全局行为设置 -->
+				<view class="demo-card">
+					<text class="card-title">气泡行为设置</text>
+					<text class="card-desc">开启 maskClose：点击气泡外空白处即可关闭，但遮罩会盖住整页，页面按钮点不到、也不能滚动。关闭后页面可正常点击与滚动，此时只能用 hideTooltip() 关闭，正好用来验证用例 4 的 Ref 调用。</text>
+					<view class="setting-row">
+						<text class="setting-label">点击空白处关闭（maskClose）</text>
+						<ste-switch v-model="maskCloseEnabled" />
+					</view>
+				</view>
+
+				<!-- 用例 1：基础用法 -->
+				<view class="demo-card">
+					<text class="card-title">1. 基础用法</text>
+					<text class="card-desc">点击目标元素，在上方弹出文字提示，箭头自动指向目标元素中心。</text>
+					<text class="card-desc">提示：同一时间只显示一个气泡。上方【点击空白处关闭】开启时，气泡外会铺一层透明遮罩，点任意空白处即可关闭（遮罩期间页面不可滚动、按钮也点不到）；关闭该开关后，点其他按钮会直接切换目标，只能用 hideTooltip() 关闭。</text>
+					<view class="btn-row">
+						<view class="btn-wrap target-btn-basic">
+							<ste-button @click="handleBasicTooltip">点击弹出提示</ste-button>
+						</view>
+					</view>
+				</view>
+
+				<!-- 用例 2：弹出方位（Placement） -->
+				<view class="demo-card">
+					<text class="card-title">2. 弹出方位 (Placement)</text>
+					<text class="card-desc">支持顶部（top）与底部（bottom）两个方向，小三角将反向贴靠指向。</text>
+					<text class="card-desc">两个按钮请分开验证：气泡显示期间先点空白处关闭，再点另一个按钮对比方位。</text>
+					<view class="btn-row">
+						<view class="btn-wrap target-btn-top">
+							<ste-button @click="handleTopTooltip">上方提示 (top)</ste-button>
+						</view>
+						<view class="btn-wrap target-btn-bottom">
+							<ste-button @click="handleBottomTooltip">下方提示 (bottom)</ste-button>
+						</view>
+					</view>
+				</view>
+
+				<!-- 用例 3：长文本自适应与最大宽度 -->
+				<view class="demo-card">
+					<text class="card-title">3. 长文本与最大宽度</text>
+					<text class="card-desc">长文本自动多行换行排列，支持通过 maxWidth 自定义气泡宽度上限。</text>
+					<view class="btn-row">
+						<view class="btn-wrap target-btn-long">
+							<ste-button @click="handleLongTextTooltip">长文本气泡说明</ste-button>
+						</view>
+					</view>
+				</view>
+
+				<!-- 用例 4：Ref 调用 -->
+				<view class="demo-card">
+					<text class="card-title">4. Ref 实例调用 showTooltip / hideTooltip</text>
+					<text class="card-desc">通过组件 Ref 实例直接调用方法。maskClose 开启时遮罩会挡住整页，页面上没有可点的关闭按钮，所以打开 2 秒后由定时器调用 tooltipRef.value.hideTooltip() 关闭，验证的仍是 Ref 暴露的 hideTooltip 路径。</text>
+					<view class="btn-row">
+						<view class="btn-wrap target-btn-ref">
+							<ste-button @click="handleRefTooltip">Ref 方式打开（2 秒后自动关）</ste-button>
+						</view>
+					</view>
+				</view>
+
+				<!-- 操作反馈日志 -->
+				<view class="demo-card">
+					<text class="card-title">操作状态反馈</text>
+					<view class="log-box">
+						<text class="log-text">{{ logText }}</text>
+					</view>
+				</view>
+			</view>
+		</scroll-view>
+		<!-- 页面全局 ste-tooltip 挂载节点：放在 scroll-view 之外，fixed 浮层才能相对视口定位 -->
+		<ste-tooltip ref="tooltipRef" :mask-close="maskCloseEnabled" />
+	</view>
+</template>
+
+<script setup lang="uts">
+	/**
+	 * @file tooltip.uvue
+	 * @description Tooltip 文字提示组件 - uni-app x / UTS 全功能演示页面
+	 */
+	import { ref, watch, getCurrentInstance, ComponentPublicInstance } from 'vue'
+	import { useTooltip } from '@/uni_modules/stellar-ui-uvue/components/ste-tooltip/use-tooltip.uts'
+	import { TooltipOptions } from '@/uni_modules/stellar-ui-uvue/components/ste-tooltip/constants.uts'
+
+	// 组合式调用函数初始化
+	const tooltip = useTooltip()
+
+	// 组件 Ref 引用实例定义（声明为 uni-app x 专属强类型）
+	const tooltipRef = ref<SteTooltipComponentPublicInstance | null>(null)
+
+	// 当前演示页面实例
+	const pageInstance = getCurrentInstance()?.proxy as ComponentPublicInstance | null
+
+	// 状态反馈日志
+	const logText = ref('等待操作中...')
+
+	// 气泡行为设置：是否启用「点击空白处关闭」
+	// 开启时遮罩会盖住整页，页面上的按钮点不到；关闭后页面可正常点击，才能验证 Ref 的 hideTooltip()
+	const maskCloseEnabled = ref(true)
+
+	// 每次「打开气泡」自增，用于让用例 4 的定时器判断期间有没有别的操作介入
+	let showSeq = 0
+	// 用例 4 的定时关闭句柄
+	let refAutoCloseTimer : number | null = null
+
+	/**
+	 * 标记一次新的展示动作
+	 * @returns 本次展示的序号
+	 */
+	function nextShowSeq() : number {
+		showSeq = showSeq + 1
+		return showSeq
+	}
+
+	// 切换设置时先收起当前气泡，避免显示的遮罩与当前开关状态不一致
+	watch(maskCloseEnabled, () => {
+		tooltip.hideTooltip()
+		logText.value = maskCloseEnabled.value
+			? '已开启「点击空白处关闭」，气泡显示期间页面按钮与滚动都会被遮罩临时屏蔽'
+			: '已关闭「点击空白处关闭」，页面可正常点击与滚动，可用下方 Ref 按钮手动关闭气泡'
+	})
+
+	// ==================== 1. 基础用法 ====================
+	function handleBasicTooltip() {
+		// 标记一次新的展示动作，让用例 4 的定时器知道期间有没有别的气泡被打开
+		nextShowSeq()
+		tooltip.showTooltip({
+			text: '这是一条基础文字气泡提示！',
+			selector: '.target-btn-basic',
+			instance: pageInstance,
+			placement: 'top',
+		} as TooltipOptions)
+		logText.value = '已触发【基础文字提示】，方位：上方'
+	}
+
+	// ==================== 2. 方位切换 ====================
+	function handleTopTooltip() {
+		// 标记一次新的展示动作，让用例 4 的定时器知道期间有没有别的气泡被打开
+		nextShowSeq()
+		tooltip.showTooltip({
+			text: '上方提示：箭头朝下指向按钮中心',
+			selector: '.target-btn-top',
+			instance: pageInstance,
+			placement: 'top',
+		} as TooltipOptions)
+		logText.value = '已触发【上方提示】，箭头在底部朝下'
+	}
+
+	function handleBottomTooltip() {
+		// 标记一次新的展示动作，让用例 4 的定时器知道期间有没有别的气泡被打开
+		nextShowSeq()
+		tooltip.showTooltip({
+			text: '下方提示：箭头朝上指向按钮中心',
+			selector: '.target-btn-bottom',
+			instance: pageInstance,
+			placement: 'bottom',
+		} as TooltipOptions)
+		logText.value = '已触发【下方提示】，箭头在顶部朝上'
+	}
+
+	// ==================== 3. 长文本换行 ====================
+	function handleLongTextTooltip() {
+		// 标记一次新的展示动作，让用例 4 的定时器知道期间有没有别的气泡被打开
+		nextShowSeq()
+		tooltip.showTooltip({
+			text: 'Tooltip 组件支持长文本自适应排列折行，当文字长度超过 maxWidth 限制时将自动换行排版。',
+			selector: '.target-btn-long',
+			instance: pageInstance,
+			placement: 'top',
+			maxWidth: '75vw',
+		} as TooltipOptions)
+		logText.value = '已触发【长文本排版提示】，maxWidth: 75vw'
+	}
+
+	// ==================== 4. Ref 调用 ====================
+	function handleRefTooltip() {
+		// 先作废旧定时器，避免连续点击时叠加多个关闭动作
+		if (refAutoCloseTimer != null) {
+			clearTimeout(refAutoCloseTimer!)
+			refAutoCloseTimer = null
+		}
+		const seq = nextShowSeq()
+
+		// Ref 实例路径：直接调用组件通过 defineExpose 暴露的 showTooltip
+		tooltipRef.value?.showTooltip({
+			text: '通过 steTooltipRef 实例直接唤起气泡，2 秒后同样通过 Ref 关闭！',
+			selector: '.target-btn-ref',
+			instance: pageInstance,
+			placement: 'bottom',
+		} as TooltipOptions)
+		logText.value = '已通过 Ref 实例调用 showTooltip()，2 秒后自动调用 Ref 上的 hideTooltip()'
+
+		// 遮罩挡住页面按钮，只能由定时器触发；但调用的仍是 tooltipRef 上的方法，
+		// 验证的正是 defineExpose 暴露的 hideTooltip 路径
+		refAutoCloseTimer = setTimeout(() => {
+			refAutoCloseTimer = null
+			// 期间若已打开别的气泡，本次计时作废，避免误关新气泡
+			if (seq != showSeq) return
+			tooltipRef.value?.hideTooltip()
+			logText.value = '已通过 Ref 实例调用 hideTooltip() 关闭气泡'
+		}, 2000)
+	}
+</script>
+
+<style scoped>
+	/* 页面根容器：必须给高度，否则内部 scroll-view 撑不满 */
+	.page-root {
+		flex: 1;
+		background-color: #f7f8fa;
+	}
+
+	/* 滚动容器 */
+	.page-container {
+		flex: 1;
+		background-color: #f7f8fa;
+	}
+
+	/* 顶部头部说明 */
+	.page-header {
+		padding: 40rpx 32rpx 24rpx;
+		background-color: #ffffff;
+		margin-bottom: 24rpx;
+	}
+
+	.page-title {
+		font-size: 40rpx;
+		font-weight: bold;
+		color: #1a1a1a;
+		margin-bottom: 12rpx;
+	}
+
+	.page-desc {
+		font-size: 26rpx;
+		color: #8c8c8c;
+		line-height: 38rpx;
+	}
+
+	/* 演示卡片列表区 */
+	.demo-content {
+		padding: 0 24rpx 48rpx;
+	}
+
+	.demo-card {
+		background-color: #ffffff;
+		border-radius: 16rpx;
+		padding: 32rpx;
+		margin-bottom: 24rpx;
+	}
+
+	.card-title {
+		font-size: 30rpx;
+		font-weight: 600;
+		color: #333333;
+		margin-bottom: 8rpx;
+	}
+
+	.card-desc {
+		font-size: 24rpx;
+		color: #999999;
+		line-height: 34rpx;
+		margin-bottom: 24rpx;
+	}
+
+	/* 行为设置行 */
+	.setting-row {
+		flex-direction: row;
+		align-items: center;
+		justify-content: space-between;
+		padding: 4rpx 0;
+	}
+
+	.setting-label {
+		font-size: 26rpx;
+		color: #333333;
+	}
+
+	/* 按钮行排列 */
+	.btn-row {
+		flex-direction: row;
+		flex-wrap: wrap;
+		align-items: center;
+	}
+
+	.btn-wrap {
+		margin-right: 20rpx;
+		margin-bottom: 16rpx;
+	}
+
+	/* 操作日志盒子 */
+	.log-box {
+		background-color: #f9f9f9;
+		border-radius: 8rpx;
+		padding: 20rpx;
+		border-left-width: 6rpx;
+		border-left-style: solid;
+		border-left-color: #0090ff;
+	}
+
+	.log-text {
+		font-size: 24rpx;
+		color: #555555;
+		line-height: 36rpx;
+	}
+</style>

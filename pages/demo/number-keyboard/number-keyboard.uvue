@@ -1,0 +1,280 @@
+<template>
+	<scroll-view direction="vertical" class="page">
+		<!-- 顶部标题 -->
+		<view class="header">
+			<text class="title">NumberKeyboard 数字键盘</text>
+			<text class="desc">用于移动端数字、验证码、金额等场景的虚拟键盘组件，支持弹出层与页面内嵌双模式。</text>
+		</view>
+
+		<!-- 1. 基础用法 -->
+		<view class="section">
+			<text class="section-title">1. 基础用法 (4列弹出式)</text>
+			<view class="demo-input-box" @click="show1 = true">
+				<text v-if="val1 != ''" class="demo-input-text">{{ val1 }}</text>
+				<text v-else class="placeholder">点击唤起基础数字键盘</text>
+			</view>
+			<ste-number-keyboard v-model="val1" v-model:show="show1" />
+		</view>
+
+		<!-- 2. 3列紧凑九宫格模式 -->
+		<view class="section">
+			<text class="section-title">2. 3列紧凑九宫格模式 (隐藏右侧功能键)</text>
+			<view class="demo-input-box" @click="show2 = true">
+				<text v-if="val2 != ''" class="demo-input-text">{{ val2 }}</text>
+				<text v-else class="placeholder">点击唤起 3 列紧凑键盘</text>
+			</view>
+			<ste-number-keyboard :rightKeys="false" v-model="val2" v-model:show="show2" />
+		</view>
+
+		<!-- 3. 自定义按键与最大长度限制 -->
+		<view class="section">
+			<text class="section-title">3. 自定义按键与最大长度 (最多6位)</text>
+			<view class="demo-input-box" @click="show3 = true">
+				<text v-if="val3 != ''" class="demo-input-text">{{ val3 }}</text>
+				<text v-else class="placeholder">支持小数点与双零 (最多6位)</text>
+			</view>
+			<ste-number-keyboard
+				:customKeys="['.', '00']"
+				:maxlength="6"
+				v-model="val3"
+				v-model:show="show3"
+			/>
+		</view>
+
+		<!-- 4. 身份证键盘 (带 X 按键) -->
+		<view class="section">
+			<text class="section-title">4. 身份证键盘 (包含 X 键)</text>
+			<view class="demo-input-box" @click="show4 = true">
+				<text v-if="val4 != ''" class="demo-input-text">{{ val4 }}</text>
+				<text v-else class="placeholder">身份证号输入 (最多18位)</text>
+			</view>
+			<ste-number-keyboard
+				:customKeys="['X']"
+				:maxlength="18"
+				v-model="val4"
+				v-model:show="show4"
+			/>
+		</view>
+
+		<!-- 5. 随机乱序键盘 -->
+		<view class="section">
+			<text class="section-title">5. 随机乱序键盘 (防窥安全键盘)</text>
+			<view class="demo-input-box" @click="show5 = true">
+				<text v-if="val5 != ''" class="demo-input-text">{{ val5 }}</text>
+				<text v-else class="placeholder">点击打开随机乱序排列键盘</text>
+			</view>
+			<ste-number-keyboard :randomKeys="true" v-model="val5" v-model:show="show5" />
+		</view>
+
+		<!-- 6. 自定义主题色与确定文字 -->
+		<view class="section">
+			<text class="section-title">6. 自定义主题色与完成按钮</text>
+			<view class="demo-input-box" @click="show6 = true">
+				<text v-if="val6 != ''" class="demo-input-text">{{ val6 }}</text>
+				<text v-else class="placeholder">绿色确认按钮与自定义文字</text>
+			</view>
+			<ste-number-keyboard
+				v-model="val6"
+				v-model:show="show6"
+				textColor="#1890ff"
+				confirmBg="#00c250"
+				confirmColor="#ffffff"
+				confirmText="支付"
+			/>
+		</view>
+
+		<!-- 7. 输入前拦截 (beforeinput) -->
+		<view class="section">
+			<text class="section-title">7. 输入前拦截 (@beforeinput)</text>
+			<view class="demo-input-box" @click="show7 = true">
+				<text v-if="val7 != ''" class="demo-input-text">{{ val7 }}</text>
+				<text v-else class="placeholder">拦截输入: 禁止输入数字 4</text>
+			</view>
+			<ste-number-keyboard
+				v-model="val7"
+				v-model:show="show7"
+				@beforeinput="onBeforeInput"
+			/>
+		</view>
+
+		<!-- 8. 页面内嵌模式 (mode="page") -->
+		<view class="section">
+			<text class="section-title">8. 页面内嵌模式 (嵌入文档流)</text>
+			<view class="demo-input-box">
+				<text v-if="val8 != ''" class="demo-input-text">{{ val8 }}</text>
+				<text v-else class="placeholder">直接在下方键盘输入</text>
+			</view>
+			<view class="embedded-keyboard-card">
+				<ste-number-keyboard
+					mode="page"
+					v-model="val8"
+					:customKeys="['.', '00']"
+				/>
+			</view>
+		</view>
+
+		<!-- 9. 多输入框切换联动 -->
+		<view class="section">
+			<text class="section-title">9. 多输入框焦点联动</text>
+			<view
+				class="demo-input-box"
+				:class="{ 'input-active': activeRef === 'amount' }"
+				@click="activeRef = 'amount'"
+			>
+				<text class="input-label">充值金额：</text>
+				<text class="demo-input-text">{{ inputValues['amount'] }}</text>
+			</view>
+			<view
+				class="demo-input-box"
+				style="margin-top: 16rpx;"
+				:class="{ 'input-active': activeRef === 'code' }"
+				@click="activeRef = 'code'"
+			>
+				<text class="input-label">安全口令：</text>
+				<text class="demo-input-text">{{ inputValues['code'] }}</text>
+			</view>
+
+			<view class="embedded-keyboard-card" style="margin-top: 16rpx;">
+				<ste-number-keyboard
+					mode="page"
+					:activeInputRef="activeRef"
+					v-model:inputValues="inputValues"
+				/>
+			</view>
+		</view>
+
+		<!-- 底部占位 -->
+		<view class="footer-space"></view>
+	</scroll-view>
+</template>
+
+<script setup lang="uts">
+	/**
+	 * @file number-keyboard.uvue
+	 * @description NumberKeyboard 数字键盘全场景交互式演示 Demo
+	 */
+	import { ref } from 'vue'
+
+	// ==================== 单输入框演示状态 ====================
+	const val1 = ref('')
+	const show1 = ref(false)
+
+	const val2 = ref('')
+	const show2 = ref(false)
+
+	const val3 = ref('')
+	const show3 = ref(false)
+
+	const val4 = ref('')
+	const show4 = ref(false)
+
+	const val5 = ref('')
+	const show5 = ref(false)
+
+	const val6 = ref('')
+	const show6 = ref(false)
+
+	const val7 = ref('')
+	const show7 = ref(false)
+
+	const val8 = ref('128.50')
+
+	// ==================== 多输入框联动演示状态 ====================
+	const activeRef = ref('amount')
+	const inputValues = ref<UTSJSONObject>({
+		amount: '688',
+		code: '520',
+	} as UTSJSONObject)
+
+	// ==================== 输入前拦截事件 ====================
+	function onBeforeInput(key: string, suspend: () => void, next: () => void, stop: () => void) {
+		if (key == '4') {
+			suspend()
+			stop()
+			uni.showToast({
+				title: '演示规则：禁止输入数字 4',
+				icon: 'none',
+			})
+		}
+	}
+</script>
+
+<style>
+.page {
+	padding: 24rpx;
+	background-color: #f7f8fa;
+	flex: 1;
+}
+
+.header {
+	margin-bottom: 30rpx;
+}
+
+.title {
+	font-size: 38rpx;
+	font-weight: bold;
+	color: #1f2329;
+}
+
+.desc {
+	font-size: 26rpx;
+	color: #8f959e;
+	margin-top: 10rpx;
+	line-height: 1.5;
+}
+
+.section {
+	margin-bottom: 36rpx;
+}
+
+.section-title {
+	font-size: 30rpx;
+	font-weight: bold;
+	color: #1f2329;
+	margin-bottom: 16rpx;
+}
+
+.demo-input-box {
+	height: 80rpx;
+	padding: 0 24rpx;
+	background-color: #ffffff;
+	border-radius: 12rpx;
+	border: 1px solid #e5e6eb;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	box-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.02);
+}
+
+.input-active {
+	border-color: #1890ff;
+	background-color: #f0f7ff;
+}
+
+.input-label {
+	font-size: 28rpx;
+	color: #8f959e;
+}
+
+.demo-input-text {
+	font-size: 32rpx;
+	font-weight: bold;
+	color: #1f2329;
+}
+
+.placeholder {
+	font-size: 28rpx;
+	color: #c9cdd4;
+}
+
+.embedded-keyboard-card {
+	margin-top: 16rpx;
+	border-radius: 16rpx;
+	overflow: hidden;
+	box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+}
+
+.footer-space {
+	height: 80rpx;
+}
+</style>

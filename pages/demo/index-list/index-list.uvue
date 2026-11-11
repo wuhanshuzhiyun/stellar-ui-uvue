@@ -1,0 +1,286 @@
+<template>
+	<!--
+		IndexList 索引列表演示页面
+		规范要求：顶级容器 scroll-view 必须设置 flex: 1 以保障页面手势滚动顺畅响应
+	-->
+	<scroll-view direction="vertical" class="page">
+		<!-- 页面顶部标题与功能简介 -->
+		<view class="header">
+			<text class="title">IndexList 索引列表</text>
+			<text class="desc">用于快速定位长列表内容（如城市列表、通讯录）。支持字母索引手势滑动、大字气泡指示与吸顶效果。</text>
+		</view>
+
+		<!-- 控制与状态卡片 -->
+		<view class="control-card">
+			<view class="control-row">
+				<text class="control-label">分组吸顶 (sticky)：</text>
+				<button class="control-btn" size="mini" @click="toggleSticky">
+					{{ stickyEnabled ? '已开启' : '已关闭' }}
+				</button>
+			</view>
+			<view class="control-row">
+				<text class="control-label">高亮主题色：</text>
+				<view class="color-options">
+					<view
+						class="color-dot"
+						:style="{ backgroundColor: '#1890ff', borderColor: currentActiveColor == '#1890ff' ? '#333333' : 'transparent' }"
+						@click="changeColor('#1890ff')"
+					></view>
+					<view
+						class="color-dot"
+						:style="{ backgroundColor: '#00c250', borderColor: currentActiveColor == '#00c250' ? '#333333' : 'transparent' }"
+						@click="changeColor('#00c250')"
+					></view>
+					<view
+						class="color-dot"
+						:style="{ backgroundColor: '#e02020', borderColor: currentActiveColor == '#e02020' ? '#333333' : 'transparent' }"
+						@click="changeColor('#e02020')"
+					></view>
+				</view>
+			</view>
+			<text class="status-tip">
+				当前高亮索引下标: {{ currentIndex }} | 上次选择: {{ selectedItemText != '' ? selectedItemText : '暂无' }}
+			</text>
+		</view>
+
+		<!-- 索引列表组件容器区（高度固定以展示内部独立滚动与吸顶效果） -->
+		<view class="list-wrapper">
+			<ste-index-list
+				:active="currentIndex"
+				:sticky="stickyEnabled"
+				:activeColor="currentActiveColor"
+				height="100%"
+				@change="onIndexChange"
+				@clickItem="onItemClick"
+			>
+				<ste-index-item
+					v-for="group in cityGroups"
+					:key="group.title"
+					:title="group.title"
+					:list="group.cities"
+				></ste-index-item>
+			</ste-index-list>
+		</view>
+	</scroll-view>
+</template>
+
+<script setup lang="uts">
+	import { ref } from 'vue'
+
+	/** 城市分组数据结构模型 */
+	type CityGroup = {
+		title : string
+		cities : Array<string>
+	}
+
+	/** 当前激活的索引下标 */
+	const currentIndex = ref(0)
+
+	/** 是否开启分组标题吸顶 */
+	const stickyEnabled = ref(true)
+
+	/** 当前高亮主题色 */
+	const currentActiveColor = ref('#1890ff')
+
+	/** 最近点击选择的条目内容 */
+	const selectedItemText = ref('')
+
+	/** 常用城市索引演示数据源 */
+	const cityGroups : Array<CityGroup> = [
+		{
+			title: 'A',
+			cities: ['鞍山', '安阳', '安庆', '安顺', '阿勒泰']
+		},
+		{
+			title: 'B',
+			cities: ['北京', '保定', '包头', '蚌埠', '本溪', '滨州', '宝鸡']
+		},
+		{
+			title: 'C',
+			cities: ['成都', '重庆', '长沙', '长春', '常州', '沧州', '承德']
+		},
+		{
+			title: 'D',
+			cities: ['大连', '东莞', '大庆', '丹东', '德阳', '大同', '达州']
+		},
+		{
+			title: 'E',
+			cities: ['鄂尔多斯', '恩施', '鄂州']
+		},
+		{
+			title: 'F',
+			cities: ['福州', '佛山', '抚顺', '阜阳', '防城港']
+		},
+		{
+			title: 'G',
+			cities: ['广州', '贵阳', '桂林', '赣州', '广元', '广安']
+		},
+		{
+			title: 'H',
+			cities: ['杭州', '合肥', '哈尔滨', '海口', '呼和浩特', '邯郸', '惠州', '湖州']
+		},
+		{
+			title: 'J',
+			cities: ['济南', '嘉兴', '荆州', '金华', '江门', '焦作', '九江', '吉林']
+		},
+		{
+			title: 'K',
+			cities: ['昆明', '开封', '克拉玛依', '喀什']
+		},
+		{
+			title: 'L',
+			cities: ['兰州', '洛阳', '连云港', '廊坊', '临沂', '柳州', '聊城', '丽江']
+		},
+		{
+			title: 'N',
+			cities: ['南京', '宁波', '南昌', '南宁', '南通', '南阳']
+		},
+		{
+			title: 'Q',
+			cities: ['青岛', '泉州', '秦皇岛', '齐齐哈尔', '清远']
+		},
+		{
+			title: 'S',
+			cities: ['上海', '深圳', '沈阳', '石家庄', '苏州', '三亚', '绍兴', '汕头']
+		},
+		{
+			title: 'T',
+			cities: ['天津', '太原', '唐山', '泰安', '台州', '泰州']
+		},
+		{
+			title: 'W',
+			cities: ['武汉', '无锡', '温州', '乌鲁木齐', '潍坊', '威海', '芜湖']
+		},
+		{
+			title: 'X',
+			cities: ['西安', '厦门', '西宁', '徐州', '襄阳', '新乡', '邢台']
+		},
+		{
+			title: 'Y',
+			cities: ['银川', '烟台', '扬州', '盐城', '宜昌', '岳阳', '延安']
+		},
+		{
+			title: 'Z',
+			cities: ['郑州', '珠海', '淄博', '中山', '湛江', '肇庆', '遵义', '张家界']
+		}
+	]
+
+	/**
+	 * 切换吸顶状态
+	 */
+	function toggleSticky() {
+		stickyEnabled.value = !stickyEnabled.value
+	}
+
+	/**
+	 * 切换主题颜色
+	 * @param color 颜色值
+	 */
+	function changeColor(color : string) {
+		currentActiveColor.value = color
+	}
+
+	/**
+	 * 索引切换回调
+	 * @param index 切换到的目标下标
+	 */
+	function onIndexChange(index : number) {
+		currentIndex.value = index
+	}
+
+	/**
+	 * 列表项点击事件
+	 * @param title 分组标题
+	 * @param text 点击的城市文本
+	 */
+	function onItemClick(title : string, text : string) {
+		selectedItemText.value = `${title} - ${text}`
+		uni.showToast({
+			title: `选中城市: ${text}`,
+			icon: 'none'
+		})
+	}
+</script>
+
+<style>
+	/* 顶级容器样式规范：必须显式声明 flex: 1 确保全屏手势滚动生效 */
+	.page {
+		flex: 1;
+		padding: 24rpx;
+		background-color: #f7f8fa;
+	}
+
+	.header {
+		margin-bottom: 24rpx;
+	}
+
+	.title {
+		font-size: 38rpx;
+		font-weight: bold;
+		color: #1f2329;
+		margin-bottom: 8rpx;
+	}
+
+	.desc {
+		font-size: 24rpx;
+		color: #8f959e;
+		line-height: 36rpx;
+	}
+
+	.control-card {
+		background-color: #ffffff;
+		border-radius: 16rpx;
+		padding: 20rpx 24rpx;
+		margin-bottom: 24rpx;
+		box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+	}
+
+	.control-row {
+		flex-direction: row;
+		align-items: center;
+		margin-bottom: 12rpx;
+	}
+
+	.control-label {
+		font-size: 26rpx;
+		color: #333333;
+		margin-right: 16rpx;
+	}
+
+	.control-btn {
+		font-size: 22rpx;
+		height: 52rpx;
+		line-height: 52rpx;
+		margin: 0;
+	}
+
+	.color-options {
+		flex-direction: row;
+		align-items: center;
+	}
+
+	.color-dot {
+		width: 36rpx;
+		height: 36rpx;
+		border-radius: 18rpx;
+		margin-right: 16rpx;
+		border-width: 4rpx;
+		border-style: solid;
+	}
+
+	.status-tip {
+		font-size: 22rpx;
+		color: #999999;
+		margin-top: 8rpx;
+	}
+
+	/* 索引列表展示容器（固定高度以展示容器内局部滚动与顶部吸顶） */
+	.list-wrapper {
+		width: 100%;
+		height: 1000rpx;
+		border-radius: 16rpx;
+		overflow: hidden;
+		background-color: #ffffff;
+		box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
+	}
+</style>

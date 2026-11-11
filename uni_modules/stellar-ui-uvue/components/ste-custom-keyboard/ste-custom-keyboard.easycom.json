@@ -1,0 +1,205 @@
+{
+	"name": "ste-custom-keyboard",
+	"description": "CustomKeyboard 定制键盘组件，支持数字键盘、身份证键盘与折扣键盘三大业务场景。已全面支持原生渲染。",
+	"example": "<ste-custom-keyboard v-model=\"value\" v-model:show=\"show\" type=\"discount\" :discounts=\"[70, 75, 80, 85, 90]\"></ste-custom-keyboard>",
+	"tutorial": "https://stellar-ui.intecloud.com.cn/?projectName=stellar-ui-uvue&menu=%E7%BB%84%E4%BB%B6&active=ste-custom-keyboard",
+	"attributes": [
+		{
+			"name": "mode",
+			"description": "键盘展示模式",
+			"type": "string",
+			"default": "popup",
+			"values": [
+				{
+					"name": "popup",
+					"description": "底部抽屉弹出式"
+				},
+				{
+					"name": "page",
+					"description": "页面文档流嵌入式"
+				}
+			]
+		},
+		{
+			"name": "type",
+			"description": "键盘业务类型。原生支持 number（数字）、idcard（身份证带X）与 discount（折扣胶囊）模式",
+			"type": "string",
+			"default": "number",
+			"values": [
+				{
+					"name": "number",
+					"description": "标准数字键盘"
+				},
+				{
+					"name": "idcard",
+					"description": "身份证键盘（自动携带 X 键）"
+				},
+				{
+					"name": "discount",
+					"description": "折扣键盘（顶部带折扣胶囊快捷栏）"
+				}
+			]
+		},
+		{
+			"name": "modelValue",
+			"description": "双向绑定的输入值，支持 v-model",
+			"type": "string",
+			"default": "''"
+		},
+		{
+			"name": "maxlength",
+			"description": "允许输入的最大字符长度",
+			"type": "number",
+			"default": "null"
+		},
+		{
+			"name": "show",
+			"description": "是否展示键盘弹窗，支持 v-model:show 双向绑定 (mode='popup' 时生效)",
+			"type": "boolean",
+			"default": false
+		},
+		{
+			"name": "discounts",
+			"description": "折扣预设数组（type='discount' 时生效），如 [70, 75, 80, 85, 90] 分别对应 7折、7.5折、8折等",
+			"type": "number[]",
+			"default": "[]"
+		},
+		{
+			"name": "rightKeys",
+			"description": "是否展示右侧操作列（确定、删除按键）",
+			"type": "boolean",
+			"default": true
+		},
+		{
+			"name": "customKeys",
+			"description": "自定义补充按键数组（如 ['.'] 或 ['00']）",
+			"type": "string[]",
+			"default": "[]"
+		},
+		{
+			"name": "randomKeys",
+			"description": "是否随机打乱数字按键布局（安全防窥键盘）",
+			"type": "boolean",
+			"default": false
+		},
+		{
+			"name": "confirmText",
+			"description": "右侧确认按钮文案",
+			"type": "string",
+			"default": "确定"
+		},
+		{
+			"name": "confirmDisabled",
+			"description": "是否禁用确认操作按钮",
+			"type": "boolean",
+			"default": false
+		},
+		{
+			"name": "showClear",
+			"description": "是否展示清空按键",
+			"type": "boolean",
+			"default": true
+		},
+		{
+			"name": "textColor",
+			"description": "按键文字颜色",
+			"type": "string",
+			"default": "#1f2329"
+		},
+		{
+			"name": "textSize",
+			"description": "按键文字字号大小",
+			"type": "number | string",
+			"default": 48
+		},
+		{
+			"name": "backspaceSize",
+			"description": "退格删除图标尺寸",
+			"type": "number | string",
+			"default": 48
+		},
+		{
+			"name": "confirmBg",
+			"description": "确认按钮背景色（折扣键盘下折扣胶囊默认同步应用该背景色）",
+			"type": "string",
+			"default": "''"
+		},
+		{
+			"name": "confirmColor",
+			"description": "确认按钮及折扣胶囊文字颜色",
+			"type": "string",
+			"default": "#ffffff"
+		},
+		{
+			"name": "keyBg",
+			"description": "按键背景颜色",
+			"type": "string",
+			"default": "#ffffff"
+		},
+		{
+			"name": "background",
+			"description": "键盘整体底层容器背景色",
+			"type": "string",
+			"default": "#f2f3f5"
+		},
+		{
+			"name": "activeInputRef",
+			"description": "多输入框联动场景下当前激活的输入框标识",
+			"type": "string",
+			"default": "''"
+		},
+		{
+			"name": "inputValues",
+			"description": "多输入框键值映射字典",
+			"type": "object",
+			"default": "{}"
+		}
+	],
+	"events": [
+		{
+			"name": "change",
+			"description": "输入值发生变更时触发",
+			"params": "value: string"
+		},
+		{
+			"name": "input",
+			"description": "键入字符时触发",
+			"params": "value: string"
+		},
+		{
+			"name": "confirm",
+			"description": "点击确认按钮时触发",
+			"params": "value: string"
+		},
+		{
+			"name": "clear",
+			"description": "点击清空按钮时触发"
+		},
+		{
+			"name": "backspace",
+			"description": "点击退格删除按钮时触发"
+		},
+		{
+			"name": "click",
+			"description": "点击任意按键或折扣胶囊时触发",
+			"params": "key: string"
+		},
+		{
+			"name": "click-discount",
+			"description": "点击折扣胶囊标签时触发",
+			"params": "text: string"
+		},
+		{
+			"name": "beforeinput",
+			"description": "按键输入前拦截触发，支持 suspend, next, stop 流程控制"
+		},
+		{
+			"name": "open",
+			"description": "弹窗打开时触发"
+		},
+		{
+			"name": "close",
+			"description": "弹窗关闭时触发"
+		}
+	]
+}

@@ -1,0 +1,296 @@
+<template>
+	<scroll-view direction="vertical" class="page">
+		<!-- 页面顶部说明 -->
+		<view class="header">
+			<text class="title">TouchSwipe 手势切屏</text>
+			<text class="desc">支持横向、纵向平滑手势滑动切换，原生阻尼弹性缓冲、灵敏度阈值自适应与受控绑定。</text>
+		</view>
+
+		<!-- 1. 基础水平切屏 -->
+		<view class="section">
+			<view class="section-header">
+				<text class="section-title">1. 基础水平切屏</text>
+				<text class="section-tag">当前索引: {{ index1 }}</text>
+			</view>
+			<view class="swipe-box">
+				<ste-touch-swipe v-model:index="index1" height="320rpx" @change="onChange1">
+					<ste-touch-swipe-item>
+						<view class="swipe-card card-blue">
+							<text class="card-num">01</text>
+							<text class="card-title">第一屏 · 探索灵感</text>
+							<text class="card-tip">👈 向左划动切换下一屏</text>
+						</view>
+					</ste-touch-swipe-item>
+					<ste-touch-swipe-item>
+						<view class="swipe-card card-purple">
+							<text class="card-num">02</text>
+							<text class="card-title">第二屏 · 原生体验</text>
+							<text class="card-tip">👉 左右划动自由切换</text>
+						</view>
+					</ste-touch-swipe-item>
+					<ste-touch-swipe-item>
+						<view class="swipe-card card-green">
+							<text class="card-num">03</text>
+							<text class="card-title">第三屏 · 极致丝滑</text>
+							<text class="card-tip">👉 向右划动返回上一屏</text>
+						</view>
+					</ste-touch-swipe-item>
+				</ste-touch-swipe>
+			</view>
+		</view>
+
+		<!-- 2. 垂直手势切屏 -->
+		<view class="section">
+			<view class="section-header">
+				<text class="section-title">2. 垂直切屏 (direction="vertical")</text>
+				<text class="section-tag">当前索引: {{ index2 }}</text>
+			</view>
+			<view class="swipe-box">
+				<ste-touch-swipe v-model:index="index2" direction="vertical" height="360rpx">
+					<ste-touch-swipe-item>
+						<view class="swipe-card card-orange">
+							<text class="card-num">TOP</text>
+							<text class="card-title">纵向首屏 · 晨曦</text>
+							<text class="card-tip">👆 向上划动查看下一篇</text>
+						</view>
+					</ste-touch-swipe-item>
+					<ste-touch-swipe-item>
+						<view class="swipe-card card-pink">
+							<text class="card-num">MID</text>
+							<text class="card-title">纵向中屏 · 暮色</text>
+							<text class="card-tip">👆 👇 上下划动自由浏览</text>
+						</view>
+					</ste-touch-swipe-item>
+					<ste-touch-swipe-item>
+						<view class="swipe-card card-cyan">
+							<text class="card-num">END</text>
+							<text class="card-title">纵向尾屏 · 星河</text>
+							<text class="card-tip">👇 向下划动返回上一篇</text>
+						</view>
+					</ste-touch-swipe-item>
+				</ste-touch-swipe>
+			</view>
+		</view>
+
+		<!-- 3. 禁用指定面板 -->
+		<view class="section">
+			<view class="section-header">
+				<text class="section-title">3. 禁用指定项 (第二项 disabled)</text>
+				<text class="section-tag">当前索引: {{ index3 }}</text>
+			</view>
+			<view class="swipe-box">
+				<ste-touch-swipe v-model:index="index3" height="320rpx">
+					<ste-touch-swipe-item>
+						<view class="swipe-card card-blue">
+							<text class="card-num">01</text>
+							<text class="card-title">正常面板</text>
+							<text class="card-tip">向左滑动将受到第二项禁用的弹性阻尼阻止</text>
+						</view>
+					</ste-touch-swipe-item>
+					<ste-touch-swipe-item :disabled="true">
+						<view class="swipe-card card-disabled">
+							<text class="card-num">🚫</text>
+							<text class="card-title">已禁用的面板</text>
+							<text class="card-tip">手势无法直接滑入此面板</text>
+						</view>
+					</ste-touch-swipe-item>
+					<ste-touch-swipe-item>
+						<view class="swipe-card card-green">
+							<text class="card-num">03</text>
+							<text class="card-title">第三屏正常面板</text>
+							<text class="card-tip">可以通过下方受控按钮直接跳转</text>
+						</view>
+					</ste-touch-swipe-item>
+				</ste-touch-swipe>
+			</view>
+		</view>
+
+		<!-- 4. 编程式受控与按钮联动 -->
+		<view class="section">
+			<view class="section-header">
+				<text class="section-title">4. 编程式受控与按钮联动</text>
+				<text class="section-tag">当前索引: {{ index4 }}</text>
+			</view>
+			<view class="swipe-box">
+				<ste-touch-swipe v-model:index="index4" height="300rpx">
+					<ste-touch-swipe-item>
+						<view class="swipe-card card-purple">
+							<text class="card-num">A</text>
+							<text class="card-title">视图板块 A</text>
+						</view>
+					</ste-touch-swipe-item>
+					<ste-touch-swipe-item>
+						<view class="swipe-card card-orange">
+							<text class="card-num">B</text>
+							<text class="card-title">视图板块 B</text>
+						</view>
+					</ste-touch-swipe-item>
+					<ste-touch-swipe-item>
+						<view class="swipe-card card-green">
+							<text class="card-num">C</text>
+							<text class="card-title">视图板块 C</text>
+						</view>
+					</ste-touch-swipe-item>
+				</ste-touch-swipe>
+			</view>
+			<!-- 操作按钮组 -->
+			<view class="btn-group">
+				<button class="action-btn" @click="setIndex4(0)">跳转到 A (0)</button>
+				<button class="action-btn" @click="setIndex4(1)">跳转到 B (1)</button>
+				<button class="action-btn" @click="setIndex4(2)">跳转到 C (2)</button>
+			</view>
+		</view>
+	</scroll-view>
+</template>
+
+<script setup lang="uts">
+/**
+ * TouchSwipe 组件演示用例
+ * 包含基础水平滑动、垂直切屏、禁用指定面板、受控联动等多维度展示。
+ */
+import { ref } from 'vue'
+
+const index1 = ref<number>(0)
+const index2 = ref<number>(0)
+const index3 = ref<number>(0)
+const index4 = ref<number>(0)
+
+function onChange1(index: number) {
+	console.log('水平切屏当前索引：', index)
+}
+
+function setIndex4(idx: number) {
+	index4.value = idx
+}
+</script>
+
+<style>
+.page {
+	padding: 24rpx;
+	background-color: #f8f9fc;
+	flex: 1;
+}
+
+.header {
+	margin-bottom: 30rpx;
+}
+
+.title {
+	font-size: 40rpx;
+	font-weight: bold;
+	color: #1a1b24;
+	margin-bottom: 12rpx;
+}
+
+.desc {
+	font-size: 26rpx;
+	color: #6a6f7d;
+	line-height: 1.5;
+}
+
+.section {
+	margin-bottom: 36rpx;
+	background-color: #ffffff;
+	border-radius: 20rpx;
+	padding: 24rpx;
+}
+
+.section-header {
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 20rpx;
+}
+
+.section-title {
+	font-size: 30rpx;
+	font-weight: 600;
+	color: #2b303b;
+}
+
+.section-tag {
+	font-size: 24rpx;
+	color: #007aff;
+	background-color: rgba(0, 122, 255, 0.08);
+	padding: 4rpx 16rpx;
+	border-radius: 20rpx;
+}
+
+.swipe-box {
+	border-radius: 16rpx;
+	overflow: hidden;
+}
+
+.swipe-card {
+	width: 100%;
+	height: 100%;
+	justify-content: center;
+	align-items: center;
+	padding: 30rpx;
+	box-sizing: border-box;
+}
+
+.card-num {
+	font-size: 48rpx;
+	font-weight: bold;
+	color: #ffffff;
+	margin-bottom: 8rpx;
+}
+
+.card-title {
+	font-size: 32rpx;
+	font-weight: 600;
+	color: #ffffff;
+	margin-bottom: 8rpx;
+}
+
+.card-tip {
+	font-size: 24rpx;
+	color: rgba(255, 255, 255, 0.8);
+}
+
+.card-blue {
+	background-color: #3b82f6;
+}
+
+.card-purple {
+	background-color: #8b5cf6;
+}
+
+.card-green {
+	background-color: #10b981;
+}
+
+.card-orange {
+	background-color: #f97316;
+}
+
+.card-pink {
+	background-color: #ec4899;
+}
+
+.card-cyan {
+	background-color: #06b6d4;
+}
+
+.card-disabled {
+	background-color: #94a3b8;
+}
+
+.btn-group {
+	flex-direction: row;
+	justify-content: space-between;
+	margin-top: 20rpx;
+}
+
+.action-btn {
+	flex: 1;
+	font-size: 24rpx;
+	margin: 0 8rpx;
+	background-color: #007aff;
+	color: #ffffff;
+	border-radius: 10rpx;
+	height: 64rpx;
+	line-height: 64rpx;
+}
+</style>
